@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سفارش از عطاری برگ سبز</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #fdfaf6;
+            --surface-color: #f5f1e9;
+            --primary-color: #4A6341;
+            --secondary-color: #D2691E;
+            --text-color: #3a3a3a;
+            --text-secondary-color: #7a7a7a;
+            --border-color: #e0dace;
+            --disabled-color: #cccccc;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23e0dace' fill-opacity='0.1'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20H6l5-20zm42 31a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM0 72h40v4H0v-4zm0-8h32v4H0v-4zm10-22h14v4H10v-4zm22-22h14v4H32v-4zM40 0h40v4H40V0zm0 8h32v4H40V8zm0 16h14v4H40v-4zm0 22h14v4H40v-4z'/%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px 20px 100px 20px;
+        }
+        .container { max-width: 500px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .profile { text-align: center; margin-bottom: 25px; }
+        .profile-pic { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary-color); object-fit: cover; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .profile-name { font-size: 1.8rem; font-weight: 700; margin: 0; color: var(--primary-color); }
+        .profile-bio { font-size: 1rem; color: var(--text-secondary-color); margin-top: 8px; line-height: 1.6; }
+
+        .search-wrapper { position: relative; margin-bottom: 25px; }
+        #search-box { width: 100%; padding: 15px 45px 15px 20px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 1rem; font-family: 'Vazirmatn', sans-serif; transition: border-color 0.3s, box-shadow 0.3s; }
+        #search-box:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(74, 99, 65, 0.1); outline: none; }
+        .search-wrapper .fa-search { position: absolute; top: 50%; right: 18px; transform: translateY(-50%); color: var(--text-secondary-color); }
+
+        .accordion .accordion-item .accordion-header { background-color: var(--surface-color); color: var(--text-color); cursor: pointer; padding: 18px 20px; width: 100%; text-align: right; border: 1px solid var(--border-color); outline: none; font-size: 1.05rem; font-weight: 500; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
+        .accordion .accordion-item .accordion-header:hover, .accordion .accordion-item .accordion-header.active { background-color: white; border-color: var(--primary-color); color: var(--primary-color); }
+        .accordion .accordion-item .accordion-header .icon::before { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; transition: transform 0.3s ease; font-size: 0.9rem; }
+        .accordion .accordion-item .accordion-header.active .icon::before { transform: rotate(180deg); }
+        .accordion-content { padding: 0 18px; background-color: white; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.3s ease; border: 1px solid transparent; border-top: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; margin-top: -12px; margin-bottom: 12px; }
+        
+        .product-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 10px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background-color 0.2s ease; }
+        .product-item:last-child { border-bottom: none; }
+        .product-item:hover { background-color: var(--surface-color); }
+        .product-item.out-of-stock { cursor: not-allowed; color: var(--disabled-color); }
+        .product-item.out-of-stock:hover { background-color: transparent; }
+        .product-item.hidden { display: none; }
+
+        .product-info { flex-grow: 1; margin-right: 15px; display: flex; flex-direction: column; }
+        .out-of-stock .product-info label { text-decoration: line-through; }
+        .out-of-stock-badge { font-size: 0.75rem; color: #d9534f; font-weight: 500; }
+        
+        .product-checkbox { appearance: none; -webkit-appearance: none; min-width: 24px; width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .product-checkbox:checked { background-color: var(--primary-color); border-color: var(--primary-color); }
+        .product-checkbox:checked::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 13px; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .product-checkbox:disabled { cursor: not-allowed; background-color: #f0f0f0; border-color: #e0e0e0; }
+
+        #cart-container { position: fixed; bottom: 0; left: 0; right: 0; padding: 15px; background: linear-gradient(to top, rgba(253, 250, 246, 1) 70%, rgba(253, 250, 246, 0)); z-index: 1000; display: flex; justify-content: center; transform: translateY(200%); transition: transform 0.4s ease-in-out; }
+        #cart-container.visible { transform: translateY(0); }
+        #send-to-whatsapp-btn { background-color: var(--primary-color); color: white; border: none; border-radius: 12px; padding: 15px 30px; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; transition: background-color 0.3s ease; }
+        #item-counter { background-color: var(--secondary-color); color: white; border-radius: 50%; width: 26px; height: 26px; display: flex; justify-content: center; align-items: center; font-size: 0.9rem; font-weight: bold; }
+        
+        .loader { text-align: center; padding: 40px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="profile">
+            <img src="https://via.placeholder.com/100/4A6341/FFFFFF?text=BG" alt="لوگو عطاری" class="profile-pic">
+            <h1 class="profile-name">عطاری برگ سبز</h1>
+            <p class="profile-bio">محصولات مورد نظر خود را انتخاب کرده و لیست سفارش را با یک کلیک در واتس‌اپ برای ما ارسال کنید.</p>
+        </header>
+
+        <div class="search-wrapper">
+            <input type="text" id="search-box" placeholder="جستجوی محصول...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <main id="product-accordion" class="accordion">
+             <div class="loader">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
+                <p style="margin-top: 10px; color: var(--text-secondary-color);">در حال بارگذاری محصولات...</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="cart-container">
+        <button id="send-to-whatsapp-btn">
+            <span>نهایی کردن سفارش</span>
+            <span id="item-counter">0</span>
+        </button>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sellerWhatsAppNumber = "989120000000"; // !! شماره واتس اپ خود را اینجا وارد کنید
+        const accordionContainer = document.getElementById('product-accordion');
+        const cartContainer = document.getElementById('cart-container');
+        const itemCounter = document.getElementById('item-counter');
+        const sendBtn = document.getElementById('send-to-whatsapp-btn');
+        const searchBox = document.getElementById('search-box');
+
+        let allProductsData = [];
+
+        // 1. Fetch and render products
+        async function loadProducts() {
+            try {
+                const response = await fetch('products.json?v=' + new Date().getTime()); // Cache-busting
+                if (!response.ok) {
+                    throw new Error('فایل محصولات یافت نشد. لطفا با فروشنده تماس بگیرید.');
+                }
+                allProductsData = await response.json();
+                renderProducts(allProductsData);
+                setupEventListeners();
+            } catch (error) {
+                accordionContainer.innerHTML = `<p style="text-align:center; color: red;">${error.message}</p>`;
+            }
+        }
+        
+        function renderProducts(categories) {
+            accordionContainer.innerHTML = '';
+            if (categories.length === 0) {
+                 accordionContainer.innerHTML = `<p style="text-align:center; color: var(--text-secondary-color);">هیچ محصولی یافت نشد.</p>`;
+                 return;
+            }
+            
+            categories.forEach(category => {
+                const item = document.createElement('div');
+                item.className = 'accordion-item';
+
+                const productsHTML = category.products.map(product => `
+                    <div class="product-item ${!product.inStock ? 'out-of-stock' : ''}" data-product-id="${product.id}">
+                        <div class="product-info">
+                            <label for="${product.id}">${product.name}</label>
+                            ${!product.inStock ? '<span class="out-of-stock-badge">ناموجود</span>' : ''}
+                        </div>
+                        <input type="checkbox" id="${product.id}" class="product-checkbox" 
+                               data-product-name="${product.name}" 
+                               ${!product.inStock ? 'disabled' : ''}>
+                    </div>
+                `).join('');
+
+                item.innerHTML = `
+                    <button class="accordion-header">
+                        <span><i class="fas ${category.icon} fa-fw"></i> ${category.categoryName}</span>
+                        <span class="icon"></span>
+                    </button>
+                    <div class="accordion-content">
+                        ${productsHTML}
+                    </div>
+                `;
+                accordionContainer.appendChild(item);
+            });
+        }
+
+        // 2. Setup all event listeners
+        function setupEventListeners() {
+            // Accordion logic
+            accordionContainer.addEventListener('click', e => {
+                if (e.target.closest('.accordion-header')) {
+                    const header = e.target.closest('.accordion-header');
+                    const content = header.nextElementSibling;
+                    const isActive = header.classList.contains("active");
+
+                    document.querySelectorAll('.accordion-header.active').forEach(activeHeader => {
+                        if (activeHeader !== header) {
+                            activeHeader.classList.remove('active');
+                            const otherContent = activeHeader.nextElementSibling;
+                            otherContent.style.maxHeight = 0;
+                            otherContent.style.padding = "0 18px";
+                        }
+                    });
+
+                    if (!isActive) {
+                        header.classList.add("active");
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        content.style.padding = "10px 18px";
+                    } else {
+                        header.classList.remove("active");
+                        content.style.maxHeight = 0;
+                        content.style.padding = "0 18px";
+                    }
+                }
+
+                // Click on product item to toggle checkbox
+                if (e.target.closest('.product-item')) {
+                    const item = e.target.closest('.product-item');
+                    if (item.classList.contains('out-of-stock')) return;
+                    
+                    const checkbox = item.querySelector('.product-checkbox');
+                    if (e.target.type !== 'checkbox') {
+                         checkbox.checked = !checkbox.checked;
+                    }
+                    updateCart();
+                }
+            });
+
+            // Cart logic
+            accordionContainer.addEventListener('change', e => {
+                 if (e.target.classList.contains('product-checkbox')) {
+                     updateCart();
+                 }
+            });
+            
+            // Search logic
+            searchBox.addEventListener('input', handleSearch);
+
+            // Send to WhatsApp
+            sendBtn.addEventListener('click', sendToWhatsApp);
+        }
+
+        // 3. Cart functionality
+        function updateCart() {
+            const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+            const count = checkedBoxes.length;
+            itemCounter.innerText = count;
+
+            if (count > 0) {
+                cartContainer.classList.add('visible');
+            } else {
+                cartContainer.classList.remove('visible');
+            }
+        }
+        
+        // 4. Send to WhatsApp functionality
+        function sendToWhatsApp() {
+            const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            let selectedProducts = [];
+            checkedBoxes.forEach(checkbox => {
+                selectedProducts.push(checkbox.getAttribute('data-product-name'));
+            });
+
+            const messageHeader = "سلام، وقت بخیر\nلیست سفارش من از عطاری برگ سبز:\n\n";
+            const productList = selectedProducts.map(p => `- ${p}`).join('\n');
+            const messageFooter = "\n\nلطفاً برای ادامه فرآیند راهنمایی کنید.";
+            const finalMessage = messageHeader + productList + messageFooter;
+            const encodedMessage = encodeURIComponent(finalMessage);
+            const whatsappUrl = `https://wa.me/${sellerWhatsAppNumber}?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // 5. Search functionality
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+
+            document.querySelectorAll('.accordion-item').forEach(categoryItem => {
+                let categoryHasVisibleProduct = false;
+                const products = categoryItem.querySelectorAll('.product-item');
+                
+                products.forEach(productItem => {
+                    const productName = productItem.querySelector('label').textContent.toLowerCase();
+                    const isMatch = productName.includes(searchTerm);
+                    productItem.classList.toggle('hidden', !isMatch);
+                    if (isMatch) {
+                        categoryHasVisibleProduct = true;
+                    }
+                });
+
+                // Hide or show the entire category based on search results
+                categoryItem.classList.toggle('hidden', !categoryHasVisibleProduct);
+                
+                // If searching, expand all matching categories
+                const header = categoryItem.querySelector('.accordion-header');
+                const content = categoryItem.querySelector('.accordion-content');
+                if (searchTerm.length > 0 && categoryHasVisibleProduct) {
+                    if (!header.classList.contains('active')) {
+                        header.classList.add('active');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        content.style.padding = '10px 18px';
+                    }
+                } else if (searchTerm.length === 0) {
+                    // Collapse all when search is cleared
+                    if (header.classList.contains('active')) {
+                         header.classList.remove('active');
+                         content.style.maxHeight = 0;
+                         content.style.padding = "0 18px";
+                    }
+                }
+            });
+        }
+
+
+        // Initial Load
+        loadProducts();
+    });
+    </script>
+</body>
+</html>
