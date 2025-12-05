@@ -3,204 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عطاری برگ سبز</title>
+    <title>فروشگاه سنجد</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            --primary-color: #28a745;
+            --primary-color: #28a745; /* سبز سنجد */
             --secondary-color: #f8f9fa;
             --text-color: #333;
-            --border-radius: 8px;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
             padding: 0 0 100px 0;
-            background-color: #f4f7f6;
+            background-color: #fdfdfd;
             color: var(--text-color);
         }
 
         .header {
-            background-color: white; padding: 20px; text-align: center;
-            border-bottom: 1px solid #eee; box-shadow: var(--shadow);
+            background-color: white; padding: 25px 20px; text-align: center;
+            border-bottom: 1px solid #eee; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             position: sticky; top: 0; z-index: 100;
         }
 
-        .header h1 { margin: 0; color: var(--primary-color); font-size: 2rem; font-weight: 700; }
-        .header p { margin: 5px 0 0; color: #666; }
+        .header h1 { margin: 0; color: var(--primary-color); font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; }
+        .header p { margin: 8px 0 0; color: #777; font-size: 0.95rem; }
         .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
         
-        /* --- START: استایل کادر جستجوی جدید --- */
-        .search-container {
-            position: relative;
-            margin-bottom: 25px;
-        }
+        /* --- استایل جستجو --- */
+        .search-container { position: relative; margin-bottom: 30px; margin-top: 10px; }
         #search-input {
-            width: 100%;
-            padding: 15px 50px 15px 20px; /* راست، بالا، پایین، چپ */
-            font-size: 1.1rem;
-            border-radius: var(--border-radius);
-            border: 1px solid #ddd;
-            box-sizing: border-box;
-            transition: box-shadow 0.3s, border-color 0.3s;
-            font-family: inherit;
+            width: 100%; padding: 16px 50px 16px 20px; font-size: 1.1rem;
+            border-radius: var(--border-radius); border: 1px solid #e0e0e0;
+            background-color: #fff; box-shadow: var(--shadow);
+            transition: all 0.3s ease;
         }
         #search-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
-            border-color: var(--primary-color);
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.15);
         }
         .search-icon {
-            position: absolute;
-            right: 20px; /* آیکون در سمت راست برای زبان فارسی */
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            pointer-events: none; /* جلوگیری از کلیک روی آیکون */
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+            color: #aaa; font-size: 1.2rem; pointer-events: none;
         }
-        /* --- END: استایل کادر جستجو --- */
 
-        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 20px 0; }
+        /* --- استایل دسته‌بندی‌ها با تصاویر جدید --- */
+        .categories-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 20px; padding-bottom: 20px; 
+        }
+        /* تنظیم برای موبایل که دو ستونه دیده شود */
+        @media (min-width: 480px) {
+             .categories-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+        }
 
         .category-tile {
             position: relative; color: white; border-radius: var(--border-radius); overflow: hidden;
-            text-decoration: none; display: flex; flex-direction: column; justify-content: center;
-            align-items: center; min-height: 180px; padding: 20px; box-shadow: var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease; background-size: cover;
-            background-position: center; cursor: pointer;
+            text-decoration: none; display: flex; flex-direction: column; justify-content: flex-end; /* متن پایین */
+            align-items: center; height: 200px; padding: 20px; box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            background-size: cover; background-position: center; cursor: pointer;
         }
         
         .category-tile::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.1) 60%);
             z-index: 1; transition: background 0.3s ease;
         }
 
-        .category-tile:hover { transform: scale(1.04); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); }
-        .category-tile:hover::before { background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.1)); }
+        .category-tile:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
+        .category-tile:active { transform: scale(0.98); }
 
-        .tile-content { position: relative; z-index: 2; text-align: center; }
-        .tile-content i { font-size: 3rem; margin-bottom: 10px; opacity: 0.9; }
-        .tile-content h2 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+        .tile-content { position: relative; z-index: 2; text-align: center; width: 100%; }
+        .tile-content i { font-size: 2.5rem; margin-bottom: 10px; display: block; opacity: 0.9; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .tile-content h2 { margin: 0; font-size: 1.4rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-        .product-section { display: none; margin-top: 30px; background-color: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow); }
-        #back-to-categories { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: var(--border-radius); cursor: pointer; font-size: 1rem; margin-bottom: 20px; transition: background-color 0.3s; }
-        #back-to-categories:hover { background-color: #218838; }
+        /* --- استایل لیست محصولات --- */
+        .product-section { display: none; margin-top: 20px; background-color: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+        
+        #back-to-categories { 
+            background-color: #f0f2f5; color: #333; border: none; padding: 12px 20px; 
+            border-radius: var(--border-radius); cursor: pointer; font-size: 1rem; font-weight: 600;
+            margin-bottom: 20px; display: inline-flex; align-items: center; gap: 10px;
+            transition: background 0.2s;
+        }
+        #back-to-categories:hover { background-color: #e4e6eb; }
+        #back-to-categories i { transform: rotate(180deg); } /* فلش به سمت راست */
 
         .product-list { list-style: none; padding: 0; margin: 0; }
         .product-item {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 10px;
-            border-bottom: 1px solid #eee;
+            display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+            gap: 15px; padding: 18px 10px; border-bottom: 1px solid #f1f1f1;
             transition: background-color 0.2s;
         }
         .product-item:last-child { border-bottom: none; }
-        .product-item.selected { background-color: #eaf6ec; }
+        .product-item.selected { background-color: #f0f9f1; }
         
-        .product-name { font-weight: 500; cursor: pointer; }
-        .product-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary-color); }
+        .product-name { font-weight: 500; font-size: 1.05rem; cursor: pointer; color: #444; }
+        .product-checkbox { width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary-color); border-radius: 4px; }
         
-        .quantity-input-container {
-            display: none;
-            align-items: center;
-            justify-self: end;
-        }
-        .product-item.selected .quantity-input-container {
-            display: flex;
-        }
+        .quantity-input-container { display: none; align-items: center; justify-self: end; }
+        .product-item.selected .quantity-input-container { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         
         .quantity-input {
-            width: 70px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: var(--border-radius);
-            text-align: center;
-            font-size: 1rem;
-            margin-left: 8px;
+            width: 60px; padding: 8px; border: 2px solid #eee; border-radius: 8px;
+            text-align: center; font-size: 1.1rem; font-weight: bold; color: var(--primary-color); margin-left: 8px;
         }
-        .quantity-unit { font-size: 0.9rem; color: #555; }
+        .quantity-input:focus { outline: none; border-color: var(--primary-color); }
+        .quantity-unit { font-size: 0.9rem; color: #888; min-width: 30px; }
         
-        .status-badge {
-            padding: 5px 12px; border-radius: 15px; font-size: 0.9rem;
-            font-weight: 500; justify-self: end;
-        }
-        .status-available { background-color: #eaf6ec; color: #28a745; }
-        .status-unavailable { background-color: #fbeae5; color: #dc3545; }
+        .status-badge { padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; }
+        .status-unavailable { background-color: #fff5f5; color: #e03e2d; border: 1px solid #ffebeb; }
 
+        /* --- دکمه واتس‌اپ --- */
         .whatsapp-fab {
-            position: fixed; bottom: 25px; left: 25px; background-color: #25D366;
-            color: white; width: 60px; height: 60px; border-radius: 50%; display: flex;
-            justify-content: center; align-items: center; font-size: 2rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); text-decoration: none;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            cursor: pointer; transform: scale(0);
+            position: fixed; bottom: 30px; left: 30px; 
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white; width: 65px; height: 65px; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; font-size: 2.2rem;
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); text-decoration: none;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; transform: scale(0); z-index: 1000;
         }
         .whatsapp-fab.visible { transform: scale(1); }
-        .whatsapp-fab:hover { background-color: #128C7E; }
+        .whatsapp-fab:hover { transform: scale(1.1); box-shadow: 0 15px 35px rgba(37, 211, 102, 0.5); }
 
         .cart-counter {
-            position: absolute; top: -5px; right: -5px; background-color: #dc3545;
-            color: white; border-radius: 50%; width: 24px; height: 24px;
-            font-size: 0.8rem; font-weight: bold; display: flex;
+            position: absolute; top: 0; right: 0; background-color: #ff3b30;
+            color: white; border-radius: 50%; width: 26px; height: 26px;
+            font-size: 0.85rem; font-weight: bold; display: flex;
             justify-content: center; align-items: center;
-            border: 2px solid white;
+            border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        #loading, #error { text-align: center; font-size: 1.2rem; padding: 40px 0; color: #777; }
+        #loading, #error { text-align: center; font-size: 1.1rem; padding: 50px 0; color: #888; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <h1>عطاری برگ سبز</h1>
-        <p>عرضه کننده انواع گیاهان دارویی، عرقیات سنتی، ادویه‌جات و محصولات سالم</p>
+        <h1>فروشگاه سنجد</h1>
+        <p>گیاهان دارویی، ادویه‌جات و محصولات ارگانیک</p>
     </header>
 
     <div class="container">
-        <!-- کادر جستجوی جدید -->
+        <!-- کادر جستجو -->
         <div class="search-container">
             <i class="fa-solid fa-search search-icon"></i>
-            <input type="search" id="search-input" placeholder="جستجوی نام محصول..." autocomplete="off">
+            <input type="search" id="search-input" placeholder="جستجوی نام محصول (مثلا: آویشن)..." autocomplete="off">
         </div>
 
+        <!-- نمای دسته‌بندی‌ها با تصاویر جدید -->
         <div id="category-view">
             <div class="categories-grid">
-                <!-- Tiles remain the same -->
-                 <a href="#" class="category-tile" data-category="گیاهان-دارویی" style="background-image: url('https://images.pexels.com/photos/5966439/pexels-photo-5966439.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                
+                <a href="#" class="category-tile" data-category="گیاهان-دارویی" style="background-image: url('https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=600');">
                     <div class="tile-content"><i class="fa-solid fa-leaf"></i><h2>گیاهان دارویی</h2></div>
                 </a>
-                <a href="#" class="category-tile" data-category="عرقیات" style="background-image: url('https://images.pexels.com/photos/7939109/pexels-photo-7939109.jpeg?auto=compress&cs=tinysrgb&w=600');">
-                    <div class="tile-content"><i class="fa-solid fa-bottle-droplet"></i><h2>عرقیات</h2></div>
-                </a>
-                <a href="#" class="category-tile" data-category="ادویه-جات" style="background-image: url('https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=600');">
+
+                <a href="#" class="category-tile" data-category="ادویه-جات" style="background-image: url('https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=600');">
                     <div class="tile-content"><i class="fa-solid fa-mortar-pestle"></i><h2>ادویه‌جات</h2></div>
                 </a>
-                <a href="#" class="category-tile" data-category="روغن-ها" style="background-image: url('https://images.pexels.com/photos/3378994/pexels-photo-3378994.jpeg?auto=compress&cs=tinysrgb&w=600');">
+
+                <a href="#" class="category-tile" data-category="عرقیات" style="background-image: url('https://images.unsplash.com/photo-1600626333392-85551b56183f?q=80&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-bottle-droplet"></i><h2>عرقیات</h2></div>
+                </a>
+
+                <a href="#" class="category-tile" data-category="روغن-ها" style="background-image: url('https://images.unsplash.com/photo-1474979266404-7cadd259c308?q=80&w=600');">
                     <div class="tile-content"><i class="fa-solid fa-oil-well"></i><h2>روغن‌ها</h2></div>
                 </a>
-                <a href="#" class="category-tile" data-category="حبوبات-و-غلات" style="background-image: url('https://images.pexels.com/photos/10394783/pexels-photo-10394783.jpeg?auto=compress&cs=tinysrgb&w=600');">
-                    <div class="tile-content"><i class="fa-solid fa-seedling"></i><h2>حبوبات و غلات</h2></div>
+
+                <a href="#" class="category-tile" data-category="حبوبات-و-غلات" style="background-image: url('https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-wheat-awn"></i><h2>حبوبات و غلات</h2></div>
                 </a>
-                <a href="#" class="category-tile" data-category="شوینده-و-بهداشتی" style="background-image: url('https://images.pexels.com/photos/4210611/pexels-photo-4210611.jpeg?auto=compress&cs=tinysrgb&w=600');">
-                    <div class="tile-content"><i class="fa-solid fa-soap"></i><h2>شوینده و بهداشتی</h2></div>
+
+                <a href="#" class="category-tile" data-category="شوینده-و-بهداشتی" style="background-image: url('https://images.unsplash.com/photo-1600855175913-5346b583c325?q=80&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-pump-soap"></i><h2>بهداشتی</h2></div>
                 </a>
-                <a href="#" class="category-tile" data-category="محصولات-خوراکی" style="background-image: url('https://images.pexels.com/photos/2253643/pexels-photo-2253643.jpeg?auto=compress&cs=tinysrgb&w=600');">
-                    <div class="tile-content"><i class="fa-solid fa-jar"></i><h2>محصولات خوراکی</h2></div>
+
+                <a href="#" class="category-tile" data-category="محصولات-خوراکی" style="background-image: url('https://images.unsplash.com/photo-1588791065838-29483b4e36a8?q=80&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-jar"></i><h2>خوراکی</h2></div>
                 </a>
-                <a href="#" class="category-tile" data-category="متفرقه" style="background-image: url('https://images.pexels.com/photos/1775043/pexels-photo-1775043.jpeg?auto=compress&cs=tinysrgb&w=600');">
-                    <div class="tile-content"><i class="fa-solid fa-shapes"></i><h2>متفرقه</h2></div>
+
+                <a href="#" class="category-tile" data-category="متفرقه" style="background-image: url('https://images.unsplash.com/photo-1628102491629-778571d893a3?q=80&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-box-open"></i><h2>سایر محصولات</h2></div>
                 </a>
+
             </div>
         </div>
 
+        <!-- نمای لیست محصولات -->
         <div id="product-view" class="product-section">
             <button id="back-to-categories"><i class="fa-solid fa-arrow-right"></i> بازگشت به دسته‌بندی‌ها</button>
-            <h2 id="product-category-title"></h2>
+            <h2 id="product-category-title" style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);"></h2>
             <div id="loading">درحال بارگذاری محصولات...</div>
             <div id="error" style="display: none;">خطا در دریافت اطلاعات. لطفا بعدا تلاش کنید.</div>
             <ul id="product-list" class="product-list"></ul>
@@ -215,6 +213,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const whatsappNumber = "989918022066";
+            
+            // Elements
             const categoryView = document.getElementById('category-view');
             const productView = document.getElementById('product-view');
             const productList = document.getElementById('product-list');
@@ -224,7 +224,7 @@
             const errorDiv = document.getElementById('error');
             const whatsappBtn = document.getElementById('whatsapp-button');
             const cartCounter = document.getElementById('cart-counter');
-            const searchInput = document.getElementById('search-input'); // عنصر جدید
+            const searchInput = document.getElementById('search-input');
 
             let allProducts = [];
             let shoppingCart = []; 
@@ -260,14 +260,13 @@
                 }
             }
 
-            // --- تابع جدید و جامع برای نمایش لیست محصولات ---
             function renderProductList(productsToShow, title) {
                 productList.innerHTML = '';
                 categoryTitle.textContent = title;
                 loadingDiv.style.display = 'none';
 
                 if (productsToShow.length === 0) {
-                    productList.innerHTML = '<li class="product-item" style="justify-content: center; color: #777;">محصولی با این مشخصات یافت نشد.</li>';
+                    productList.innerHTML = '<li class="product-item" style="justify-content: center; color: #777; padding: 30px;">محصولی یافت نشد.</li>';
                     return;
                 }
                 
@@ -302,7 +301,7 @@
                     } else {
                         listItem.style.gridTemplateColumns = '1fr auto';
                         listItem.innerHTML = `
-                            <span class="product-name" style="text-decoration: line-through; color: #999;">${product.name}</span>
+                            <span class="product-name" style="text-decoration: line-through; color: #aaa;">${product.name}</span>
                             <span class="status-badge status-unavailable">ناموجود</span>
                         `;
                     }
@@ -310,11 +309,17 @@
                 });
             }
 
+            // Event Listeners
             productList.addEventListener('change', function(e) {
                 if (e.target.classList.contains('product-checkbox')) {
                     const listItem = e.target.closest('.product-item');
                     if (e.target.checked) {
                         listItem.classList.add('selected');
+                        // Focus on input automatically
+                        setTimeout(() => {
+                           const input = listItem.querySelector('.quantity-input');
+                           if(input) input.focus(); 
+                        }, 100);
                     } else {
                         listItem.classList.remove('selected');
                     }
@@ -328,7 +333,6 @@
                 }
             });
 
-            // رویداد کلیک روی کاشی‌های دسته‌بندی
             document.querySelectorAll('.category-tile').forEach(tile => {
                 tile.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -340,7 +344,6 @@
                 });
             });
 
-            // --- رویدادهای جدید برای جستجو ---
             searchInput.addEventListener('input', () => {
                 const searchTerm = searchInput.value.trim().toLowerCase();
                 if (searchTerm) {
@@ -348,23 +351,24 @@
                     renderProductList(searchResults, `نتایج جستجو برای: «${searchTerm}»`);
                     showProductView();
                 } else {
-                    showCategoryView(); // بازگشت به صفحه دسته‌بندی‌ها اگر جستجو خالی شود
+                    showCategoryView();
                 }
             });
 
             backButton.addEventListener('click', () => {
                 showCategoryView();
-                searchInput.value = ''; // پاک کردن متن جستجو هنگام بازگشت
+                searchInput.value = '';
             });
             
             whatsappBtn.addEventListener('click', () => {
                 updateCartAndButton(); 
                 if (shoppingCart.length === 0) return;
 
-                let message = "سلام، وقت بخیر. لیست سفارش من:\n\n";
+                let message = "سلام فروشگاه سنجد، سفارش جدید:\n\n";
                 shoppingCart.forEach(item => {
-                    message += `- ${item.name}: ${item.quantity} ${item.unit}\n`;
+                    message += `▪️ ${item.name}: ${item.quantity} ${item.unit}\n`;
                 });
+                message += "\nلطفاً بررسی کنید.";
                 
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
@@ -377,7 +381,6 @@
                     if (!response.ok) throw new Error('Network response was not ok');
                     allProducts = await response.json();
                     loadingDiv.style.display = 'none';
-                    // Don't render anything here initially, just show category view.
                 } catch (err) {
                     loadingDiv.style.display = 'none';
                     errorDiv.style.display = 'block';
