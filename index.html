@@ -3,391 +3,375 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فروشگاه عطاری برگ سبز</title>
+    <title>عطاری برگ سبز</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            --primary-color: #4A5C3D; /* Green */
-            --secondary-color: #E4D5B7; /* Cream */
-            --text-color: #333333;
-            --light-bg: #F5F5F5;
-            --unavailable-color: #b0b0b0;
+            --primary-color: #28a745;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --border-radius: 8px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: var(--light-bg);
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            padding: 0;
+            background-color: #f4f7f6;
             color: var(--text-color);
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .header img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--primary-color);
-            padding: 3px;
-        }
-        .header h1 {
-            color: var(--primary-color);
-            margin: 10px 0 5px;
-            font-size: 2em;
-        }
-        .header p {
-            color: #777;
-            font-size: 1.1em;
-        }
 
-        /* Category Tiles (New) */
-        #category-view h2 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-        }
-        .category-tile {
-            background-color: #fff;
-            border: 2px solid var(--secondary-color);
-            border-radius: 10px;
+        .header {
+            background-color: white;
             padding: 20px;
             text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        .category-tile:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.08);
-            border-color: var(--primary-color);
-        }
-
-        /* Product List View (New) */
-        #product-view {
-            display: none; /* Hidden by default */
-        }
-        #product-list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        #back-to-categories {
-            background: none;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-         #back-to-categories:hover {
-            background-color: var(--primary-color);
-            color: white;
-         }
-
-        #search-box {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1em;
-            margin-bottom: 20px;
-        }
-        
-        .product-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 10px;
             border-bottom: 1px solid #eee;
-            transition: background-color 0.2s;
+            box-shadow: var(--shadow);
         }
-        .product-item:hover {
-            background-color: #f9f9f9;
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 700;
         }
-        .product-item span {
-            flex-grow: 1;
+
+        .header p {
+            margin: 5px 0 0;
+            color: #666;
         }
-        .product-item .unavailable-label {
-            font-size: 0.8em;
-            color: var(--unavailable-color);
-            margin-right: 10px;
-            font-style: italic;
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .product-item.unavailable span {
-            color: var(--unavailable-color);
-            text-decoration: line-through;
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        .category-tile {
+            position: relative;
+            color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
         }
         
-        .add-btn {
+        .category-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+            z-index: 1;
+            transition: background 0.3s ease;
+        }
+
+        .category-tile:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-tile:hover::before {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.1));
+        }
+
+        .tile-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .tile-content i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .tile-content h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .product-section {
+            display: none;
+            margin-top: 30px;
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        #back-to-categories {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.2s;
-        }
-        .add-btn:hover {
-            background-color: #3a4a30;
-        }
-        .add-btn.added {
-            background-color: #28a745;
-        }
-        .add-btn.added::before {
-            content: '✓ ';
-        }
-        .product-item.unavailable .add-btn {
-            background-color: var(--unavailable-color);
-            cursor: not-allowed;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
         }
 
-        .cart-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px dashed var(--secondary-color);
+        #back-to-categories:hover {
+            background-color: #218838;
         }
-        .cart-section h3 {
-            text-align: center;
-            color: var(--primary-color);
-        }
-        #cart-items {
+
+        .product-list {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
-        #cart-items li {
-            background-color: #f9f9f9;
-            padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 5px;
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1rem;
         }
-        #send-to-whatsapp {
-            display: block;
-            width: 100%;
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-name {
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-available {
+            background-color: #eaf6ec;
+            color: #28a745;
+        }
+
+        .status-unavailable {
+            background-color: #fbeae5;
+            color: #dc3545;
+        }
+
+        .whatsapp-fab {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
             background-color: #25D366;
             color: white;
-            text-align: center;
-            padding: 15px;
-            border-radius: 10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             text-decoration: none;
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-top: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .whatsapp-fab:hover {
+            transform: scale(1.1);
+        }
+
+        #loading, #error {
+            text-align: center;
+            font-size: 1.2rem;
+            padding: 40px 0;
+            color: #777;
         }
     </style>
 </head>
 <body>
 
+    <header class="header">
+        <h1>عطاری برگ سبز</h1>
+        <p>عرضه کننده انواع گیاهان دارویی، عرقیات سنتی، ادویه‌جات و محصولات سالم</p>
+    </header>
+
     <div class="container">
-        <header class="header">
-            <!-- <img src="YOUR_LOGO_URL" alt="لوگو عطاری"> -->
-            <h1>عطاری برگ سبز</h1>
-            <p>عرضه کننده انواع گیاهان دارویی، عرقیات و محصولات ارگانیک</p>
-        </header>
-
-        <!-- Category View -->
         <div id="category-view">
-            <h2>دسته‌بندی محصولات</h2>
-            <div class="category-grid" id="category-grid">
-                <!-- Category tiles will be loaded here by JavaScript -->
+            <div class="categories-grid">
+                <!-- کاشی‌ها با دسته‌بندی‌های صحیح -->
+                <a href="#" class="category-tile" data-category="گیاهان-دارویی" style="background-image: url('https://images.pexels.com/photos/5966439/pexels-photo-5966439.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-leaf"></i>
+                        <h2>گیاهان دارویی</h2>
+                    </div>
+                </a>
+                <a href="#" class="category-tile" data-category="عرقیات" style="background-image: url('https://images.pexels.com/photos/7939109/pexels-photo-7939109.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-bottle-droplet"></i>
+                        <h2>عرقیات</h2>
+                    </div>
+                </a>
+                <a href="#" class="category-tile" data-category="ادویه-جات" style="background-image: url('https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-mortar-pestle"></i>
+                        <h2>ادویه‌جات</h2>
+                    </div>
+                </a>
+                <a href="#" class="category-tile" data-category="روغن-ها" style="background-image: url('https://images.pexels.com/photos/3378994/pexels-photo-3378994.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-oil-well"></i>
+                        <h2>روغن‌ها</h2>
+                    </div>
+                </a>
+                <a href="#" class="category-tile" data-category="حبوبات-و-غلات" style="background-image: url('https://images.pexels.com/photos/10394783/pexels-photo-10394783.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-seedling"></i>
+                        <h2>حبوبات و غلات</h2>
+                    </div>
+                </a>
+                <a href="#" class="category-tile" data-category="شوینده-و-بهداشتی" style="background-image: url('https://images.pexels.com/photos/4210611/pexels-photo-4210611.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-soap"></i>
+                        <h2>شوینده و بهداشتی</h2>
+                    </div>
+                </a>
+                <a href="#" class="category-tile" data-category="محصولات-خوراکی" style="background-image: url('https://images.pexels.com/photos/2253643/pexels-photo-2253643.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-jar"></i>
+                        <h2>محصولات خوراکی</h2>
+                    </div>
+                </a>
+                <a href="#" class="category-tile" data-category="متفرقه" style="background-image: url('https://images.pexels.com/photos/1775043/pexels-photo-1775043.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content">
+                        <i class="fa-solid fa-shapes"></i>
+                        <h2>متفرقه</h2>
+                    </div>
+                </a>
             </div>
         </div>
 
-        <!-- Product List View -->
-        <div id="product-view">
-            <div id="product-list-header">
-                <h2 id="product-list-title"></h2>
-                <button id="back-to-categories">بازگشت به دسته‌بندی‌ها</button>
-            </div>
-            
-            <input type="text" id="search-box" placeholder="جستجوی محصول در این دسته...">
-            
-            <div id="product-list">
-                <!-- Products will be loaded here -->
-            </div>
+        <div id="product-view" class="product-section">
+            <button id="back-to-categories"><i class="fa-solid fa-arrow-right"></i> بازگشت به دسته‌بندی‌ها</button>
+            <h2 id="product-category-title"></h2>
+            <div id="loading">درحال بارگذاری محصولات...</div>
+            <div id="error" style="display: none;">خطا در دریافت اطلاعات. لطفا بعدا تلاش کنید.</div>
+            <ul id="product-list" class="product-list"></ul>
         </div>
-
-        <section class="cart-section">
-            <h3>سبد خرید شما</h3>
-            <ul id="cart-items">
-                <!-- Selected items will appear here -->
-            </ul>
-            <a id="send-to-whatsapp" href="#" target="_blank">ارسال سفارش به واتس‌اپ</a>
-        </section>
-
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // =================================================================
-            // ========== تنظیمات اصلی: شماره واتس اپ خود را اینجا وارد کنید ==========
-            // =================================================================
-            const whatsappNumber = '989918022066'; // <<<<< شماره واتس‌اپ با کد کشور (بدون +)
-            // =================================================================
+    <a id="whatsapp-link" href="#" class="whatsapp-fab" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-            const categoryGrid = document.getElementById('category-grid');
-            const productList = document.getElementById('product-list');
-            const searchBox = document.getElementById('search-box');
-            const cartItems = document.getElementById('cart-items');
-            const sendToWhatsappBtn = document.getElementById('send-to-whatsapp');
-            
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- تنظیمات ---
+            const whatsappNumber = "989396349583"; // شماره واتس‌اپ خود را بدون + وارد کنید.
+            // --- پایان تنظیمات ---
+
             const categoryView = document.getElementById('category-view');
             const productView = document.getElementById('product-view');
-            const backToCategoriesBtn = document.getElementById('back-to-categories');
-            const productListTitle = document.getElementById('product-list-title');
+            const productList = document.getElementById('product-list');
+            const categoryTitle = document.getElementById('product-category-title');
+            const backButton = document.getElementById('back-to-categories');
+            const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            
+            document.getElementById('whatsapp-link').href = `https://wa.me/${whatsappNumber}`;
 
-            let allProductsData = {};
-            let currentProducts = [];
-            let cart = [];
+            let allProducts = [];
 
-            // Fetch product data
-            fetch('products.json')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('فایل products.json پیدا نشد. مطمئن شوید در کنار فایل index.html آپلود شده است.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    allProductsData = data;
-                    displayCategories();
-                })
-                .catch(error => {
-                    console.error('Error loading products:', error);
-                    categoryGrid.innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
-                });
-
-            // Display category tiles
-            function displayCategories() {
-                categoryGrid.innerHTML = '';
-                Object.keys(allProductsData).forEach(category => {
-                    const tile = document.createElement('div');
-                    tile.className = 'category-tile';
-                    tile.textContent = category;
-                    tile.dataset.category = category;
-                    tile.addEventListener('click', () => showProductsForCategory(category));
-                    categoryGrid.appendChild(tile);
-                });
-            }
-
-            function showProductsForCategory(categoryName) {
-                currentProducts = allProductsData[categoryName];
-                productListTitle.textContent = categoryName;
-                displayProducts(currentProducts);
-                
-                categoryView.style.display = 'none';
-                productView.style.display = 'block';
-                searchBox.value = '';
-            }
-
-            backToCategoriesBtn.addEventListener('click', () => {
+            function showCategoryView() {
                 categoryView.style.display = 'block';
                 productView.style.display = 'none';
-            });
-            
-            // Display products
-            function displayProducts(products) {
+                window.scrollTo(0, 0); // بازگشت به بالای صفحه
+            }
+
+            function showProductView() {
+                categoryView.style.display = 'none';
+                productView.style.display = 'block';
+                window.scrollTo(0, 0); // بازگشت به بالای صفحه
+            }
+
+            function renderProducts(category, categoryName) {
                 productList.innerHTML = '';
-                products.forEach(product => {
-                    const item = document.createElement('div');
-                    item.className = 'product-item';
-                    if (!product.inStock) {
-                        item.classList.add('unavailable');
-                    }
+                categoryTitle.textContent = categoryName;
 
-                    const nameSpan = document.createElement('span');
-                    nameSpan.textContent = product.name;
+                const filteredProducts = allProducts.filter(p => p.category === category);
+                
+                if (filteredProducts.length === 0) {
+                    productList.innerHTML = '<li class="product-item">محصولی در این دسته‌بندی یافت نشد.</li>';
+                    return;
+                }
 
-                    const addButton = document.createElement('button');
-                    addButton.textContent = 'افزودن';
-                    addButton.className = 'add-btn';
-                    addButton.dataset.name = product.name;
-                    
-                    item.appendChild(nameSpan);
+                // مرتب‌سازی محصولات بر اساس نام
+                filteredProducts.sort((a, b) => a.name.localeCompare(b.name, 'fa'));
 
-                    if (!product.inStock) {
-                        const unavailableLabel = document.createElement('span');
-                        unavailableLabel.className = 'unavailable-label';
-                        unavailableLabel.textContent = 'ناموجود';
-                        addButton.disabled = true;
-                        item.appendChild(unavailableLabel);
-                    }
-
-                    item.appendChild(addButton);
-                    productList.appendChild(item);
+                filteredProducts.forEach(product => {
+                    const statusClass = product.available ? 'status-available' : 'status-unavailable';
+                    const statusText = product.available ? 'موجود' : 'ناموجود';
+                    const listItem = document.createElement('li');
+                    listItem.className = 'product-item';
+                    listItem.innerHTML = `
+                        <span class="product-name">${product.name}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    `;
+                    productList.appendChild(listItem);
                 });
             }
 
-            // Search functionality
-            searchBox.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const filteredProducts = currentProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
-                displayProducts(filteredProducts);
+            document.querySelectorAll('.category-tile').forEach(tile => {
+                tile.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.dataset.category;
+                    const categoryName = this.querySelector('h2').textContent;
+                    renderProducts(category, categoryName);
+                    showProductView();
+                });
             });
 
-            // Add to cart
-            productList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('add-btn') && !e.target.disabled) {
-                    const productName = e.target.dataset.name;
-                    if (!cart.includes(productName)) {
-                        cart.push(productName);
-                        e.target.classList.add('added');
-                        e.target.textContent = 'اضافه شد';
-                        updateCart();
+            backButton.addEventListener('click', showCategoryView);
+
+            // Fetch products from JSON file
+            async function fetchProducts() {
+                try {
+                    // اضافه کردن یک پارامتر برای جلوگیری از کش شدن فایل
+                    const response = await fetch('products.json?v=' + new Date().getTime()); 
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                }
-            });
-            
-            // Update cart display
-            function updateCart() {
-                cartItems.innerHTML = '';
-                if (cart.length === 0) {
-                    const li = document.createElement('li');
-                    li.textContent = 'سبد خرید خالی است.';
-                    cartItems.appendChild(li);
-                } else {
-                    cart.forEach(itemName => {
-                        const li = document.createElement('li');
-                        li.textContent = itemName;
-                        cartItems.appendChild(li);
-                    });
-                }
-                updateWhatsappLink();
-            }
-
-            // Update WhatsApp link
-            function updateWhatsappLink() {
-                if (cart.length > 0) {
-                    const header = "سلام، سفارش من از عطاری برگ سبز:\n\n";
-                    const orderText = cart.join('\n');
-                    const fullMessage = encodeURIComponent(header + orderText);
-                    sendToWhatsappBtn.href = `https://wa.me/${whatsappNumber}?text=${fullMessage}`;
-                    sendToWhatsappBtn.style.display = 'block';
-                } else {
-                    sendToWhatsappBtn.style.display = 'none';
+                    allProducts = await response.json();
+                    loadingDiv.style.display = 'none';
+                } catch (err) {
+                    loadingDiv.style.display = 'none';
+                    errorDiv.style.display = 'block';
+                    console.error('Fetch error:', err);
                 }
             }
 
-            // Initial call
-            updateCart();
+            // Initial setup
+            showCategoryView();
+            fetchProducts();
         });
     </script>
 
