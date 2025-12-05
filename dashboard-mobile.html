@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت موجودی (نسخه موبایل)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        #container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .category {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .category-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-item label {
+            margin-right: 10px;
+            flex-grow: 1;
+        }
+        input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-left: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #output-section {
+            display: none;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ccc;
+        }
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            height: 150px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        .copy-btn {
+            padding: 10px;
+            font-size: 1em;
+            background-color: #007bff;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+        .instructions {
+            background-color: #eaf6ff;
+            border: 1px solid #b8dcf0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <h1>پنل مدیریت موجودی (نسخه موبایل)</h1>
+        
+        <div class="instructions">
+            <p><strong>راهنما:</strong></p>
+            <ol>
+                <li>تیک محصولات <strong>موجود</strong> را بزنید.</li>
+                <li>تیک محصولات <strong>ناموجود</strong> را بردارید.</li>
+                <li>روی دکمه سبز رنگ <strong>"۱. مشاهده و کپی فایل‌های جدید"</strong> کلیک کنید.</li>
+                <li>محتوای دو کادر پایین را کپی کرده و در گیت‌هاب و خود این فایل جایگزین کنید.</li>
+            </ol>
+        </div>
+
+        <div id="products-list"></div>
+
+        <button id="generate-files-btn">۱. مشاهده و کپی فایل‌های جدید</button>
+
+        <div id="output-section">
+            <hr>
+            <h2>۲. فایل‌ها را کپی و جایگزین کنید</h2>
+
+            <div class="instructions">
+                <h3>فایل products.json (برای سایت اصلی)</h3>
+                <p>این متن را کامل کپی کرده و در فایل <strong>products.json</strong> در گیت‌هاب جایگزین محتوای قبلی کنید.</p>
+                <button class="copy-btn" data-target="json-output">کپی محتوای products.json</button>
+                <textarea id="json-output" readonly></textarea>
+            </div>
+
+            <div class="instructions" style="border-color: #f0b8b8; background-color: #fff2f2;">
+                <h3>فایل dashboard-mobile.html (برای مدیریت آینده)</h3>
+                <p><strong>مهم:</strong> این متن را کامل کپی کرده و <strong>تمام محتوای همین فایل</strong> (dashboard-mobile.html) را با آن جایگزین کنید تا تغییراتتان برای دفعه بعد ذخیره شود.</p>
+                <button class="copy-btn" data-target="html-output">کپی محتوای dashboard-mobile.html</button>
+                <textarea id="html-output" rows="10" readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    ================================================================
+    == داده‌های محصولات در اینجا ذخیره می‌شود. این بخش را دستی تغییر ندهید. ==
+    ================================================================
+    -->
+    <script id="product-data" type="application/json">
+    {
+      "عرقیات": [
+        {"id": "ar-01", "name": "گلاب", "inStock": true},
+        {"id": "ar-02", "name": "عرق نعنا", "inStock": true},
+        {"id": "ar-03", "name": "عرق کاسنی", "inStock": true},
+        {"id": "ar-04", "name": "عرق شاطره", "inStock": true},
+        {"id": "ar-05", "name": "عرق بیدمشک", "inStock": true},
+        {"id": "ar-06", "name": "عرق بهارنارنج", "inStock": true},
+        {"id": "ar-07", "name": "عرق آویشن", "inStock": true},
+        {"id": "ar-08", "name": "عرق رازیانه", "inStock": true},
+        {"id": "ar-09", "name": "عرق زنیان", "inStock": true},
+        {"id": "ar-10", "name": "عرق زیره", "inStock": true}
+      ],
+      "ادویه‌جات": [
+        {"id": "ad-01", "name": "زردچوبه", "inStock": true},
+        {"id": "ad-02", "name": "فلفل سیاه", "inStock": true},
+        {"id": "ad-03", "name": "فلفل قرمز", "inStock": true},
+        {"id": "ad-04", "name": "دارچین", "inStock": true},
+        {"id": "ad-05", "name": "زنجبیل", "inStock": true},
+        {"id": "ad-06", "name": "پودر سیر", "inStock": true},
+        {"id": "ad-07", "name": "پودر پیاز", "inStock": true},
+        {"id": "ad-08", "name": "پاپریکا", "inStock": true},
+        {"id": "ad-09", "name": "آویشن", "inStock": true},
+        {"id": "ad-10", "name": "کاری", "inStock": true},
+        {"id": "ad-11", "name": "سماق", "inStock": true},
+        {"id": "ad-12", "name": "هل", "inStock": true},
+        {"id": "ad-13", "name": "میخک", "inStock": true},
+        {"id": "ad-14", "name": "جوز هندی", "inStock": true},
+        {"id": "ad-15", "name": "زعفران", "inStock": true}
+      ],
+      "گیاهان دارویی": [
+        {"id": "gi-01", "name": "بابونه", "inStock": true},
+        {"id": "gi-02", "name": "گل گاو زبان", "inStock": true},
+        {"id": "gi-03", "name": "سنبل الطیب", "inStock": true},
+        {"id": "gi-04", "name": "اسطوخودوس", "inStock": true},
+        {"id": "gi-05", "name": "به لیمو", "inStock": true},
+        {"id": "gi-06", "name": "چای ترش", "inStock": true},
+        {"id": "gi-07", "name": "چای سبز", "inStock": true},
+        {"id": "gi-08", "name": "چای کوهی", "inStock": true},
+        {"id": "gi-09", "name": "خاکشیر", "inStock": true},
+        {"id": "gi-10", "name": "تخم شربتی", "inStock": true},
+        {"id": "gi-11", "name": "چای لبو", "inStock": false},
+        {"id": "gi-12", "name": "کندر", "inStock": true},
+        {"id": "gi-13", "name": "صمغ عربی", "inStock": true}
+      ],
+      "روغن‌های گیاهی": [
+        {"id": "ro-01", "name": "روغن زیتون", "inStock": true},
+        {"id": "ro-02", "name": "روغن کنجد", "inStock": true},
+        {"id": "ro-03", "name": "روغن نارگیل", "inStock": true},
+        {"id": "ro-04", "name": "روغن سیاهدانه", "inStock": true},
+        {"id": "ro-05", "name": "روغن بنفشه", "inStock": true},
+        {"id": "ro-06", "name": "روغن کرچک", "inStock": true},
+        {"id": "ro-07", "name": "روغن بادام تلخ", "inStock": true},
+        {"id": "ro-08", "name": "روغن بادام شیرین", "inStock": true}
+      ],
+      "حبوبات و غلات": [
+        {"id": "ho-01", "name": "نخود", "inStock": true},
+        {"id": "ho-02", "name": "لوبیا", "inStock": true},
+        {"id": "ho-03", "name": "عدس", "inStock": true},
+        {"id": "ho-04", "name": "جو پرک", "inStock": true},
+        {"id": "ho-05", "name": "کینوا", "inStock": true},
+        {"id": "ho-06", "name": "دانه چیا", "inStock": true}
+      ],
+      "شیرین‌کننده‌ها": [
+        {"id": "sh-01", "name": "عسل", "inStock": true},
+        {"id": "sh-02", "name": "شیره انگور", "inStock": true},
+        {"id": "sh-03", "name": "شیره خرما", "inStock": true},
+        {"id": "sh-04", "name": "شیره توت", "inStock": true},
+        {"id": "sh-05", "name": "نبات", "inStock": true},
+        {"id": "sh-06", "name": "شکر قهوه‌ای", "inStock": true}
+      ],
+      "محصولات بهداشتی و آرایشی سنتی": [
+        {"id": "be-01", "name": "سفیدآب", "inStock": true},
+        {"id": "be-02", "name": "سرمه", "inStock": true},
+        {"id": "be-03", "name": "حنا", "inStock": true},
+        {"id": "be-04", "name": "صابون زیتون", "inStock": true},
+        {"id": "be-05", "name": "صابون مراغه", "inStock": true}
+      ],
+      "آجیل و خشکبار": [
+        {"id": "kh-01", "name": "بادام", "inStock": true},
+        {"id": "kh-02", "name": "گردو", "inStock": true},
+        {"id": "kh-03", "name": "پسته", "inStock": true},
+        {"id": "kh-04", "name": "فندق", "inStock": true},
+        {"id": "kh-05", "name": "انجیر خشک", "inStock": true},
+        {"id": "kh-06", "name": "کشمش", "inStock": true},
+        {"id": "kh-07", "name": "توت خشک", "inStock": true},
+        {"id": "kh-08", "name": "برگه زردآلو", "inStock": true}
+      ],
+      "سرکه‌ها و آبغوره‌ها": [
+        {"id": "se-01", "name": "سرکه سیب", "inStock": true},
+        {"id": "se-02", "name": "سرکه انگور", "inStock": true},
+        {"id": "se-03", "name": "آبغوره", "inStock": true},
+        {"id": "se-04", "name": "آبلیمو", "inStock": true}
+      ]
+    }
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const productDataElement = document.getElementById('product-data');
+            const productsListContainer = document.getElementById('products-list');
+            const generateBtn = document.getElementById('generate-files-btn');
+            const outputSection = document.getElementById('output-section');
+            const jsonOutputTextarea = document.getElementById('json-output');
+            const htmlOutputTextarea = document.getElementById('html-output');
+        
+            let productsData = {};
+        
+            function loadProducts() {
+                try {
+                    productsData = JSON.parse(productDataElement.textContent);
+                    renderProducts();
+                } catch (e) {
+                    console.error('خطا در خواندن اطلاعات محصولات:', e);
+                    productsListContainer.innerHTML = '<p style="color: red;">خطا: اطلاعات محصولات در این فایل ساختار درستی ندارد.</p>';
+                }
+            }
+        
+            function renderProducts() {
+                productsListContainer.innerHTML = '';
+                for (const category in productsData) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category';
+        
+                    const categoryTitle = document.createElement('h2');
+                    categoryTitle.className = 'category-title';
+                    categoryTitle.textContent = category;
+                    categoryDiv.appendChild(categoryTitle);
+        
+                    productsData[category].forEach(product => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'product-item';
+        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = `product-${product.id}`;
+                        checkbox.checked = product.inStock;
+                        checkbox.dataset.productId = product.id;
+                        checkbox.dataset.category = category;
+        
+                        const label = document.createElement('label');
+                        label.htmlFor = `product-${product.id}`;
+                        label.textContent = product.name;
+        
+                        itemDiv.appendChild(label);
+                        itemDiv.appendChild(checkbox);
+                        categoryDiv.appendChild(itemDiv);
+                    });
+        
+                    productsListContainer.appendChild(categoryDiv);
+                }
+            }
+        
+            generateBtn.addEventListener('click', function() {
+                const updatedData = JSON.parse(JSON.stringify(productsData)); // Deep copy
+        
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    const { productId, category } = checkbox.dataset;
+                    const product = updatedData[category].find(p => p.id === productId);
+                    if (product) {
+                        product.inStock = checkbox.checked;
+                    }
+                });
+        
+                // Generate new JSON for products.json
+                const newJsonString = JSON.stringify(updatedData, null, 2);
+                jsonOutputTextarea.value = newJsonString;
+        
+                // Generate new HTML for dashboard-mobile.html
+                const currentHtml = document.documentElement.outerHTML;
+                const scriptStartTag = '<script id="product-data" type="application/json">';
+                const scriptEndTag = '<\/script>';
+                const regex = new RegExp(scriptStartTag + '[\\s\\S]*?' + scriptEndTag);
+                const newHtmlContent = currentHtml.replace(regex, scriptStartTag + '\n' + newJsonString + '\n    ' + scriptEndTag.replace('<\\/','</'));
+                htmlOutputTextarea.value = newHtmlContent;
+
+                outputSection.style.display = 'block';
+                window.scrollTo(0, generateBtn.offsetTop);
+                alert('فایل‌های جدید آماده کپی هستند. لطفاً به بخش پایین صفحه مراجعه کنید.');
+            });
+
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    const textarea = document.getElementById(targetId);
+                    textarea.select();
+                    textarea.setSelectionRange(0, 999999); // For mobile devices
+                    try {
+                        document.execCommand('copy');
+                        alert('متن با موفقیت کپی شد!');
+                    } catch (err) {
+                        alert('خطا در کپی. لطفاً به صورت دستی متن را انتخاب و کپی کنید.');
+                    }
+                });
+            });
+        
+            loadProducts();
+        });
+    </script>
+
+</body>
+</html>
