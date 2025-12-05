@@ -5,318 +5,365 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پنل مدیریت موجودی</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
-        .container { max-width: 800px; margin: auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1, h2, h3 { color: #333; }
-        h1 { text-align: center; color: #28a745; }
-        .category-section { margin-bottom: 25px; border-top: 1px solid #eee; padding-top: 15px; }
-        .product-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-        .product-item:last-child { border-bottom: none; }
-        .product-item label { margin-right: 15px; flex-grow: 1; cursor: pointer; }
-        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
-        #json-output { width: 100%; height: 200px; margin-top: 15px; font-family: monospace; font-size: 12px; direction: ltr; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; }
-        .controls { margin-top: 20px; text-align: center; }
-        button { background-color: #007bff; color: white; border: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
-        button:hover { background-color: #0056b3; }
-        #copy-feedback { color: green; font-weight: bold; margin-top: 10px; text-align: center; }
-        .search-box { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .search-container {
+            margin-bottom: 20px;
+            position: sticky;
+            top: 10px;
+            background: white;
+            padding: 15px 0;
+            z-index: 10;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .product-list {
+            list-style: none;
+            padding: 0;
+            max-height: 50vh;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-item:nth-child(odd) {
+            background-color: #fafafa;
+        }
+        .product-name {
+            flex-grow: 1;
+            margin-right: 15px;
+        }
+        .product-unit {
+            font-size: 0.85em;
+            color: #777;
+            margin-right: 5px;
+        }
+        .product-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #28a745;
+            cursor: pointer;
+        }
+        #json-output {
+            width: 100%;
+            height: 200px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            direction: ltr;
+        }
+        #copy-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        #copy-button:hover {
+            background-color: #0056b3;
+        }
+        #copy-button.copied {
+            background-color: #28a745;
+        }
+        #product-count {
+            text-align: center;
+            color: #666;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>پنل مدیریت موجودی محصولات</h1>
-        <p>برای تغییر وضعیت هر محصول، تیک کنار آن را بزنید (برای موجود کردن) یا بردارید (برای ناموجود کردن). کد JSON در پایین صفحه به صورت خودکار به‌روز می‌شود.</p>
-        
-        <input type="text" id="search-input" class="search-box" placeholder="جستجوی محصول...">
+        <h1>پنل مدیریت موجودی</h1>
 
-        <div id="product-container"></div>
-
-        <h2>خروجی JSON برای `products.json`</h2>
-        <textarea id="json-output" readonly></textarea>
-        <div class="controls">
-            <button onclick="copyJson()">کپی کد JSON</button>
-            <div id="copy-feedback" style="display: none;">کد با موفقیت کپی شد!</div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="جستجوی محصول...">
+            <div id="product-count"></div>
         </div>
+
+        <ul id="product-list" class="product-list">
+            <!-- Products will be loaded here by JS -->
+        </ul>
+
+        <h2>خروجی JSON برای products.json</h2>
+        <textarea id="json-output" readonly></textarea>
+        <button id="copy-button">کپی کد JSON</button>
     </div>
 
     <script>
-        const allProductsData = [
-            // این لیست کامل محصولات است
-            {"name":"آرد برنج","category":"متفرقه","available":true},
-            {"name":"آرد جو","category":"متفرقه","available":true},
-            {"name":"آرد جوانه گندم","category":"متفرقه","available":true},
-            {"name":"آرد گندم","category":"متفرقه","available":true},
-            {"name":"آرد نخودچی","category":"متفرقه","available":true},
-            {"name":"آلو بخارا","category":"محصولات-خوراکی","available":true},
-            {"name":"آلو جنگلی","category":"محصولات-خوراکی","available":true},
-            {"name":"آویشن","category":"گیاهان-دارویی","available":true},
-            {"name":"ارده","category":"محصولات-خوراکی","available":true},
-            {"name":"اسپند","category":"گیاهان-دارویی","available":true},
-            {"name":"استخودوس","category":"گیاهان-دارویی","available":true},
-            {"name":"افتیمون","category":"گیاهان-دارویی","available":true},
-            {"name":"انار خشک","category":"محصولات-خوراکی","available":true},
-            {"name":"انجیر","category":"محصولات-خوراکی","available":true},
-            {"name":"انجیر خشک","category":"محصولات-خوراکی","available":true},
-            {"name":"بابا آدم","category":"گیاهان-دارویی","available":true},
-            {"name":"بابونه","category":"گیاهان-دارویی","available":true},
-            {"name":"بادرنجبویه","category":"گیاهان-دارویی","available":true},
-            {"name":"بار هنگ","category":"گیاهان-دارویی","available":true},
-            {"name":"برگ بو","category":"گیاهان-دارویی","available":true},
-            {"name":"برگ سنا","category":"گیاهان-دارویی","available":true},
-            {"name":"برگ گردو","category":"گیاهان-دارویی","available":true},
-            {"name":"برنج","category":"حبوبات-و-غلات","available":true},
-            {"name":"برنج نیم دانه","category":"حبوبات-و-غلات","available":true},
-            {"name":"بهار نارنج","category":"گیاهان-دارویی","available":true},
-            {"name":"بهدانه","category":"گیاهان-دارویی","available":true},
-            {"name":"بوره","category":"متفرقه","available":true},
-            {"name":"پاپل","category":"متفرقه","available":true},
-            {"name":"پای خر","category":"گیاهان-دارویی","available":true},
-            {"name":"پر سیاوش","category":"گیاهان-دارویی","available":true},
-            {"name":"پوست بلوط","category":"گیاهان-دارویی","available":true},
-            {"name":"پودر سیر","category":"ادویه-جات","available":true},
-            {"name":"پونه","category":"گیاهان-دارویی","available":true},
-            {"name":"پولک","category":"گیاهان-دارویی","available":true},
-            {"name":"تاجریزی","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم بالنگا","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم خرفه","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم ریحان","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم شربتی","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم شوید","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم گشنیز","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم کتان","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم کاهو","category":"گیاهان-دارویی","available":true},
-            {"name":"تخم یونجه","category":"گیاهان-دارویی","available":true},
-            {"name":"تمرهندی","category":"محصولات-خوراکی","available":true},
-            {"name":"جدوا","category":"ادویه-جات","available":true},
-            {"name":"جو","category":"حبوبات-و-غلات","available":true},
-            {"name":"جو پرک","category":"حبوبات-و-غلات","available":true},
-            {"name":"جوش شیرین","category":"متفرقه","available":true},
-            {"name":"جوهر لیمو","category":"متفرقه","available":true},
-            {"name":"چای سبز","category":"گیاهان-دارویی","available":true},
-            {"name":"چای سیاه","category":"گیاهان-دارویی","available":true},
-            {"name":"چای ماسالا","category":"ادویه-جات","available":true},
-            {"name":"چای مکه","category":"گیاهان-دارویی","available":true},
-            {"name":"چای کوهی","category":"گیاهان-دارویی","available":true},
-            {"name":"چهار تخم","category":"گیاهان-دارویی","available":true},
-            {"name":"چهار شیره","category":"محصولات-خوراکی","available":true},
-            {"name":"چهار عرق","category":"عرقیات","available":true},
-            {"name":"حبوبات","category":"حبوبات-و-غلات","available":true},
-            {"name":"حنظل","category":"گیاهان-دارویی","available":true},
-            {"name":"حنا","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"خاکشیر","category":"گیاهان-دارویی","available":true},
-            {"name":"خرما","category":"محصولات-خوراکی","available":true},
-            {"name":"خرفه","category":"گیاهان-دارویی","available":true},
-            {"name":"خردل","category":"ادویه-جات","available":true},
-            {"name":"دارچین","category":"ادویه-جات","available":true},
-            {"name":"دال عدس","category":"حبوبات-و-غلات","available":true},
-            {"name":"دانه چیا","category":"گیاهان-دارویی","available":true},
-            {"name":"رازیانه","category":"گیاهان-دارویی","available":true},
-            {"name":"رب انار","category":"محصولات-خوراکی","available":true},
-            {"name":"رزماری","category":"گیاهان-دارویی","available":true},
-            {"name":"رنگ حنا","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"روغن آرگان","category":"روغن-ها","available":true},
-            {"name":"روغن بادام تلخ","category":"روغن-ها","available":true},
-            {"name":"روغن بادام شیرین","category":"روغن-ها","available":true},
-            {"name":"روغن بنفشه","category":"روغن-ها","available":true},
-            {"name":"روغن خراطین","category":"روغن-ها","available":true},
-            {"name":"روغن زیتون","category":"روغن-ها","available":true},
-            {"name":"روغن سیاهدانه","category":"روغن-ها","available":true},
-            {"name":"روغن شترمرغ","category":"روغن-ها","available":true},
-            {"name":"روغن مار","category":"روغن-ها","available":true},
-            {"name":"روغن نارگیل","category":"روغن-ها","available":true},
-            {"name":"روغن کرچک","category":"روغن-ها","available":true},
-            {"name":"روغن کنجد","category":"روغن-ها","available":true},
-            {"name":"روغن کوهان شتر","category":"روغن-ها","available":true},
-            {"name":"ریوند چینی","category":"گیاهان-دارویی","available":true},
-            {"name":"زردچوبه","category":"ادویه-جات","available":true},
-            {"name":"زرشک","category":"محصولات-خوراکی","available":true},
-            {"name":"زعفران","category":"ادویه-جات","available":true},
-            {"name":"زنجبیل","category":"ادویه-جات","available":true},
-            {"name":"زنیان","category":"گیاهان-دارویی","available":true},
-            {"name":"ژلاتین","category":"متفرقه","available":true},
-            {"name":"سدر","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"سرکه انگور","category":"محصولات-خوراکی","available":true},
-            {"name":"سرکه خرما","category":"محصولات-خوراکی","available":true},
-            {"name":"سرکه سیب","category":"محصولات-خوراکی","available":true},
-            {"name":"سقز","category":"گیاهان-دارویی","available":true},
-            {"name":"سماق","category":"ادویه-جات","available":true},
-            {"name":"سنجد","category":"محصولات-خوراکی","available":true},
-            {"name":"سیاهدانه","category":"گیاهان-دارویی","available":true},
-            {"name":"سیر خشک","category":"ادویه-جات","available":true},
-            {"name":"شاتره","category":"گیاهان-دارویی","available":true},
-            {"name":"شامپو بدن","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"شامپو سر","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"شاهتره","category":"گیاهان-دارویی","available":true},
-            {"name":"شکر تیغال","category":"گیاهان-دارویی","available":true},
-            {"name":"شکر قهوه ای","category":"محصولات-خوراکی","available":true},
-            {"name":"شنبلیله","category":"گیاهان-دارویی","available":true},
-            {"name":"شوره","category":"متفرقه","available":true},
-            {"name":"شیر خشت","category":"گیاهان-دارویی","available":true},
-            {"name":"شیره انگور","category":"محصولات-خوراکی","available":true},
-            {"name":"شیره توت","category":"محصولات-خوراکی","available":true},
-            {"name":"شیره خرما","category":"محصولات-خوراکی","available":true},
-            {"name":"شیرین بیان","category":"گیاهان-دارویی","available":true},
-            {"name":"صابون","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"صابون زردچوبه","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"صمغ عربی","category":"گیاهان-دارویی","available":true},
-            {"name":"عسل","category":"محصولات-خوراکی","available":true},
-            {"name":"عناب","category":"محصولات-خوراکی","available":true},
-            {"name":"عرق آلوورا","category":"عرقیات","available":true},
-            {"name":"عرق آویشن","category":"عرقیات","available":true},
-            {"name":"عرق بابونه","category":"عرقیات","available":true},
-            {"name":"عرق بادرنجبویه","category":"عرقیات","available":true},
-            {"name":"عرق بید","category":"عرقیات","available":true},
-            {"name":"عرق بیدمشک","category":"عرقیات","available":true},
-            {"name":"عرق پونه","category":"عرقیات","available":true},
-            {"name":"عرق چهارگیاه","category":"عرقیات","available":true},
-            {"name":"عرق خارخاسک","category":"عرقیات","available":true},
-            {"name":"عرق خارشتر","category":"عرقیات","available":true},
-            {"name":"عرق رازیانه","category":"عرقیات","available":true},
-            {"name":"عرق زنجبیل","category":"عرقیات","available":true},
-            {"name":"عرق زنیان","category":"عرقیات","available":true},
-            {"name":"عرق زیره","category":"عرقیات","available":true},
-            {"name":"عرق سنبل الطیب","category":"عرقیات","available":true},
-            {"name":"عرق شاتره","category":"عرقیات","available":true},
-            {"name":"عرق شنبلیله","category":"عرقیات","available":true},
-            {"name":"عرق شوید","category":"عرقیات","available":true},
-            {"name":"عرق شیرین بیان","category":"عرقیات","available":true},
-            {"name":"عرق کاسنی","category":"عرقیات","available":true},
-            {"name":"عرق کیالک","category":"عرقیات","available":true},
-            {"name":"عرق گاوزبان","category":"عرقیات","available":true},
-            {"name":"عرق گزنه","category":"عرقیات","available":true},
-            {"name":"عرق گلاب","category":"عرقیات","available":true},
-            {"name":"عرق نعنا","category":"عرقیات","available":true},
-            {"name":"عرق هل","category":"عرقیات","available":true},
-            {"name":"عرق یونجه","category":"عرقیات","available":true},
-            {"name":"فلفل سیاه","category":"ادویه-جات","available":true},
-            {"name":"فلفل قرمز","category":"ادویه-جات","available":true},
-            {"name":"فلوس","category":"گیاهان-دارویی","available":true},
-            {"name":"قره قروت","category":"محصولات-خوراکی","available":true},
-            {"name":"کندر","category":"گیاهان-دارویی","available":true},
-            {"name":"کتیرا","category":"گیاهان-دارویی","available":true},
-            {"name":"کشمش","category":"محصولات-خوراکی","available":true},
-            {"name":"گل بابونه","category":"گیاهان-دارویی","available":true},
-            {"name":"گل بنفشه","category":"گیاهان-دارویی","available":true},
-            {"name":"گل ختمی","category":"گیاهان-دارویی","available":true},
-            {"name":"گل زوفا","category":"گیاهان-دارویی","available":true},
-            {"name":"گل محمدی","category":"گیاهان-دارویی","available":true},
-            {"name":"گلرنگ","category":"گیاهان-دارویی","available":true},
-            {"name":"گلنار","category":"گیاهان-دارویی","available":true},
-            {"name":"گندم","category":"حبوبات-و-غلات","available":true},
-            {"name":"لپه","category":"حبوبات-و-غلات","available":true},
-            {"name":"لیمو خشک","category":"ادویه-جات","available":true},
-            {"name":"لیمو عمانی","category":"ادویه-جات","available":true},
-            {"name":"ماش","category":"حبوبات-و-غلات","available":true},
-            {"name":"مایع ظرفشویی","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"مایع لباسشویی","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"مریم گلی","category":"گیاهان-دارویی","available":true},
-            {"name":"مروارید","category":"متفرقه","available":true},
-            {"name":"مرزه","category":"گیاهان-دارویی","available":true},
-            {"name":"مقل","category":"گیاهان-دارویی","available":true},
-            {"name":"موسیر","category":"ادویه-جات","available":true},
-            {"name":"موم","category":"متفرقه","available":true},
-            {"name":"میخک","category":"ادویه-جات","available":true},
-            {"name":"نعنا خشک","category":"گیاهان-دارویی","available":true},
-            {"name":"نمک دریا","category":"ادویه-جات","available":true},
-            {"name":"نوره","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"نخود","category":"حبوبات-و-غلات","available":true},
-            {"name":"نشاسته","category":"متفرقه","available":true},
-            {"name":"هل","category":"ادویه-جات","available":true},
-            {"name":"هلیله سیاه","category":"گیاهان-دارویی","available":true},
-            {"name":"وایتکس","category":"شوینده-و-بهداشتی","available":true},
-            {"name":"وانیل","category":"ادویه-جات","available":true},
-            {"name":"کنجد","category":"حبوبات-و-غلات","available":true},
-            {"name":"کاسنی","category":"گیاهان-دارویی","available":true},
-            {"name":"کاکائو","category":"ادویه-جات","available":true},
-            {"name":"گزنه","category":"گیاهان-دارویی","available":true},
-            {"name":"گل گاوزبان","category":"گیاهان-دارویی","available":true}
+        const allProducts = [
+            // This data is embedded to avoid fetch issues on local files
+            // The JSON structure now includes "unit"
+            { "name": "آرد برنج", "category": "حبوبات-و-غلات", "available": true, "unit": "گرم" },
+            { "name": "آرد جو", "category": "حبوبات-و-غلات", "available": true, "unit": "گرم" },
+            { "name": "آرد جوانه گندم", "category": "حبوبات-و-غلات", "available": true, "unit": "گرم" },
+            { "name": "آرد گندم", "category": "حبوبات-و-غلات", "available": true, "unit": "گرم" },
+            { "name": "آرد نخودچی", "category": "حبوبات-و-غلات", "available": true, "unit": "گرم" },
+            { "name": "آویشن", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "آویشن شیرازی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "اسپند", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "استخودوس", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "افتیمون", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "اکالیپتوس", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "انیسون", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "انجیر خشک", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "بابا آدم", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "بابونه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "بادرنجبویه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "بارهنگ", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "برگ بو", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "برگ سنا", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "برگ گردو", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "برنج ایرانی", "category": "حبوبات-و-غلات", "available": true, "unit": "کیلو" },
+            { "name": "بهار نارنج", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "به لیمو", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "بومادران", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "پاپایا", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "پاپل", "category": "متفرقه", "available": false, "unit": "عدد" },
+            { "name": "پونه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "پونه کوهی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "پودر پاپریکا", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "پودر پیاز", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "پودر دارچین", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "پودر زنجبیل", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "پودر سیر", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "پودر لیمو", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "پودر نارگیل", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "تاج ریزی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم بالنگا", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم خرفه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم ریحان", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم شربتی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم شوید", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم کتان", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم گشنیز", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "تخم کاهو", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "ترنجبین", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "جدوا", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "جوز هندی", "category": "ادویه-جات", "available": true, "unit": "عدد" },
+            { "name": "جو دوسر پرک", "category": "حبوبات-و-غلات", "available": true, "unit": "گرم" },
+            { "name": "جوهر لیمو", "category": "متفرقه", "available": true, "unit": "گرم" },
+            { "name": "چای ترش", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "چای سبز", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "چای ماسالا", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "چای کوهی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "چهار تخم", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "چهارگل", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "چوب دارچین", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "حنا", "category": "شوینده-و-بهداشتی", "available": true, "unit": "گرم" },
+            { "name": "خاکشیر", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "ختمی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "خردل", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "دارچین", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "دار فلفل", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "رازیانه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "رزماری", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "روغن آرگان", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن بادام تلخ", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن بادام شیرین", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن بنفشه", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن خراطین", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن سیاهدانه", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن کرچک", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن کنجد", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن مورد", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن نارگیل", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "روغن زیتون", "category": "روغن-ها", "available": true, "unit": "عدد" },
+            { "name": "زردچوبه", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "زعفران", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "زنجبیل", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "زنیان", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "زیره سبز", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "زیره سیاه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "سدر", "category": "شوینده-و-بهداشتی", "available": true, "unit": "گرم" },
+            { "name": "سرکه سیب", "category": "محصولات-خوراکی", "available": true, "unit": "بطری" },
+            { "name": "سماق", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "سنجد", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "سیاهدانه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "شاتره", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "شاهسفرم", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "شکر سرخ", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "شکر قهوه ای", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "شنبلیله", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "شیر خشت", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "شیرین بیان", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "شیره انگور", "category": "محصولات-خوراکی", "available": true, "unit": "ظرف" },
+            { "name": "شیره توت", "category": "محصولات-خوراکی", "available": true, "unit": "ظرف" },
+            { "name": "شیره خرما", "category": "محصولات-خوراکی", "available": true, "unit": "ظرف" },
+            { "name": "صابون", "category": "شوینده-و-بهداشتی", "available": true, "unit": "عدد" },
+            { "name": "صابون زردچوبه", "category": "شوینده-و-بهداشتی", "available": true, "unit": "عدد" },
+            { "name": "صمغ عربی", "category": "شوینده-و-بهداشتی", "available": true, "unit": "گرم" },
+            { "name": "عسل", "category": "محصولات-خوراکی", "available": true, "unit": "ظرف" },
+            { "name": "عناب", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "عرق آلوورا", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق آویشن", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق اترج", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق اسطوخودوس", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق بادرنجبویه", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق بارهنگ", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق برگ چنار", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق برگ زیتون", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق برگ گردو", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق بومادران", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق بهارنارنج", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق بید", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق بیدمشک", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق پونه", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق خارخاسک", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق خارشتر", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق ختمی", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق رازیانه", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق زنیان", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق زیره", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق سنبل الطیب", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق شاتره", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق شنبلیله", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق شوید", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق شیرین بیان", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق کاسنی", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق کرفس", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق کیالک", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق گشنیز", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق گلاب", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق گزنه", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق مرزه", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق نعنا", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق هل", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "عرق یونجه", "category": "عرقیات", "available": true, "unit": "بطری" },
+            { "name": "غنچه گل محمدی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "فلفل سیاه", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "فلفل قرمز", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "فلوس", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "فیبر", "category": "متفرقه", "available": true, "unit": "عدد" },
+            { "name": "قدومه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "کندر", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "کنجد", "category": "حبوبات-و-غلات", "available": true, "unit": "گرم" },
+            { "name": "کتیرا", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گل بابونه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گل بنفشه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گل پنیرک", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گل ختمی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گل زوفا", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گل محمدی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گلرنگ", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "گلنار", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "گندم", "category": "حبوبات-و-غلات", "available": true, "unit": "کیلو" },
+            { "name": "ماریانا", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "مازو", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "مخلصه", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "مرزنجوش", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "مریم گلی", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "موسیر", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "میخک", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "نعنا", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "نعنا خشک", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "نمک دریا", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" },
+            { "name": "هل", "category": "ادویه-جات", "available": true, "unit": "گرم" },
+            { "name": "هلیله", "category": "گیاهان-دارویی", "available": true, "unit": "گرم" },
+            { "name": "وایتکس", "category": "شوینده-و-بهداشتی", "available": true, "unit": "عدد" },
+            { "name": "نشاسته", "category": "محصولات-خوراکی", "available": true, "unit": "گرم" }
         ];
 
         document.addEventListener('DOMContentLoaded', function() {
-            const productContainer = document.getElementById('product-container');
+            const productList = document.getElementById('product-list');
             const jsonOutput = document.getElementById('json-output');
-            const searchInput = document.getElementById('search-input');
-            
-            const productsByCategory = allProductsData.reduce((acc, product) => {
-                if (!acc[product.category]) {
-                    acc[product.category] = [];
-                }
-                acc[product.category].push(product);
-                return acc;
-            }, {});
+            const copyButton = document.getElementById('copy-button');
+            const searchInput = document.getElementById('searchInput');
+            const productCount = document.getElementById('product-count');
 
-            function renderProducts(filter = '') {
-                productContainer.innerHTML = '';
-                const filterText = filter.toLowerCase();
-
-                for (const category in productsByCategory) {
-                    const products = productsByCategory[category].filter(p => p.name.toLowerCase().includes(filterText));
-
-                    if (products.length > 0) {
-                        const categorySection = document.createElement('div');
-                        categorySection.className = 'category-section';
-                        
-                        const categoryTitle = document.createElement('h3');
-                        // Replace hyphen with space for display
-                        categoryTitle.textContent = category.replace(/-/g, ' '); 
-                        categorySection.appendChild(categoryTitle);
-
-                        products.forEach(product => {
-                            const itemDiv = document.createElement('div');
-                            itemDiv.className = 'product-item';
-                            itemDiv.innerHTML = `
-                                <input type="checkbox" id="prod-${product.name}" data-name="${product.name}" ${product.available ? 'checked' : ''}>
-                                <label for="prod-${product.name}">${product.name}</label>
-                            `;
-                            categorySection.appendChild(itemDiv);
-                        });
-                        productContainer.appendChild(categorySection);
-                    }
-                }
-                updateJsonOutput(); // Update JSON after rendering
-            }
-
-            function updateJsonOutput() {
-                const currentProductStates = allProductsData.map(p => {
-                    const checkbox = document.getElementById(`prod-${p.name}`);
-                    // If checkbox exists (not filtered out), use its state. Otherwise, keep original state.
-                    const isAvailable = checkbox ? checkbox.checked : p.available;
-                    return { name: p.name, category: p.category, available: isAvailable };
+            function generateJson() {
+                const updatedProducts = allProducts.map(product => {
+                    const checkbox = document.getElementById(`prod-${product.name}`);
+                    const isAvailable = checkbox ? checkbox.checked : product.available;
+                    // This is the CRITICAL fix: we preserve the unit from the original data
+                    return {
+                        name: product.name,
+                        category: product.category,
+                        available: isAvailable,
+                        unit: product.unit 
+                    };
                 });
-                jsonOutput.value = JSON.stringify(currentProductStates, null, 2);
+                jsonOutput.value = JSON.stringify(updatedProducts, null, 2);
             }
-            
-            productContainer.addEventListener('change', function(e) {
-                if (e.target.type === 'checkbox') {
-                    // Find the product in original data and update its 'available' status
-                    const productName = e.target.dataset.name;
-                    const product = allProductsData.find(p => p.name === productName);
-                    if (product) {
-                        product.available = e.target.checked;
+
+            function renderProducts(filterText = '') {
+                productList.innerHTML = '';
+                let visibleProducts = 0;
+                
+                const sortedProducts = [...allProducts].sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+
+                sortedProducts.forEach(product => {
+                    if (filterText && !product.name.includes(filterText)) {
+                        return; // Skip if it doesn't match the search
                     }
-                    updateJsonOutput();
-                }
+
+                    const listItem = document.createElement('li');
+                    listItem.className = 'product-item';
+                    listItem.innerHTML = `
+                        <span class="product-name">
+                            ${product.name}
+                            <span class="product-unit">(${product.unit || 'عدد'})</span>
+                        </span>
+                        <input type="checkbox" class="product-checkbox" id="prod-${product.name}" ${product.available ? 'checked' : ''}>
+                    `;
+                    productList.appendChild(listItem);
+                    visibleProducts++;
+                });
+
+                productCount.textContent = `نمایش ${visibleProducts} از ${allProducts.length} محصول`;
+
+                // Add event listeners after rendering
+                document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', generateJson);
+                });
+            }
+
+            searchInput.addEventListener('input', function() {
+                renderProducts(this.value.trim());
             });
 
-            searchInput.addEventListener('input', () => {
-                renderProducts(searchInput.value);
-            });
-
-            // Initial render
-            renderProducts();
-        });
-
-        function copyJson() {
-            const jsonOutput = document.getElementById('json-output');
-            jsonOutput.select();
-            document.execCommand('copy');
-            
-            const feedback = document.getElementById('copy-feedback');
-            feedback.style.display = 'block';
-            setTimeout(() => {
-                feedback.style.display = 'none';
-            }, 2000);
-        }
-    </script>
-</body>
-</html>
+            copyButton.addEventListener('click', function() {
+                generateJson(); // Ensure JSON is up-to-date before copying
+                jsonOutput.select();
+                document.execCommand('copy');
+                
