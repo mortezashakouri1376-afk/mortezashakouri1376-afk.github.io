@@ -7,14 +7,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            --primary-color: #6B8E23; /* سبز زیتونی */
-            --primary-dark: #55721c;
-            --light-bg: #f4f7f0;      /* پس‌زمینه خیلی روشن */
-            --white: #ffffff;
-            --text-color: #333;
-            --gray-text: #666;
+            /* تم اصلی */
+            --primary-color: #6B8E23; 
+            --light-bg: #f8f9fa;      
+            --selected-bg: #eef5e0;   
+            --text-color: #444;
             --border-radius: 16px;
-            --shadow: 0 8px 20px rgba(107, 142, 35, 0.15);
+            --shadow: 0 10px 30px rgba(0,0,0,0.08); 
         }
 
         body {
@@ -27,166 +26,166 @@
 
         /* --- هدر --- */
         .header {
-            background-color: var(--white);
-            padding: 20px;
-            text-align: center;
+            background-color: white; padding: 25px 20px; text-align: center;
+            border-bottom: 1px solid #eaeaea; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
             position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-bottom: 3px solid var(--primary-color);
         }
-        .header h1 { margin: 0; color: var(--primary-color); font-size: 2rem; font-weight: 900; }
-        .header p { margin: 5px 0 0; color: var(--gray-text); font-size: 0.9rem; }
+        .header h1 { margin: 0; color: var(--primary-color); font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; }
+        .header p { margin: 8px 0 0; color: #999; font-size: 0.9rem; }
 
         .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
-
+        
         /* --- جستجو --- */
-        .search-container { position: relative; margin-bottom: 25px; margin-top: 10px; }
+        .search-container { position: relative; margin-bottom: 30px; margin-top: 10px; }
         #search-input {
             width: 100%; padding: 16px 50px 16px 20px; font-size: 1.1rem;
-            border-radius: var(--border-radius); border: 2px solid #e0e0e0;
-            background-color: var(--white); transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border-radius: var(--border-radius); border: 2px solid #eee;
+            background-color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: all 0.3s ease; color: #555;
         }
         #search-input:focus {
             outline: none; border-color: var(--primary-color);
-            box-shadow: 0 4px 15px rgba(107, 142, 35, 0.2);
+            box-shadow: 0 0 0 4px rgba(107, 142, 35, 0.15);
         }
         .search-icon {
             position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            color: #aaa; font-size: 1.2rem;
+            color: #ccc; font-size: 1.2rem; pointer-events: none;
         }
 
-        /* --- گرید دسته‌بندی (تصاویر واقعی) --- */
+        /* --- گرید دسته‌بندی --- */
         .categories-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
             gap: 15px; padding-bottom: 20px; 
         }
         @media (min-width: 480px) {
-             .categories-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+             .categories-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
         }
 
         .category-tile {
-            position: relative; border-radius: var(--border-radius); overflow: hidden;
-            height: 180px; text-decoration: none; color: white;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: var(--shadow); cursor: pointer;
-            background-size: cover; background-position: center;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; color: white; border-radius: var(--border-radius); overflow: hidden;
+            text-decoration: none; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; height: 180px; padding: 20px; 
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
-        /* لایه تاریک روی عکس برای خوانایی متن */
+        /* استایل گرادینت‌ها برای دسته‌های مختلف */
+        .cat-herbs { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); } /* سبز */
+        .cat-spices { background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%); } /* قرمز آتشین */
+        .cat-liquids { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); } /* آبی یخی */
+        .cat-oils { background: linear-gradient(135deg, #f09819 0%, #edde5d 100%); } /* طلایی */
+        .cat-grains { background: linear-gradient(135deg, #C04848 0%, #480048 100%); } /* زرشکی قهوه ای */
+        .cat-hygiene { background: linear-gradient(135deg, #cc2b5e 0%, #753a88 100%); } /* بنفش */
+        .cat-food { background: linear-gradient(135deg, #FF8008 0%, #FFC837 100%); } /* نارنجی */
+        .cat-misc { background: linear-gradient(135deg, #606c88 0%, #3f4c6b 100%); } /* طوسی سرمه ای */
+
+        /* پترن نقطه‌ای روی گرادینت برای زیبایی بیشتر */
         .category-tile::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
-            transition: background 0.3s;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 20px 20px; opacity: 0.6; pointer-events: none;
         }
-        .category-tile:hover::before { background: linear-gradient(to bottom, rgba(107, 142, 35, 0.4), rgba(107, 142, 35, 0.8)); }
-        .category-tile:hover { transform: translateY(-5px); }
 
-        /* --- تصاویر پس‌زمینه (از سرور داخلی دیجی‌کالا) --- */
-        /* گیاهان (عکس نعنا خشک) */
-        .cat-herbs { background-image: url('https://dkstatics-public.digikala.com/digikala-products/119904833.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
-        /* ادویه (عکس زردچوبه/ادویه) */
-        .cat-spices { background-image: url('https://dkstatics-public.digikala.com/digikala-products/113483482.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
-        /* عرقیات (عکس گلاب) */
-        .cat-liquids { background-image: url('https://dkstatics-public.digikala.com/digikala-products/3828656.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
-        /* روغن‌ها (عکس روغن زیتون) */
-        .cat-oils { background-image: url('https://dkstatics-public.digikala.com/digikala-products/3966526.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
-        /* حبوبات (عکس لوبیا) */
-        .cat-grains { background-image: url('https://dkstatics-public.digikala.com/digikala-products/2900035.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
-        /* بهداشتی (عکس صابون سنتی) */
-        .cat-hygiene { background-image: url('https://dkstatics-public.digikala.com/digikala-products/4228301.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
-        /* خوراکی (عکس عسل/شیره) */
-        .cat-food { background-image: url('https://dkstatics-public.digikala.com/digikala-products/112783364.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
-        /* متفرقه (عکس جعبه) */
-        .cat-misc { background-image: url('https://dkstatics-public.digikala.com/digikala-products/111193966.jpg?x-oss-process=image/resize,m_lfit,h_300,w_300/quality,q_80'); }
+        .category-tile:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
 
-        .tile-content { position: relative; z-index: 2; text-align: center; }
+        .tile-content { position: relative; z-index: 2; text-align: center; width: 100%; }
         
-        /* --- استایل آیکون‌ها و انیمیشن‌ها --- */
+        /* --- انیمیشن آیکون‌ها --- */
         .tile-content i { 
-            font-size: 3rem; margin-bottom: 10px; display: inline-block; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-size: 3.5rem; margin-bottom: 15px; display: inline-block; 
+            color: rgba(255,255,255,0.95);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
             transition: all 0.3s ease;
         }
-        .tile-content h2 { margin: 0; font-size: 1.2rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
 
-        /* تعریف انیمیشن‌ها */
         @keyframes swing { 20% { transform: rotate(15deg); } 40% { transform: rotate(-10deg); } 60% { transform: rotate(5deg); } 80% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
         @keyframes bounce-custom { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         @keyframes pulse-custom { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
         @keyframes shake-custom { 0% { transform: rotate(0); } 25% { transform: rotate(15deg); } 50% { transform: rotate(-15deg); } 75% { transform: rotate(5deg); } 100% { transform: rotate(0); } }
 
-        /* اختصاص انیمیشن به هر آیکون هنگام هاور روی کاشی */
         .category-tile:hover .fa-leaf { animation: swing 1s ease-in-out; } 
-        .category-tile:hover .fa-bottle-droplet, .category-tile:hover .fa-oil-well { animation: bounce-custom 0.8s ease; } 
+        .category-tile:hover .fa-bottle-droplet, 
+        .category-tile:hover .fa-oil-well { animation: bounce-custom 0.8s ease; } 
         .category-tile:hover .fa-mortar-pestle { animation: shake-custom 0.8s ease; } 
-        .category-tile:hover .fa-wheat-awn { animation: pulse-custom 0.8s ease; } 
+        .category-tile:hover .fa-wheat-awn, 
+        .category-tile:hover .fa-seedling { animation: pulse-custom 0.8s ease; } 
         .category-tile:hover .fa-pump-soap { animation: swing 1s ease; }
+        .category-tile:hover .fa-jar { animation: bounce-custom 0.8s ease; }
+        .category-tile:hover .fa-box-open { animation: pulse-custom 0.8s ease; }
+
+        .tile-content h2 { margin: 0; font-size: 1.3rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.2); letter-spacing: -0.5px; }
 
         /* --- بخش محصولات --- */
-        .product-section { display: none; margin-top: 20px; background-color: white; padding: 20px; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+        .product-section { display: none; margin-top: 20px; background-color: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow); }
         
         #back-to-categories { 
-            background-color: #f0f2f5; color: #555; border: none; padding: 10px 20px; 
-            border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 20px; 
-            display: inline-flex; align-items: center; gap: 8px;
-            transition: 0.2s;
+            background-color: #f0f2f5; color: #555; border: none; padding: 12px 20px; 
+            border-radius: 12px; cursor: pointer; font-size: 0.95rem; font-weight: 700;
+            margin-bottom: 25px; display: inline-flex; align-items: center; gap: 10px;
+            transition: all 0.2s;
         }
         #back-to-categories:hover { background-color: #e2e6ea; color: var(--primary-color); }
+        #back-to-categories i { transform: rotate(180deg); }
 
         .product-list { list-style: none; padding: 0; margin: 0; }
         .product-item {
             display: grid; grid-template-columns: auto 1fr auto; align-items: center;
-            gap: 12px; padding: 15px 10px; border-bottom: 1px solid #f0f0f0;
+            gap: 15px; padding: 18px 10px; border-bottom: 1px solid #f4f4f4;
             transition: background-color 0.2s; border-radius: 8px;
         }
         .product-item:last-child { border-bottom: none; }
-        .product-item.selected { background-color: #f9fdf5; border-right: 4px solid var(--primary-color); }
+        .product-item.selected { background-color: var(--selected-bg); border-right: 4px solid var(--primary-color); }
         
-        .product-name { font-weight: 600; color: #333; cursor: pointer; font-size: 1.05rem; }
-        .product-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary-color); }
+        .product-name { font-weight: 600; font-size: 1.05rem; cursor: pointer; color: #333; }
+        .product-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary-color); border-radius: 6px; }
         
-        /* بخش تعداد و حذف */
-        .quantity-input-container { display: none; align-items: center; gap: 10px; }
+        .quantity-input-container { display: none; align-items: center; justify-self: end; gap: 10px; }
         .product-item.selected .quantity-input-container { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         
         .quantity-input {
-            width: 50px; padding: 5px; border: 2px solid #dce6c5; border-radius: 8px;
-            text-align: center; font-weight: bold; color: var(--primary-color); font-size: 1.1rem;
+            width: 60px; padding: 6px; border: 2px solid #dce6c5; border-radius: 8px;
+            text-align: center; font-size: 1.1rem; font-weight: bold; color: var(--primary-color);
         }
         .quantity-input:focus { outline: none; border-color: var(--primary-color); }
-        
-        /* دکمه حذف */
+        .quantity-unit { font-size: 0.85rem; color: #888; min-width: 30px; }
+
         .delete-btn {
-            color: #ff4757; background-color: #ffe0e3; 
-            width: 32px; height: 32px; border-radius: 50%;
+            color: #ff4757; cursor: pointer; font-size: 1.1rem; padding: 8px;
+            background: #ffeef0; border-radius: 50%; width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
+            transition: all 0.2s;
         }
-        .delete-btn:hover { background-color: #ff4757; color: white; transform: scale(1.1); }
+        .delete-btn:hover { transform: scale(1.1); background: #ff4757; color: white; }
+
+        .status-badge { padding: 5px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; }
+        .status-unavailable { background-color: #fff0f0; color: #e03e2d; }
 
         /* --- دکمه واتس‌اپ --- */
         .whatsapp-fab {
             position: fixed; bottom: 30px; left: 30px; 
             background: linear-gradient(135deg, #25D366, #128C7E);
-            color: white; width: 60px; height: 60px; border-radius: 50%; display: flex;
-            justify-content: center; align-items: center; font-size: 30px;
+            color: white; width: 65px; height: 65px; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; font-size: 2.2rem;
             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); text-decoration: none;
-            transition: all 0.3s; cursor: pointer; transform: scale(0); z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; transform: scale(0); z-index: 1000;
         }
         .whatsapp-fab.visible { transform: scale(1); }
-        .whatsapp-fab:hover { transform: scale(1.1); }
+        .whatsapp-fab:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 15px 35px rgba(37, 211, 102, 0.5); }
 
         .cart-counter {
             position: absolute; top: -5px; right: -5px; background-color: #ff4757;
-            color: white; border-radius: 50%; width: 24px; height: 24px;
-            font-size: 0.8rem; font-weight: bold; display: flex;
-            justify-content: center; align-items: center; border: 2px solid white;
+            color: white; border-radius: 50%; width: 28px; height: 28px;
+            font-size: 0.85rem; font-weight: bold; display: flex;
+            justify-content: center; align-items: center;
+            border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        #loading { text-align: center; padding: 40px; color: var(--primary-color); font-weight: bold; }
+        #loading, #error { text-align: center; font-size: 1.1rem; padding: 50px 0; color: #889e75; }
     </style>
 </head>
 <body>
@@ -197,75 +196,78 @@
     </header>
 
     <div class="container">
+        <!-- کادر جستجو -->
         <div class="search-container">
             <i class="fa-solid fa-search search-icon"></i>
-            <input type="search" id="search-input" placeholder="جستجو در محصولات..." autocomplete="off">
+            <input type="search" id="search-input" placeholder="جستجو (مثلا: آویشن، نعنا)..." autocomplete="off">
         </div>
 
-        <!-- نمای دسته‌بندی‌ها (با عکس‌های سرور داخلی) -->
+        <!-- نمای دسته‌بندی‌ها (با رنگ‌های گرادینت) -->
         <div id="category-view">
             <div class="categories-grid">
                 
-                <div class="category-tile cat-herbs" data-category="گیاهان-دارویی">
+                <a href="#" class="category-tile cat-herbs" data-category="گیاهان-دارویی">
                     <div class="tile-content"><i class="fa-solid fa-leaf"></i><h2>گیاهان دارویی</h2></div>
-                </div>
+                </a>
 
-                <div class="category-tile cat-spices" data-category="ادویه-جات">
+                <a href="#" class="category-tile cat-spices" data-category="ادویه-جات">
                     <div class="tile-content"><i class="fa-solid fa-mortar-pestle"></i><h2>ادویه‌جات</h2></div>
-                </div>
+                </a>
 
-                <div class="category-tile cat-liquids" data-category="عرقیات">
+                <a href="#" class="category-tile cat-liquids" data-category="عرقیات">
                     <div class="tile-content"><i class="fa-solid fa-bottle-droplet"></i><h2>عرقیات</h2></div>
-                </div>
+                </a>
 
-                <div class="category-tile cat-oils" data-category="روغن-ها">
+                <a href="#" class="category-tile cat-oils" data-category="روغن-ها">
                     <div class="tile-content"><i class="fa-solid fa-oil-well"></i><h2>روغن‌ها</h2></div>
-                </div>
+                </a>
 
-                <div class="category-tile cat-grains" data-category="حبوبات-و-غلات">
+                <a href="#" class="category-tile cat-grains" data-category="حبوبات-و-غلات">
                     <div class="tile-content"><i class="fa-solid fa-wheat-awn"></i><h2>حبوبات و غلات</h2></div>
-                </div>
+                </a>
 
-                <div class="category-tile cat-hygiene" data-category="شوینده-و-بهداشتی">
+                <a href="#" class="category-tile cat-hygiene" data-category="شوینده-و-بهداشتی">
                     <div class="tile-content"><i class="fa-solid fa-pump-soap"></i><h2>بهداشتی</h2></div>
-                </div>
+                </a>
 
-                <div class="category-tile cat-food" data-category="محصولات-خوراکی">
+                <a href="#" class="category-tile cat-food" data-category="محصولات-خوراکی">
                     <div class="tile-content"><i class="fa-solid fa-jar"></i><h2>خوراکی</h2></div>
-                </div>
+                </a>
 
-                <div class="category-tile cat-misc" data-category="متفرقه">
+                <a href="#" class="category-tile cat-misc" data-category="متفرقه">
                     <div class="tile-content"><i class="fa-solid fa-box-open"></i><h2>سایر محصولات</h2></div>
-                </div>
+                </a>
 
             </div>
         </div>
 
-        <!-- نمای محصولات -->
+        <!-- نمای لیست محصولات -->
         <div id="product-view" class="product-section">
             <button id="back-to-categories"><i class="fa-solid fa-arrow-right"></i> بازگشت</button>
-            <h2 id="product-category-title" style="color: var(--primary-color); margin-top:0;"></h2>
-            <div id="loading">درحال دریافت محصولات...</div>
+            <h2 id="product-category-title" style="margin-top: 0; margin-bottom: 20px; color: var(--primary-color);"></h2>
+            <div id="loading">درحال بارگذاری محصولات...</div>
+            <div id="error" style="display: none;">خطا در بارگذاری محصولات.</div>
             <ul id="product-list" class="product-list"></ul>
         </div>
     </div>
 
     <div id="whatsapp-button" class="whatsapp-fab">
         <i class="fab fa-whatsapp"></i>
-        <span id="cart-counter" class="cart-counter">0</span>
+        <span id="cart-counter" class="cart-counter"></span>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const whatsappNumber = "989918022066";
             
-            // عناصر صفحه
+            // Elements
             const categoryView = document.getElementById('category-view');
             const productView = document.getElementById('product-view');
             const productList = document.getElementById('product-list');
             const categoryTitle = document.getElementById('product-category-title');
             const backButton = document.getElementById('back-to-categories');
             const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
             const whatsappBtn = document.getElementById('whatsapp-button');
             const cartCounter = document.getElementById('cart-counter');
             const searchInput = document.getElementById('search-input');
@@ -285,14 +287,13 @@
                 window.scrollTo(0, 0);
             }
             
-            // بروزرسانی سبد خرید و دکمه واتس‌اپ
             function updateCartAndButton() {
                 shoppingCart = [];
                 document.querySelectorAll('.product-checkbox:checked').forEach(checkbox => {
                     const name = checkbox.dataset.name;
                     const unit = checkbox.dataset.unit;
                     const quantityInput = document.getElementById(`qty-${name}`);
-                    const quantity = quantityInput ? quantityInput.value : 1;
+                    const quantity = quantityInput.value || 1;
                     
                     shoppingCart.push({ name, quantity, unit });
                 });
@@ -305,25 +306,13 @@
                 }
             }
 
-            // حذف محصول از سبد خرید
-            window.deleteItem = function(productName) {
-                const checkbox = document.getElementById(`prod-${productName}`);
-                if(checkbox) {
-                    checkbox.checked = false;
-                    // حذف کلاس selected از والد
-                    const listItem = checkbox.closest('.product-item');
-                    listItem.classList.remove('selected');
-                    updateCartAndButton();
-                }
-            };
-
             function renderProductList(productsToShow, title) {
                 productList.innerHTML = '';
                 categoryTitle.textContent = title;
                 loadingDiv.style.display = 'none';
 
                 if (productsToShow.length === 0) {
-                    productList.innerHTML = '<li style="text-align:center; padding:20px; color:#777;">محصولی یافت نشد.</li>';
+                    productList.innerHTML = '<li class="product-item" style="justify-content: center; color: #777; padding: 30px;">محصولی یافت نشد.</li>';
                     return;
                 }
                 
@@ -332,9 +321,15 @@
                 productsToShow.forEach(product => {
                     const listItem = document.createElement('li');
                     listItem.className = 'product-item';
-                    const isSelected = shoppingCart.some(item => item.name === product.name);
-                    if(isSelected) listItem.classList.add('selected');
+                    listItem.id = `item-${product.name}`;
+                    
+                    const cartItem = shoppingCart.find(item => item.name === product.name);
+                    const isSelected = !!cartItem;
 
+                    if (isSelected) {
+                        listItem.classList.add('selected');
+                    }
+                    
                     if (product.available) {
                         listItem.innerHTML = `
                             <input type="checkbox" class="product-checkbox" id="prod-${product.name}" 
@@ -344,31 +339,33 @@
                             
                             <div class="quantity-input-container">
                                 <input type="number" min="1" class="quantity-input" 
-                                       id="qty-${product.name}" value="1" 
-                                       oninput="updateCartAndButton()">
-                                <span style="font-size:0.8rem; color:#888;">${product.unit || 'عدد'}</span>
-                                <div class="delete-btn" onclick="deleteItem('${product.name}')" title="حذف">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </div>
+                                       id="qty-${product.name}" value="${cartItem ? cartItem.quantity : '1'}"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <span class="quantity-unit">${product.unit || 'عدد'}</span>
+                                <i class="fa-solid fa-trash-can delete-btn" title="حذف"></i>
                             </div>
                         `;
                     } else {
+                        listItem.style.gridTemplateColumns = '1fr auto';
                         listItem.innerHTML = `
-                            <span style="color:#aaa; text-decoration:line-through; margin-right:30px;">${product.name}</span>
-                            <span style="background:#ffebee; color:#c62828; padding:2px 8px; border-radius:10px; font-size:0.8rem;">ناموجود</span>
-                            <div></div>
+                            <span class="product-name" style="text-decoration: line-through; color: #aaa;">${product.name}</span>
+                            <span class="status-badge status-unavailable">ناموجود</span>
                         `;
                     }
                     productList.appendChild(listItem);
                 });
             }
 
-            // رویداد تغییر چک‌باکس
+            // Event Listeners
             productList.addEventListener('change', function(e) {
                 if (e.target.classList.contains('product-checkbox')) {
                     const listItem = e.target.closest('.product-item');
                     if (e.target.checked) {
                         listItem.classList.add('selected');
+                        setTimeout(() => {
+                           const input = listItem.querySelector('.quantity-input');
+                           if(input) input.focus(); 
+                        }, 100);
                     } else {
                         listItem.classList.remove('selected');
                     }
@@ -376,9 +373,28 @@
                 }
             });
 
-            // کلیک روی دسته‌بندی‌ها
+            productList.addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-btn') || e.target.parentElement.classList.contains('delete-btn')) {
+                    const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.parentElement;
+                    const listItem = btn.closest('.product-item');
+                    const checkbox = listItem.querySelector('.product-checkbox');
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        listItem.classList.remove('selected');
+                        updateCartAndButton();
+                    }
+                }
+            });
+
+            productList.addEventListener('input', function(e) {
+                if(e.target.classList.contains('quantity-input')) {
+                    updateCartAndButton();
+                }
+            });
+
             document.querySelectorAll('.category-tile').forEach(tile => {
-                tile.addEventListener('click', function() {
+                tile.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const category = this.dataset.category;
                     const categoryName = this.querySelector('h2').textContent;
                     const filteredProducts = allProducts.filter(p => p.category === category);
@@ -387,12 +403,11 @@
                 });
             });
 
-            // جستجو
             searchInput.addEventListener('input', () => {
                 const searchTerm = searchInput.value.trim().toLowerCase();
                 if (searchTerm) {
                     const searchResults = allProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
-                    renderProductList(searchResults, `جستجو: ${searchTerm}`);
+                    renderProductList(searchResults, `نتایج جستجو برای: «${searchTerm}»`);
                     showProductView();
                 } else {
                     showCategoryView();
@@ -405,27 +420,37 @@
             });
             
             whatsappBtn.addEventListener('click', () => {
+                updateCartAndButton(); 
                 if (shoppingCart.length === 0) return;
+
                 let message = "سلام فروشگاه سنجد، سفارش جدید:\n\n";
                 shoppingCart.forEach(item => {
                     message += `▪️ ${item.name}: ${item.quantity} ${item.unit}\n`;
                 });
-                const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-                window.open(url, '_blank');
+                message += "\nلطفاً بررسی کنید.";
+                
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+                window.open(whatsappUrl, '_blank');
             });
 
-            // دریافت اطلاعات از فایل JSON
-            fetch('products.json?v=' + Date.now())
-                .then(response => response.json())
-                .then(data => {
-                    allProducts = data;
+            async function fetchProducts() {
+                try {
+                    const response = await fetch('products.json?v=' + new Date().getTime()); 
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    allProducts = await response.json();
                     loadingDiv.style.display = 'none';
-                })
-                .catch(err => {
-                    loadingDiv.innerHTML = 'خطا در بارگذاری محصولات. فایل json بررسی شود.';
-                    console.error(err);
-                });
+                } catch (err) {
+                    loadingDiv.style.display = 'none';
+                    errorDiv.style.display = 'block';
+                    console.error('Fetch error:', err);
+                }
+            }
+            
+            showCategoryView();
+            fetchProducts();
         });
     </script>
+
 </body>
 </html>
