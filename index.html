@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عطاری برگ سبز</title>
+    <title>عطاری سنجد</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
@@ -286,7 +286,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // --- تنظیمات ---
-            const whatsappNumber = "989396349583"; // شماره واتس‌اپ خود را بدون + وارد کنید.
+            const whatsappNumber = "989918022066"; // شماره واتس‌اپ خود را بدون + وارد کنید.
             // --- پایان تنظیمات ---
 
             const categoryView = document.getElementById('category-view');
@@ -304,13 +304,13 @@
             function showCategoryView() {
                 categoryView.style.display = 'block';
                 productView.style.display = 'none';
-                window.scrollTo(0, 0); // بازگشت به بالای صفحه
+                window.scrollTo(0, 0);
             }
 
             function showProductView() {
                 categoryView.style.display = 'none';
                 productView.style.display = 'block';
-                window.scrollTo(0, 0); // بازگشت به بالای صفحه
+                window.scrollTo(0, 0);
             }
 
             function renderProducts(category, categoryName) {
@@ -324,7 +324,6 @@
                     return;
                 }
 
-                // مرتب‌سازی محصولات بر اساس نام
                 filteredProducts.sort((a, b) => a.name.localeCompare(b.name, 'fa'));
 
                 filteredProducts.forEach(product => {
@@ -352,10 +351,8 @@
 
             backButton.addEventListener('click', showCategoryView);
 
-            // Fetch products from JSON file
             async function fetchProducts() {
                 try {
-                    // اضافه کردن یک پارامتر برای جلوگیری از کش شدن فایل
                     const response = await fetch('products.json?v=' + new Date().getTime()); 
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -368,8 +365,7 @@
                     console.error('Fetch error:', err);
                 }
             }
-
-            // Initial setup
+            
             showCategoryView();
             fetchProducts();
         });
