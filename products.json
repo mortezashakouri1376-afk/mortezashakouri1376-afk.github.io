@@ -504,12 +504,6 @@
     "unit": "گرم"
   },
   {
-    "name": "سمنو",
-    "category": "شیرین",
-    "available": false,
-    "unit": "گرم"
-  },
-  {
     "name": "سنجد",
     "category": "محصولات-خوراکی",
     "available": true,
