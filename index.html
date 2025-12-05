@@ -23,13 +23,21 @@
             border-radius: 0.375rem;
             font-weight: bold;
         }
+        /* --- سبک اصلاح شده برای بازگرداندن طرح اصلی --- */
         .product-item {
             display: flex;
+            justify-content: space-between; /* کلید اصلی برای چیدمان صحیح */
             align-items: center;
-            gap: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
         .product-info {
-            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* فاصله بین نام و چک‌باکس */
+        }
+        .product-info .form-check-label {
+            cursor: pointer;
         }
         .quantity-control {
             display: flex;
@@ -61,7 +69,7 @@
             <p class="lead">محصولات مورد نظر خود را انتخاب و مقدار آن را مشخص کنید.</p>
         </header>
 
-        <!-- بخش جدید: کادر جستجو -->
+        <!-- بخش جستجو (دست نخورده و سالم) -->
         <div class="mb-4">
             <input type="text" id="search-input" class="form-control" placeholder="جستجوی محصول...">
         </div>
@@ -85,19 +93,16 @@
     document.addEventListener('DOMContentLoaded', () => {
         const productListEl = document.getElementById('product-list');
         const sendOrderBtn = document.getElementById('send-order-btn');
-        const searchInput = document.getElementById('search-input'); // گرفتن کادر جستجو
+        const searchInput = document.getElementById('search-input');
         
-        let allProductsData = []; // متغیری برای نگهداری کل داده‌ها
+        let allProductsData = [];
 
-        // تابع اصلی برای نمایش محصولات
         function displayProducts(searchTerm = '') {
-            productListEl.innerHTML = ''; // پاک کردن لیست فعلی
+            productListEl.innerHTML = '';
             const lowercasedSearchTerm = searchTerm.trim().toLowerCase();
 
-            // 1. فیلتر محصولات موجود
             let availableProducts = allProductsData.filter(p => p.available);
             
-            // 2. فیلتر بر اساس جستجو (اگر عبارتی وارد شده باشد)
             if (lowercasedSearchTerm) {
                 availableProducts = availableProducts.filter(p => 
                     p.name.toLowerCase().includes(lowercasedSearchTerm)
@@ -113,7 +118,6 @@
                 return;
             }
 
-            // 3. گروه‌بندی محصولات فیلتر شده بر اساس دسته‌بندی
             const groupedByCategory = availableProducts.reduce((acc, product) => {
                 const category = product.category || 'متفرقه';
                 if (!acc[category]) {
@@ -123,7 +127,6 @@
                 return acc;
             }, {});
 
-            // 4. ساخت و نمایش HTML
             for (const category in groupedByCategory) {
                 const categoryTitle = document.createElement('h2');
                 categoryTitle.className = 'h4 category-title';
@@ -136,18 +139,18 @@
                 groupedByCategory[category].forEach(product => {
                     const listItem = document.createElement('li');
                     listItem.className = 'list-group-item product-item';
+                    
+                    // --- ساختار HTML اصلاح شده برای بازگرداندن طرح اصلی ---
                     listItem.innerHTML = `
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="product-${product.id}" data-product-id="${product.id}" data-product-name="${product.name}" data-product-unit="${product.unit || ''}">
-                        </div>
                         <div class="product-info">
+                            <input class="form-check-input" type="checkbox" value="" id="product-${product.id}" data-product-id="${product.id}" data-product-name="${product.name}" data-product-unit="${product.unit || ''}">
                             <label class="form-check-label" for="product-${product.id}">
                                 ${product.name}
                             </label>
                         </div>
                         <div class="quantity-control">
-                            <input type="number" class="form-control quantity-input" id="quantity-${product.id}" value="1" min="1" disabled>
                             <span class="product-unit">${product.unit || ''}</span>
+                            <input type="number" class="form-control quantity-input" id="quantity-${product.id}" value="1" min="1" disabled>
                         </div>
                     `;
                     productGroup.appendChild(listItem);
@@ -157,7 +160,6 @@
             }
         }
 
-        // رویداد برای فعال/غیرفعال کردن فیلد مقدار
         productListEl.addEventListener('change', (e) => {
             if (e.target.type === 'checkbox') {
                 const productId = e.target.dataset.productId;
@@ -166,7 +168,6 @@
             }
         });
 
-        // رویداد برای دکمه ارسال به واتس‌اپ
         sendOrderBtn.addEventListener('click', () => {
             const selectedItems = [];
             const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
@@ -188,18 +189,16 @@
             }
 
             const message = "سلام، لطفا سفارش زیر را آماده کنید:\n\n" + selectedItems.join('\n');
-            const phoneNumber = "989123456789"; // شماره واتس‌اپ خود را اینجا وارد کنید
+            const phoneNumber = "989918022066"; // شماره واتس‌اپ خود را اینجا وارد کنید
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
             
             window.open(whatsappUrl, '_blank');
         });
 
-        // رویداد برای کادر جستجو
         searchInput.addEventListener('input', () => {
             displayProducts(searchInput.value);
         });
 
-        // بارگذاری اولیه محصولات
         fetch('products.json')
             .then(response => {
                 if (!response.ok) {
@@ -208,8 +207,8 @@
                 return response.json();
             })
             .then(data => {
-                allProductsData = data; // ذخیره داده‌ها
-                displayProducts();      // نمایش اولیه همه محصولات
+                allProductsData = data;
+                displayProducts();
             })
             .catch(error => {
                 console.error("خطا در بارگذاری فایل products.json:", error);
