@@ -31,6 +31,37 @@
         .header h1 { margin: 0; color: var(--primary-color); font-size: 2rem; font-weight: 700; }
         .header p { margin: 5px 0 0; color: #666; }
         .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        /* --- START: استایل کادر جستجوی جدید --- */
+        .search-container {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        #search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px; /* راست، بالا، پایین، چپ */
+            font-size: 1.1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            transition: box-shadow 0.3s, border-color 0.3s;
+            font-family: inherit;
+        }
+        #search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+            border-color: var(--primary-color);
+        }
+        .search-icon {
+            position: absolute;
+            right: 20px; /* آیکون در سمت راست برای زبان فارسی */
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none; /* جلوگیری از کلیک روی آیکون */
+        }
+        /* --- END: استایل کادر جستجو --- */
+
         .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 20px 0; }
 
         .category-tile {
@@ -75,12 +106,12 @@
         .product-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary-color); }
         
         .quantity-input-container {
-            display: none; /* Hidden by default */
+            display: none;
             align-items: center;
-            justify-self: end; /* Align to the right */
+            justify-self: end;
         }
         .product-item.selected .quantity-input-container {
-            display: flex; /* Shown when item is selected */
+            display: flex;
         }
         
         .quantity-input {
@@ -131,9 +162,15 @@
     </header>
 
     <div class="container">
+        <!-- کادر جستجوی جدید -->
+        <div class="search-container">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="search" id="search-input" placeholder="جستجوی نام محصول..." autocomplete="off">
+        </div>
+
         <div id="category-view">
             <div class="categories-grid">
-                <!-- Tiles are the same -->
+                <!-- Tiles remain the same -->
                  <a href="#" class="category-tile" data-category="گیاهان-دارویی" style="background-image: url('https://images.pexels.com/photos/5966439/pexels-photo-5966439.jpeg?auto=compress&cs=tinysrgb&w=600');">
                     <div class="tile-content"><i class="fa-solid fa-leaf"></i><h2>گیاهان دارویی</h2></div>
                 </a>
@@ -187,9 +224,9 @@
             const errorDiv = document.getElementById('error');
             const whatsappBtn = document.getElementById('whatsapp-button');
             const cartCounter = document.getElementById('cart-counter');
+            const searchInput = document.getElementById('search-input'); // عنصر جدید
 
             let allProducts = [];
-            // Cart now stores objects: { name, quantity, unit }
             let shoppingCart = []; 
 
             function showCategoryView() {
@@ -210,7 +247,7 @@
                     const name = checkbox.dataset.name;
                     const unit = checkbox.dataset.unit;
                     const quantityInput = document.getElementById(`qty-${name}`);
-                    const quantity = quantityInput.value || 1; // Default to 1 if empty
+                    const quantity = quantityInput.value || 1;
                     
                     shoppingCart.push({ name, quantity, unit });
                 });
@@ -223,19 +260,20 @@
                 }
             }
 
-            function renderProducts(category, categoryName) {
+            // --- تابع جدید و جامع برای نمایش لیست محصولات ---
+            function renderProductList(productsToShow, title) {
                 productList.innerHTML = '';
-                categoryTitle.textContent = categoryName;
+                categoryTitle.textContent = title;
+                loadingDiv.style.display = 'none';
 
-                const filteredProducts = allProducts.filter(p => p.category === category)
-                                                  .sort((a, b) => a.name.localeCompare(b.name, 'fa'));
-                
-                if (filteredProducts.length === 0) {
-                    productList.innerHTML = '<li class="product-item">محصولی در این دسته‌بندی یافت نشد.</li>';
+                if (productsToShow.length === 0) {
+                    productList.innerHTML = '<li class="product-item" style="justify-content: center; color: #777;">محصولی با این مشخصات یافت نشد.</li>';
                     return;
                 }
+                
+                productsToShow.sort((a, b) => a.name.localeCompare(b.name, 'fa'));
 
-                filteredProducts.forEach(product => {
+                productsToShow.forEach(product => {
                     const listItem = document.createElement('li');
                     listItem.className = 'product-item';
                     listItem.id = `item-${product.name}`;
@@ -262,7 +300,6 @@
                             </div>
                         `;
                     } else {
-                        // Change grid layout for unavailable items
                         listItem.style.gridTemplateColumns = '1fr auto';
                         listItem.innerHTML = `
                             <span class="product-name" style="text-decoration: line-through; color: #999;">${product.name}</span>
@@ -285,29 +322,42 @@
                 }
             });
 
-            // Listen for changes in quantity inputs to update the cart in real-time
             productList.addEventListener('input', function(e) {
                 if(e.target.classList.contains('quantity-input')) {
                     updateCartAndButton();
                 }
             });
 
+            // رویداد کلیک روی کاشی‌های دسته‌بندی
             document.querySelectorAll('.category-tile').forEach(tile => {
                 tile.addEventListener('click', function(e) {
                     e.preventDefault();
                     const category = this.dataset.category;
                     const categoryName = this.querySelector('h2').textContent;
-                    renderProducts(category, categoryName);
+                    const filteredProducts = allProducts.filter(p => p.category === category);
+                    renderProductList(filteredProducts, categoryName);
                     showProductView();
                 });
             });
 
+            // --- رویدادهای جدید برای جستجو ---
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                if (searchTerm) {
+                    const searchResults = allProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
+                    renderProductList(searchResults, `نتایج جستجو برای: «${searchTerm}»`);
+                    showProductView();
+                } else {
+                    showCategoryView(); // بازگشت به صفحه دسته‌بندی‌ها اگر جستجو خالی شود
+                }
+            });
+
             backButton.addEventListener('click', () => {
                 showCategoryView();
+                searchInput.value = ''; // پاک کردن متن جستجو هنگام بازگشت
             });
             
             whatsappBtn.addEventListener('click', () => {
-                // Final update before sending, to ensure all quantities are captured
                 updateCartAndButton(); 
                 if (shoppingCart.length === 0) return;
 
@@ -323,11 +373,11 @@
 
             async function fetchProducts() {
                 try {
-                    // Force refresh to avoid cache issues
                     const response = await fetch('products.json?v=' + new Date().getTime()); 
                     if (!response.ok) throw new Error('Network response was not ok');
                     allProducts = await response.json();
                     loadingDiv.style.display = 'none';
+                    // Don't render anything here initially, just show category view.
                 } catch (err) {
                     loadingDiv.style.display = 'none';
                     errorDiv.style.display = 'block';
