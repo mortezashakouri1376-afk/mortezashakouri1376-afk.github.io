@@ -3,218 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لیست محصولات</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <title>عطاری برگ سبز</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #28a745;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --border-radius: 8px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: 'Vazirmatn', sans-serif;
-            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0 0 100px 0;
+            background-color: #f4f7f6;
+            color: var(--text-color);
         }
-        .container {
-            max-width: 800px;
+
+        .header {
+            background-color: white; padding: 20px; text-align: center;
+            border-bottom: 1px solid #eee; box-shadow: var(--shadow);
+            position: sticky; top: 0; z-index: 100;
         }
-        .category-title {
-            background-color: #e9ecef;
-            padding: 0.75rem 1.25rem;
-            margin-top: 1.5rem;
-            border-radius: 0.375rem;
-            font-weight: bold;
+
+        .header h1 { margin: 0; color: var(--primary-color); font-size: 2rem; font-weight: 700; }
+        .header p { margin: 5px 0 0; color: #666; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 20px 0; }
+
+        .category-tile {
+            position: relative; color: white; border-radius: var(--border-radius); overflow: hidden;
+            text-decoration: none; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; min-height: 180px; padding: 20px; box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease; background-size: cover;
+            background-position: center; cursor: pointer;
         }
-        /* --- سبک اصلاح شده برای بازگرداندن طرح اصلی --- */
+        
+        .category-tile::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+            z-index: 1; transition: background 0.3s ease;
+        }
+
+        .category-tile:hover { transform: scale(1.04); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); }
+        .category-tile:hover::before { background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.1)); }
+
+        .tile-content { position: relative; z-index: 2; text-align: center; }
+        .tile-content i { font-size: 3rem; margin-bottom: 10px; opacity: 0.9; }
+        .tile-content h2 { margin: 0; font-size: 1.5rem; font-weight: 600; }
+
+        .product-section { display: none; margin-top: 30px; background-color: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow); }
+        #back-to-categories { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: var(--border-radius); cursor: pointer; font-size: 1rem; margin-bottom: 20px; transition: background-color 0.3s; }
+        #back-to-categories:hover { background-color: #218838; }
+
+        .product-list { list-style: none; padding: 0; margin: 0; }
         .product-item {
-            display: flex;
-            justify-content: space-between; /* کلید اصلی برای چیدمان صحیح */
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            padding-top: 1rem;
-            padding-bottom: 1rem;
+            gap: 15px;
+            padding: 15px 10px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
         }
-        .product-info {
-            display: flex;
+        .product-item:last-child { border-bottom: none; }
+        .product-item.selected { background-color: #eaf6ec; }
+        
+        .product-name { font-weight: 500; cursor: pointer; }
+        .product-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary-color); }
+        
+        .quantity-input-container {
+            display: none; /* Hidden by default */
             align-items: center;
-            gap: 0.75rem; /* فاصله بین نام و چک‌باکس */
+            justify-self: end; /* Align to the right */
         }
-        .product-info .form-check-label {
-            cursor: pointer;
+        .product-item.selected .quantity-input-container {
+            display: flex; /* Shown when item is selected */
         }
-        .quantity-control {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        
         .quantity-input {
             width: 70px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
             text-align: center;
+            font-size: 1rem;
+            margin-left: 8px;
         }
-        .product-unit {
-            color: #6c757d;
-            font-size: 0.9em;
+        .quantity-unit { font-size: 0.9rem; color: #555; }
+        
+        .status-badge {
+            padding: 5px 12px; border-radius: 15px; font-size: 0.9rem;
+            font-weight: 500; justify-self: end;
         }
-        .order-btn-container {
-            position: sticky;
-            bottom: 0;
-            background: linear-gradient(to top, white, rgba(255, 255, 255, 0));
-            padding: 1.5rem 0;
-            border-top: 1px solid #dee2e6;
+        .status-available { background-color: #eaf6ec; color: #28a745; }
+        .status-unavailable { background-color: #fbeae5; color: #dc3545; }
+
+        .whatsapp-fab {
+            position: fixed; bottom: 25px; left: 25px; background-color: #25D366;
+            color: white; width: 60px; height: 60px; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; font-size: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); text-decoration: none;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            cursor: pointer; transform: scale(0);
         }
+        .whatsapp-fab.visible { transform: scale(1); }
+        .whatsapp-fab:hover { background-color: #128C7E; }
+
+        .cart-counter {
+            position: absolute; top: -5px; right: -5px; background-color: #dc3545;
+            color: white; border-radius: 50%; width: 24px; height: 24px;
+            font-size: 0.8rem; font-weight: bold; display: flex;
+            justify-content: center; align-items: center;
+            border: 2px solid white;
+        }
+
+        #loading, #error { text-align: center; font-size: 1.2rem; padding: 40px 0; color: #777; }
     </style>
 </head>
 <body>
 
-    <div class="container py-4">
-        <header class="text-center mb-4">
-            <h1>لیست محصولات</h1>
-            <p class="lead">محصولات مورد نظر خود را انتخاب و مقدار آن را مشخص کنید.</p>
-        </header>
+    <header class="header">
+        <h1>عطاری برگ سبز</h1>
+        <p>عرضه کننده انواع گیاهان دارویی، عرقیات سنتی، ادویه‌جات و محصولات سالم</p>
+    </header>
 
-        <!-- بخش جستجو (دست نخورده و سالم) -->
-        <div class="mb-4">
-            <input type="text" id="search-input" class="form-control" placeholder="جستجوی محصول...">
+    <div class="container">
+        <div id="category-view">
+            <div class="categories-grid">
+                <!-- Tiles are the same -->
+                 <a href="#" class="category-tile" data-category="گیاهان-دارویی" style="background-image: url('https://images.pexels.com/photos/5966439/pexels-photo-5966439.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-leaf"></i><h2>گیاهان دارویی</h2></div>
+                </a>
+                <a href="#" class="category-tile" data-category="عرقیات" style="background-image: url('https://images.pexels.com/photos/7939109/pexels-photo-7939109.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-bottle-droplet"></i><h2>عرقیات</h2></div>
+                </a>
+                <a href="#" class="category-tile" data-category="ادویه-جات" style="background-image: url('https://images.pexels.com/photos/357756/pexels-photo-357756.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-mortar-pestle"></i><h2>ادویه‌جات</h2></div>
+                </a>
+                <a href="#" class="category-tile" data-category="روغن-ها" style="background-image: url('https://images.pexels.com/photos/3378994/pexels-photo-3378994.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-oil-well"></i><h2>روغن‌ها</h2></div>
+                </a>
+                <a href="#" class="category-tile" data-category="حبوبات-و-غلات" style="background-image: url('https://images.pexels.com/photos/10394783/pexels-photo-10394783.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-seedling"></i><h2>حبوبات و غلات</h2></div>
+                </a>
+                <a href="#" class="category-tile" data-category="شوینده-و-بهداشتی" style="background-image: url('https://images.pexels.com/photos/4210611/pexels-photo-4210611.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-soap"></i><h2>شوینده و بهداشتی</h2></div>
+                </a>
+                <a href="#" class="category-tile" data-category="محصولات-خوراکی" style="background-image: url('https://images.pexels.com/photos/2253643/pexels-photo-2253643.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-jar"></i><h2>محصولات خوراکی</h2></div>
+                </a>
+                <a href="#" class="category-tile" data-category="متفرقه" style="background-image: url('https://images.pexels.com/photos/1775043/pexels-photo-1775043.jpeg?auto=compress&cs=tinysrgb&w=600');">
+                    <div class="tile-content"><i class="fa-solid fa-shapes"></i><h2>متفرقه</h2></div>
+                </a>
+            </div>
         </div>
 
-        <div id="product-list">
-            <!-- محصولات به صورت پویا اینجا بارگذاری می‌شوند -->
+        <div id="product-view" class="product-section">
+            <button id="back-to-categories"><i class="fa-solid fa-arrow-right"></i> بازگشت به دسته‌بندی‌ها</button>
+            <h2 id="product-category-title"></h2>
+            <div id="loading">درحال بارگذاری محصولات...</div>
+            <div id="error" style="display: none;">خطا در دریافت اطلاعات. لطفا بعدا تلاش کنید.</div>
+            <ul id="product-list" class="product-list"></ul>
         </div>
     </div>
 
-    <div class="order-btn-container text-center">
-        <button id="send-order-btn" class="btn btn-success btn-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
-                <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
-            </svg>
-            ارسال سفارش به واتس‌اپ
-        </button>
+    <div id="whatsapp-button" class="whatsapp-fab">
+        <i class="fab fa-whatsapp"></i>
+        <span id="cart-counter" class="cart-counter"></span>
     </div>
-
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const productListEl = document.getElementById('product-list');
-        const sendOrderBtn = document.getElementById('send-order-btn');
-        const searchInput = document.getElementById('search-input');
-        
-        let allProductsData = [];
+        document.addEventListener('DOMContentLoaded', function() {
+            const whatsappNumber = "989918022066";
+            const categoryView = document.getElementById('category-view');
+            const productView = document.getElementById('product-view');
+            const productList = document.getElementById('product-list');
+            const categoryTitle = document.getElementById('product-category-title');
+            const backButton = document.getElementById('back-to-categories');
+            const loadingDiv = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+            const whatsappBtn = document.getElementById('whatsapp-button');
+            const cartCounter = document.getElementById('cart-counter');
 
-        function displayProducts(searchTerm = '') {
-            productListEl.innerHTML = '';
-            const lowercasedSearchTerm = searchTerm.trim().toLowerCase();
+            let allProducts = [];
+            // Cart now stores objects: { name, quantity, unit }
+            let shoppingCart = []; 
 
-            let availableProducts = allProductsData.filter(p => p.available);
+            function showCategoryView() {
+                categoryView.style.display = 'block';
+                productView.style.display = 'none';
+                window.scrollTo(0, 0);
+            }
+
+            function showProductView() {
+                categoryView.style.display = 'none';
+                productView.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
             
-            if (lowercasedSearchTerm) {
-                availableProducts = availableProducts.filter(p => 
-                    p.name.toLowerCase().includes(lowercasedSearchTerm)
-                );
-            }
-
-            if (availableProducts.length === 0 && lowercasedSearchTerm) {
-                productListEl.innerHTML = `<p class="text-center text-muted mt-4">محصولی با این نام یافت نشد.</p>`;
-                return;
-            }
-            if (availableProducts.length === 0) {
-                 productListEl.innerHTML = `<p class="text-center text-muted mt-4">در حال حاضر محصولی برای نمایش وجود ندارد.</p>`;
-                return;
-            }
-
-            const groupedByCategory = availableProducts.reduce((acc, product) => {
-                const category = product.category || 'متفرقه';
-                if (!acc[category]) {
-                    acc[category] = [];
-                }
-                acc[category].push(product);
-                return acc;
-            }, {});
-
-            for (const category in groupedByCategory) {
-                const categoryTitle = document.createElement('h2');
-                categoryTitle.className = 'h4 category-title';
-                categoryTitle.textContent = category;
-                productListEl.appendChild(categoryTitle);
-
-                const productGroup = document.createElement('ul');
-                productGroup.className = 'list-group list-group-flush';
-                
-                groupedByCategory[category].forEach(product => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'list-group-item product-item';
+            function updateCartAndButton() {
+                shoppingCart = [];
+                document.querySelectorAll('.product-checkbox:checked').forEach(checkbox => {
+                    const name = checkbox.dataset.name;
+                    const unit = checkbox.dataset.unit;
+                    const quantityInput = document.getElementById(`qty-${name}`);
+                    const quantity = quantityInput.value || 1; // Default to 1 if empty
                     
-                    // --- ساختار HTML اصلاح شده برای بازگرداندن طرح اصلی ---
-                    listItem.innerHTML = `
-                        <div class="product-info">
-                            <input class="form-check-input" type="checkbox" value="" id="product-${product.id}" data-product-id="${product.id}" data-product-name="${product.name}" data-product-unit="${product.unit || ''}">
-                            <label class="form-check-label" for="product-${product.id}">
-                                ${product.name}
-                            </label>
-                        </div>
-                        <div class="quantity-control">
-                            <span class="product-unit">${product.unit || ''}</span>
-                            <input type="number" class="form-control quantity-input" id="quantity-${product.id}" value="1" min="1" disabled>
-                        </div>
-                    `;
-                    productGroup.appendChild(listItem);
+                    shoppingCart.push({ name, quantity, unit });
+                });
+
+                if (shoppingCart.length > 0) {
+                    whatsappBtn.classList.add('visible');
+                    cartCounter.textContent = shoppingCart.length;
+                } else {
+                    whatsappBtn.classList.remove('visible');
+                }
+            }
+
+            function renderProducts(category, categoryName) {
+                productList.innerHTML = '';
+                categoryTitle.textContent = categoryName;
+
+                const filteredProducts = allProducts.filter(p => p.category === category)
+                                                  .sort((a, b) => a.name.localeCompare(b.name, 'fa'));
+                
+                if (filteredProducts.length === 0) {
+                    productList.innerHTML = '<li class="product-item">محصولی در این دسته‌بندی یافت نشد.</li>';
+                    return;
+                }
+
+                filteredProducts.forEach(product => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'product-item';
+                    listItem.id = `item-${product.name}`;
+                    
+                    const cartItem = shoppingCart.find(item => item.name === product.name);
+                    const isSelected = !!cartItem;
+
+                    if (isSelected) {
+                        listItem.classList.add('selected');
+                    }
+                    
+                    if (product.available) {
+                        listItem.innerHTML = `
+                            <input type="checkbox" class="product-checkbox" id="prod-${product.name}" 
+                                   data-name="${product.name}" data-unit="${product.unit || 'عدد'}" ${isSelected ? 'checked' : ''}>
+                            
+                            <label for="prod-${product.name}" class="product-name">${product.name}</label>
+                            
+                            <div class="quantity-input-container">
+                                <input type="number" min="1" class="quantity-input" 
+                                       id="qty-${product.name}" value="${cartItem ? cartItem.quantity : '1'}"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <span class="quantity-unit">${product.unit || 'عدد'}</span>
+                            </div>
+                        `;
+                    } else {
+                        // Change grid layout for unavailable items
+                        listItem.style.gridTemplateColumns = '1fr auto';
+                        listItem.innerHTML = `
+                            <span class="product-name" style="text-decoration: line-through; color: #999;">${product.name}</span>
+                            <span class="status-badge status-unavailable">ناموجود</span>
+                        `;
+                    }
+                    productList.appendChild(listItem);
+                });
+            }
+
+            productList.addEventListener('change', function(e) {
+                if (e.target.classList.contains('product-checkbox')) {
+                    const listItem = e.target.closest('.product-item');
+                    if (e.target.checked) {
+                        listItem.classList.add('selected');
+                    } else {
+                        listItem.classList.remove('selected');
+                    }
+                    updateCartAndButton();
+                }
+            });
+
+            // Listen for changes in quantity inputs to update the cart in real-time
+            productList.addEventListener('input', function(e) {
+                if(e.target.classList.contains('quantity-input')) {
+                    updateCartAndButton();
+                }
+            });
+
+            document.querySelectorAll('.category-tile').forEach(tile => {
+                tile.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const category = this.dataset.category;
+                    const categoryName = this.querySelector('h2').textContent;
+                    renderProducts(category, categoryName);
+                    showProductView();
+                });
+            });
+
+            backButton.addEventListener('click', () => {
+                showCategoryView();
+            });
+            
+            whatsappBtn.addEventListener('click', () => {
+                // Final update before sending, to ensure all quantities are captured
+                updateCartAndButton(); 
+                if (shoppingCart.length === 0) return;
+
+                let message = "سلام، وقت بخیر. لیست سفارش من:\n\n";
+                shoppingCart.forEach(item => {
+                    message += `- ${item.name}: ${item.quantity} ${item.unit}\n`;
                 });
                 
-                productListEl.appendChild(productGroup);
-            }
-        }
-
-        productListEl.addEventListener('change', (e) => {
-            if (e.target.type === 'checkbox') {
-                const productId = e.target.dataset.productId;
-                const quantityInput = document.getElementById(`quantity-${productId}`);
-                quantityInput.disabled = !e.target.checked;
-            }
-        });
-
-        sendOrderBtn.addEventListener('click', () => {
-            const selectedItems = [];
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-            
-            checkboxes.forEach(cb => {
-                const productId = cb.dataset.productId;
-                const name = cb.dataset.productName;
-                const unit = cb.dataset.productUnit;
-                const quantity = document.getElementById(`quantity-${productId}`).value;
-                
-                if (parseInt(quantity, 10) > 0) {
-                    selectedItems.push(`${name}: ${quantity} ${unit}`);
-                }
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+                window.open(whatsappUrl, '_blank');
             });
 
-            if (selectedItems.length === 0) {
-                alert('لطفا حداقل یک محصول را انتخاب کنید.');
-                return;
-            }
-
-            const message = "سلام، لطفا سفارش زیر را آماده کنید:\n\n" + selectedItems.join('\n');
-            const phoneNumber = "989123456789"; // شماره واتس‌اپ خود را اینجا وارد کنید
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-            
-            window.open(whatsappUrl, '_blank');
-        });
-
-        searchInput.addEventListener('input', () => {
-            displayProducts(searchInput.value);
-        });
-
-        fetch('products.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            async function fetchProducts() {
+                try {
+                    // Force refresh to avoid cache issues
+                    const response = await fetch('products.json?v=' + new Date().getTime()); 
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    allProducts = await response.json();
+                    loadingDiv.style.display = 'none';
+                } catch (err) {
+                    loadingDiv.style.display = 'none';
+                    errorDiv.style.display = 'block';
+                    console.error('Fetch error:', err);
                 }
-                return response.json();
-            })
-            .then(data => {
-                allProductsData = data;
-                displayProducts();
-            })
-            .catch(error => {
-                console.error("خطا در بارگذاری فایل products.json:", error);
-                productListEl.innerHTML = `<p class="text-center text-danger">متاسفانه در بارگذاری محصولات مشکلی پیش آمده است. لطفا بعداً تلاش کنید.</p>`;
-            });
-    });
+            }
+            
+            showCategoryView();
+            fetchProducts();
+        });
     </script>
+
 </body>
 </html>
