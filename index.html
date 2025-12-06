@@ -92,6 +92,7 @@
             display: flex; align-items: center; padding: 15px 25px;
             color: rgba(255,255,255,0.8); text-decoration: none; font-size: 1.1rem;
             transition: 0.2s; border-right: 3px solid transparent;
+            cursor: pointer; /* اضافه شد برای رفتار دکمه */
         }
         .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
         .nav-item i { margin-left: 15px; width: 25px; text-align: center; color: var(--gold-color); }
@@ -270,18 +271,19 @@
         </div>
 
         <div class="nav-links">
-            <a href="#" class="nav-item" onclick="navigate('home'); toggleMenu()">
+            <!-- FIX: آیتم‌ها به جای تگ a به تگ div تبدیل شدند تا از رفرش صفحه جلوگیری شود -->
+            <div class="nav-item" onclick="navigate('home'); toggleMenu()">
                 <i class="fa-solid fa-house"></i> خانه
-            </a>
-            <a href="#" class="nav-item" onclick="navigate('remedy'); toggleMenu()">
+            </div>
+            <div class="nav-item" onclick="navigate('remedy'); toggleMenu()">
                 <i class="fa-solid fa-user-doctor"></i> مشاور هوشمند
-            </a>
-            <a href="#" class="nav-item" onclick="navigate('wheel'); toggleMenu()">
+            </div>
+            <div class="nav-item" onclick="navigate('wheel'); toggleMenu()">
                 <i class="fa-solid fa-dharmachakra"></i> گردونه شانس
-            </a>
-            <a href="#" class="nav-item" onclick="navigate('tayeb'); toggleMenu()">
+            </div>
+            <div class="nav-item" onclick="navigate('tayeb'); toggleMenu()">
                 <i class="fa-solid fa-heart-pulse"></i> سبک زندگی سالم
-            </a>
+            </div>
         </div>
 
         <div style="border-top:1px solid rgba(255,255,255,0.1); margin:10px 20px;"></div>
@@ -294,7 +296,7 @@
         </button>
 
         <div style="text-align:center; font-size:0.8rem; color:rgba(255,255,255,0.4); padding:20px;">
-            Senjed Store v3.6 (Fixed)
+            Senjed Store v3.7 (Menu Fixed)
         </div>
     </div>
 
