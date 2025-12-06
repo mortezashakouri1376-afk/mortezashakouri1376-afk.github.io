@@ -5,151 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>فروشگاه سنجد</title>
     
-    <!-- لینک آیکون‌ها -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <!-- لینک فونت‌های فارسی هنری و استاندارد از گوگل -->
     <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --primary-color: #6B8E23; 
             --dark-green: #3A5210;
-            --gold: #F2C94C;
             --light-bg: #f8f9fa;      
             --selected-bg: #eef5e0;   
             --text-color: #444;
-            --border-radius: 20px;
             --shadow: 0 10px 30px rgba(0,0,0,0.08); 
         }
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            margin: 0;
-            padding: 0 0 100px 0;
+            margin: 0; padding: 0 0 100px 0;
             background-color: var(--light-bg);
             color: var(--text-color);
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent; /* حذف هایلایت آبی در موبایل */
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- هدر لاکچری --- */
+        /* --- هدر --- */
         .header {
             position: relative;
             background: linear-gradient(135deg, #557C18 0%, #2d420b 100%);
             padding: 40px 20px 70px 20px;
             border-radius: 0 0 40px 40px;
-            text-align: center;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(45, 66, 11, 0.3);
-            z-index: 10;
-        }
-        .header::before, .header::after {
-            content: ''; position: absolute; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            z-index: 1; pointer-events: none;
-        }
-        .header::before {
-            width: 200px; height: 200px; top: -50px; left: -50px;
-            animation: floatOrb 10s ease-in-out infinite alternate;
-        }
-        .header::after {
-            width: 150px; height: 150px; bottom: 20px; right: -30px;
-            background: rgba(255, 215, 0, 0.1);
-            animation: floatOrb 8s ease-in-out infinite alternate-reverse;
+            text-align: center; overflow: hidden;
+            box-shadow: 0 10px 25px rgba(45, 66, 11, 0.3); z-index: 10;
         }
         .header-bg-icon {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 10rem; color: rgba(255,255,255,0.03);
-            z-index: 0; pointer-events: none;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 10rem; color: rgba(255,255,255,0.03); pointer-events: none;
         }
         .header h1 {
-            font-family: 'Lalezar', cursive;
-            margin: 0; font-size: 3.5rem; color: #fff;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            position: relative; z-index: 2; letter-spacing: 1px;
+            font-family: 'Lalezar', cursive; margin: 0; font-size: 3.5rem; color: #fff;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; z-index: 2;
             animation: fadeInDown 1s ease-out;
         }
         .header p {
-            font-family: 'Vazirmatn', sans-serif; font-weight: 300;
-            margin: 5px 0 0; color: rgba(255, 255, 255, 0.85); 
-            font-size: 1rem; position: relative; z-index: 2;
+            font-family: 'Vazirmatn', sans-serif; font-weight: 300; margin: 5px 0 0; 
+            color: rgba(255, 255, 255, 0.85); font-size: 1rem; position: relative; z-index: 2;
             animation: fadeInUp 1s ease-out 0.3s backwards;
         }
-
-        @keyframes floatOrb { 0% { transform: translate(0, 0); } 100% { transform: translate(20px, 30px); } }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- کانتینر اصلی --- */
+        /* --- کانتینر و جستجو --- */
         .container { padding: 0 20px 20px; max-width: 1200px; margin: 0 auto; }
-        
-        /* --- جستجو --- */
-        .search-container { 
-            position: relative; margin-top: -35px; margin-bottom: 35px; z-index: 20; 
-        }
+        .search-container { position: relative; margin-top: -35px; margin-bottom: 35px; z-index: 20; }
         #search-input {
             width: 100%; padding: 18px 50px 18px 20px; font-size: 1.1rem;
             font-family: 'Vazirmatn', sans-serif; border-radius: 50px; border: none;
             background-color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transition: all 0.3s ease; color: #555; box-sizing: border-box;
+            color: #555; box-sizing: border-box;
         }
-        #search-input:focus { outline: none; transform: translateY(-2px); box-shadow: 0 15px 30px rgba(107, 142, 35, 0.25); }
-        .search-icon {
-            position: absolute; right: 25px; top: 50%; transform: translateY(-50%);
-            color: var(--primary-color); font-size: 1.3rem; pointer-events: none;
-        }
+        #search-input:focus { outline: none; box-shadow: 0 15px 30px rgba(107, 142, 35, 0.25); }
+        .search-icon { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 1.3rem; pointer-events: none; }
 
-        /* --- گرید دسته‌بندی --- */
+        /* --- کاشی‌ها --- */
         .categories-grid { 
             display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
             gap: 18px; padding-bottom: 20px; 
         }
-        @media (min-width: 480px) {
-             .categories-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
-        }
+        @media (min-width: 480px) { .categories-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; } }
 
         .category-tile {
             position: relative; color: white; border-radius: 25px; overflow: hidden;
-            text-decoration: none; display: flex; flex-direction: column; justify-content: center;
-            align-items: center; height: 170px; padding: 10px; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
-            cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            height: 170px; padding: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer;
         }
-        
+        .category-tile:active { transform: scale(0.95); }
+        .category-tile:hover { transform: translateY(-5px); }
+
         /* رنگ‌بندی کاشی‌ها */
-        .cat-special { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); box-shadow: 0 10px 20px rgba(32, 58, 67, 0.3); border: 1px solid rgba(255,255,255,0.1); } /* کاشی سفارش خاص */
-        .cat-mixer { background: linear-gradient(135deg, #DA22FF 0%, #9733EE 100%); box-shadow: 0 10px 20px rgba(218, 34, 255, 0.3); } /* کاشی میکسر */
-        
-        .cat-herbs { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); box-shadow: 0 10px 20px rgba(86, 171, 47, 0.3); }
-        .cat-spices { background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%); box-shadow: 0 10px 20px rgba(221, 36, 118, 0.3); }
-        .cat-liquids { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3); }
-        .cat-oils { background: linear-gradient(135deg, #f09819 0%, #edde5d 100%); box-shadow: 0 10px 20px rgba(240, 152, 25, 0.3); }
-        .cat-grains { background: linear-gradient(135deg, #EB3349 0%, #F45C43 100%); box-shadow: 0 10px 20px rgba(235, 51, 73, 0.3); }
-        .cat-hygiene { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); box-shadow: 0 10px 20px rgba(142, 45, 226, 0.3); }
-        .cat-food { background: linear-gradient(135deg, #FF8008 0%, #FFC837 100%); box-shadow: 0 10px 20px rgba(255, 128, 8, 0.3); }
-        .cat-misc { background: linear-gradient(135deg, #6190E8 0%, #A7BFE8 100%); box-shadow: 0 10px 20px rgba(97, 144, 232, 0.3); }
+        .cat-special { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); border: 1px solid rgba(255,255,255,0.1); }
+        .cat-mixer { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); box-shadow: 0 10px 20px rgba(74, 0, 224, 0.3); }
+        .cat-herbs { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+        .cat-spices { background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%); }
+        .cat-liquids { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .cat-oils { background: linear-gradient(135deg, #f09819 0%, #edde5d 100%); }
+        .cat-grains { background: linear-gradient(135deg, #EB3349 0%, #F45C43 100%); }
+        .cat-hygiene { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .cat-food { background: linear-gradient(135deg, #FF8008 0%, #FFC837 100%); }
+        .cat-misc { background: linear-gradient(135deg, #6190E8 0%, #A7BFE8 100%); }
 
-        .category-tile::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent); }
-        .category-tile:hover { transform: translateY(-8px) scale(1.03); }
         .tile-content { position: relative; z-index: 2; text-align: center; width: 100%; }
-        .tile-content i { font-size: 3.2rem; margin-bottom: 10px; display: inline-block; color: #fff; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); transition: all 0.3s ease; }
-        .tile-content h2 { font-family: 'Lalezar', cursive; margin: 0; font-size: 1.5rem; text-shadow: 0 2px 5px rgba(0,0,0,0.2); letter-spacing: 0.5px; }
-        
-        /* انیمیشن‌های کاشی */
-        @keyframes bounce-c { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        .category-tile:hover i { animation: bounce-c 0.6s ease; }
+        .tile-content i { font-size: 3rem; margin-bottom: 10px; color: #fff; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); }
+        .tile-content h2 { font-family: 'Lalezar', cursive; margin: 0; font-size: 1.4rem; text-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* --- بخش‌های داخلی (مشترک) --- */
+        /* --- بخش‌های داخلی --- */
         .inner-section { display: none; margin-top: 20px; background-color: white; padding: 25px; border-radius: 25px; box-shadow: var(--shadow); }
         .back-btn { 
-            background-color: #f0f2f5; color: #555; border: none; padding: 12px 20px; 
-            border-radius: 15px; cursor: pointer; font-size: 0.95rem; font-family: 'Vazirmatn', sans-serif; font-weight: 700;
-            margin-bottom: 25px; display: inline-flex; align-items: center; gap: 10px; transition: all 0.2s;
+            background-color: #f0f2f5; color: #555; border: none; padding: 10px 20px; 
+            border-radius: 15px; cursor: pointer; font-family: 'Vazirmatn', sans-serif; font-weight: 700;
+            margin-bottom: 20px; display: inline-flex; align-items: center; gap: 8px;
         }
-        .back-btn:hover { background-color: #e2e6ea; color: var(--primary-color); }
 
         /* --- لیست محصولات --- */
         .product-list { list-style: none; padding: 0; margin: 0; }
@@ -159,105 +113,112 @@
             transition: background-color 0.2s; border-radius: 12px; margin-bottom: 5px;
         }
         .product-item.selected { background-color: var(--selected-bg); border: 1px solid var(--primary-color); }
-        .product-name { font-weight: 500; font-size: 1.1rem; cursor: pointer; color: #333; }
-        .product-checkbox { width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary-color); border-radius: 6px; }
-        .quantity-input-container { display: none; align-items: center; justify-self: end; gap: 10px; }
-        .product-item.selected .quantity-input-container { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        .quantity-input { width: 50px; padding: 5px; border: 2px solid #dce6c5; border-radius: 10px; text-align: center; font-size: 1.1rem; font-weight: bold; color: var(--primary-color); font-family: 'Vazirmatn', sans-serif; }
-        .quantity-input:focus { outline: none; border-color: var(--primary-color); }
-        .delete-btn { color: #ff4757; cursor: pointer; font-size: 1rem; background: #ffeef0; border-radius: 10px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .delete-btn:hover { background: #ff4757; color: white; }
-        .status-badge { padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; }
-        .status-unavailable { background-color: #fff0f0; color: #e03e2d; }
+        .product-checkbox { width: 24px; height: 24px; accent-color: var(--primary-color); }
+        .quantity-input-container { display: none; align-items: center; gap: 10px; }
+        .product-item.selected .quantity-input-container { display: flex; }
+        .quantity-input { width: 50px; padding: 5px; border: 2px solid #dce6c5; border-radius: 10px; text-align: center; font-weight: bold; color: var(--primary-color); }
+        .delete-btn { color: #ff4757; background: #ffeef0; border-radius: 10px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* --- استایل‌های بخش سفارش خاص --- */
+        /* --- بخش سفارش خاص --- */
         .special-form { display: flex; flex-direction: column; gap: 20px; }
-        .form-group label { font-weight: bold; margin-bottom: 8px; display: block; color: var(--dark-green); }
-        .form-control {
-            width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 15px;
-            font-family: 'Vazirmatn', sans-serif; font-size: 1rem; transition: border 0.3s; box-sizing: border-box;
-        }
-        .form-control:focus { outline: none; border-color: var(--primary-color); }
-        .btn-submit-special {
-            background: linear-gradient(135deg, #203a43, #2c5364); color: white; padding: 15px;
-            border: none; border-radius: 15px; font-size: 1.1rem; font-family: 'Lalezar', cursive;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(32, 58, 67, 0.2); margin-top: 10px;
-        }
-        .btn-submit-special:hover { transform: translateY(-2px); }
+        .form-control { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 15px; font-family: 'Vazirmatn'; font-size: 1rem; box-sizing: border-box; }
+        .btn-submit-special { background: linear-gradient(135deg, #203a43, #2c5364); color: white; padding: 15px; border: none; border-radius: 15px; font-size: 1.1rem; font-family: 'Lalezar'; width: 100%; cursor: pointer; }
 
-        /* --- استایل‌های بخش مکمل ارگانیک (گیمیفیکیشن) --- */
-        .mixer-container { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        /* --- استایل‌های پیشرفته میکسر (GAME) --- */
+        .mixer-wrapper { display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        /* شلف مکمل‌ها */
+        /* انتخاب سایز */
+        .size-selector {
+            display: flex; background: #eee; padding: 5px; border-radius: 50px;
+            width: 100%; max-width: 350px; margin-bottom: 10px;
+        }
+        .size-btn {
+            flex: 1; border: none; background: transparent; padding: 10px;
+            border-radius: 40px; cursor: pointer; font-family: 'Lalezar'; font-size: 1rem; color: #666;
+            transition: all 0.3s ease;
+        }
+        .size-btn.active { background: #fff; color: #8E2DE2; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transform: scale(1.05); }
+
+        /* شلف سه‌بعدی */
         .supplements-shelf {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-            background: #8B4513; padding: 15px; border-radius: 10px;
-            width: 100%; box-sizing: border-box; box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            background: #8B5E3C; padding: 15px 10px 25px 10px; border-radius: 15px;
+            width: 100%; box-sizing: border-box; position: relative;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.4), 0 5px 15px rgba(0,0,0,0.2);
+            border-bottom: 8px solid #5D3A1A;
         }
         .supplement-jar {
-            background-color: rgba(255,255,255,0.9); border-radius: 8px;
-            height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: grab; user-select: none; position: relative; box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0.5));
+            border-radius: 5px; height: 55px; display: flex; flex-direction: column; align-items: center;
+            cursor: grab; position: relative; box-shadow: 0 5px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
         }
-        .supplement-jar:active { cursor: grabbing; }
-        .jar-lid { width: 20px; height: 5px; background: #555; margin-bottom: 2px; }
-        .jar-body { width: 30px; height: 35px; border-radius: 5px; border: 1px solid #ccc; }
-        .jar-label { font-size: 0.6rem; margin-top: 2px; color: #333; text-align: center; white-space: nowrap; overflow: hidden; width: 100%; }
+        .supplement-jar:active { transform: scale(0.9); cursor: grabbing; }
+        .jar-lid { width: 70%; height: 6px; background: #333; margin-top: -3px; border-radius: 2px; }
+        .jar-body { width: 100%; height: 100%; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+        .jar-body span { font-size: 0.6rem; font-weight: bold; color: rgba(0,0,0,0.6); writing-mode: vertical-rl; transform: rotate(180deg); }
 
-        /* ظرف مخلوط (ارلن مایر) */
+        /* منطقه ظرف */
         .mixing-area {
-            position: relative; width: 100%; height: 250px;
+            position: relative; width: 100%; height: 260px;
             display: flex; justify-content: center; align-items: flex-end;
-            margin-top: 10px;
         }
         .flask-container {
-            position: relative; width: 140px; height: 200px;
-            display: flex; flex-direction: column-reverse; /* لایه‌ها از پایین پر شوند */
-            align-items: center;
+            position: relative; width: 160px; height: 220px;
+            display: flex; flex-direction: column-reverse; align-items: center;
         }
         .flask-glass {
             position: relative; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 3px solid rgba(200, 200, 200, 0.5);
-            /* شکل ارلن مایر */
-            clip-path: polygon(25% 0, 75% 0, 100% 100%, 0% 100%);
-            overflow: hidden; /* برای برش لایه‌ها */
-            z-index: 2;
-            backdrop-filter: blur(2px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 4px solid rgba(255, 255, 255, 0.6);
+            border-top: none;
+            border-radius: 0 0 20px 20px; /* پایین گرد */
+            /* شکل مخروطی ملایم */
+            clip-path: polygon(20% 0, 80% 0, 100% 100%, 0% 100%);
+            overflow: hidden; z-index: 2; backdrop-filter: blur(2px);
+            box-shadow: inset 0 -10px 20px rgba(255,255,255,0.3), 0 10px 20px rgba(0,0,0,0.1);
         }
         .flask-neck {
-            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
-            width: 65px; height: 35px; background: rgba(255, 255, 255, 0.15);
-            border: 3px solid rgba(200, 200, 200, 0.5); border-bottom: none;
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+            width: 50px; height: 40px; background: rgba(255, 255, 255, 0.1);
+            border: 4px solid rgba(255, 255, 255, 0.6); border-bottom: none; border-radius: 5px 5px 0 0;
             z-index: 1;
         }
         
-        /* لایه‌های پودر */
-        .powder-layer { width: 100%; transition: height 0.3s ease-out; }
+        /* لایه‌ها و انیمیشن */
+        .powder-layer { width: 100%; transition: height 0.4s cubic-bezier(0.4, 2, 0.55, 0.44); border-top: 1px solid rgba(255,255,255,0.2); }
+        
+        /* ذرات پودر (Particles) */
+        .particle {
+            position: absolute; top: 0; width: 6px; height: 6px; border-radius: 50%;
+            animation: fall 0.6s linear forwards; z-index: 5; pointer-events: none;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(150px) scale(0.5); opacity: 0; }
+        }
 
-        /* متن وزن روی ظرف */
         .flask-stats {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 1.5rem; font-weight: bold; color: #333; text-shadow: 0 0 5px white;
+            font-size: 1.8rem; font-weight: bold; color: #333; text-shadow: 0 0 10px rgba(255,255,255,0.8);
             z-index: 10; pointer-events: none; font-family: 'Lalezar', cursive;
+            background: rgba(255,255,255,0.6); padding: 5px 15px; border-radius: 20px;
         }
 
-        .completed-mixes {
-            margin-top: 20px; width: 100%; border-top: 1px dashed #ccc; padding-top: 10px;
-        }
+        .completed-mixes { width: 100%; border-top: 2px dashed #ddd; padding-top: 15px; margin-top: 15px; }
         .mix-item {
-            background: #f9f9f9; padding: 10px; border-radius: 10px; margin-bottom: 5px;
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
+            background: white; padding: 10px; border-radius: 12px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
+        .delete-mix-btn { color: red; background: #ffeeee; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
 
-        /* المان متحرک (Ghost) برای تاچ */
+        /* گوست درگ موبایل */
         .drag-ghost {
-            position: fixed; pointer-events: none; z-index: 9999;
-            width: 50px; height: 50px; opacity: 0.8; border-radius: 50%;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: white; font-weight: bold;
+            position: fixed; pointer-events: none; z-index: 9999; width: 50px; height: 50px;
+            opacity: 0.9; border-radius: 50%; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: none; align-items: center; justify-content: center; font-size: 20px;
+            color: white; font-weight: bold; border: 2px solid white;
         }
 
         /* --- دکمه واتس‌اپ --- */
@@ -267,18 +228,15 @@
             color: white; width: 65px; height: 65px; border-radius: 50%; display: flex;
             justify-content: center; align-items: center; font-size: 2.5rem;
             box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); text-decoration: none;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer; transform: scale(0); z-index: 1000;
+            transform: scale(0); transition: all 0.4s; cursor: pointer; z-index: 1000;
         }
         .whatsapp-fab.visible { transform: scale(1); }
-        .whatsapp-fab:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 15px 35px rgba(37, 211, 102, 0.5); }
+        .whatsapp-fab:hover { transform: scale(1.1) rotate(10deg); }
         .cart-counter {
             position: absolute; top: 0; right: 0; background-color: #ff4757;
             color: white; border-radius: 50%; width: 24px; height: 24px;
-            font-size: 0.8rem; font-weight: bold; display: flex;
-            justify-content: center; align-items: center; border: 2px solid white;
+            font-size: 0.8rem; font-weight: bold; display: flex; justify-content: center; align-items: center; border: 2px solid white;
         }
-
         #loading { text-align: center; padding: 40px; color: #888; }
     </style>
 </head>
@@ -293,125 +251,99 @@
     <div class="container">
         <div class="search-container">
             <i class="fa-solid fa-search search-icon"></i>
-            <input type="search" id="search-input" placeholder="جستجو (مثلا: آویشن)..." autocomplete="off">
+            <input type="search" id="search-input" placeholder="جستجو محصولات..." autocomplete="off">
         </div>
 
-        <!-- نمای دسته‌بندی‌ها -->
+        <!-- منوی اصلی (کاشی‌ها) -->
         <div id="category-view">
             <div class="categories-grid">
-                
-                <!-- کاشی ۱: سفارش محصول خاص -->
+                <!-- کاشی ویژه -->
                 <div class="category-tile cat-special" onclick="showSection('special-request-view')">
                     <div class="tile-content"><i class="fa-solid fa-star"></i><h2>سفارش محصول خاص</h2></div>
                 </div>
-
-                <!-- کاشی ۲: مکمل ارگانیک (بازی) -->
+                <!-- کاشی میکس -->
                 <div class="category-tile cat-mixer" onclick="initMixer(); showSection('mixer-view')">
-                    <div class="tile-content"><i class="fa-solid fa-flask"></i><h2>میکس مکمل ارگانیک</h2></div>
+                    <div class="tile-content"><i class="fa-solid fa-flask"></i><h2>میکس مکمل (بازی)</h2></div>
                 </div>
-
-                <div class="category-tile cat-herbs" data-category="گیاهان-دارویی">
-                    <div class="tile-content"><i class="fa-solid fa-leaf"></i><h2>گیاهان دارویی</h2></div>
-                </div>
-                <div class="category-tile cat-spices" data-category="ادویه-جات">
-                    <div class="tile-content"><i class="fa-solid fa-mortar-pestle"></i><h2>ادویه‌جات</h2></div>
-                </div>
-                <div class="category-tile cat-liquids" data-category="عرقیات">
-                    <div class="tile-content"><i class="fa-solid fa-bottle-droplet"></i><h2>عرقیات</h2></div>
-                </div>
-                <div class="category-tile cat-oils" data-category="روغن-ها">
-                    <div class="tile-content"><i class="fa-solid fa-oil-well"></i><h2>روغن‌ها</h2></div>
-                </div>
-                <div class="category-tile cat-grains" data-category="حبوبات-و-غلات">
-                    <div class="tile-content"><i class="fa-solid fa-wheat-awn"></i><h2>حبوبات</h2></div>
-                </div>
-                <div class="category-tile cat-hygiene" data-category="شوینده-و-بهداشتی">
-                    <div class="tile-content"><i class="fa-solid fa-pump-soap"></i><h2>بهداشتی</h2></div>
-                </div>
-                <div class="category-tile cat-food" data-category="محصولات-خوراکی">
-                    <div class="tile-content"><i class="fa-solid fa-jar"></i><h2>خوراکی</h2></div>
-                </div>
-                <div class="category-tile cat-misc" data-category="متفرقه">
-                    <div class="tile-content"><i class="fa-solid fa-box-open"></i><h2>سایر</h2></div>
-                </div>
+                <!-- دسته‌ها -->
+                <div class="category-tile cat-herbs" data-category="گیاهان-دارویی"><div class="tile-content"><i class="fa-solid fa-leaf"></i><h2>گیاهان دارویی</h2></div></div>
+                <div class="category-tile cat-spices" data-category="ادویه-جات"><div class="tile-content"><i class="fa-solid fa-mortar-pestle"></i><h2>ادویه‌جات</h2></div></div>
+                <div class="category-tile cat-liquids" data-category="عرقیات"><div class="tile-content"><i class="fa-solid fa-bottle-droplet"></i><h2>عرقیات</h2></div></div>
+                <div class="category-tile cat-oils" data-category="روغن-ها"><div class="tile-content"><i class="fa-solid fa-oil-well"></i><h2>روغن‌ها</h2></div></div>
+                <div class="category-tile cat-grains" data-category="حبوبات-و-غلات"><div class="tile-content"><i class="fa-solid fa-wheat-awn"></i><h2>حبوبات</h2></div></div>
+                <div class="category-tile cat-hygiene" data-category="شوینده-و-بهداشتی"><div class="tile-content"><i class="fa-solid fa-pump-soap"></i><h2>بهداشتی</h2></div></div>
+                <div class="category-tile cat-food" data-category="محصولات-خوراکی"><div class="tile-content"><i class="fa-solid fa-jar"></i><h2>خوراکی</h2></div></div>
+                <div class="category-tile cat-misc" data-category="متفرقه"><div class="tile-content"><i class="fa-solid fa-box-open"></i><h2>سایر</h2></div></div>
             </div>
         </div>
 
-        <!-- نمای لیست محصولات استاندارد -->
+        <!-- صفحه محصولات -->
         <div id="product-view" class="inner-section">
-            <button class="back-btn" onclick="showCategoryView()"><i class="fa-solid fa-arrow-right"></i> بازگشت به دسته‌ها</button>
-            <h2 id="product-category-title" style="margin-top: 0; color: var(--primary-color); font-family: 'Lalezar', cursive;"></h2>
+            <button class="back-btn" onclick="showCategoryView()"><i class="fa-solid fa-arrow-right"></i> بازگشت</button>
+            <h2 id="product-category-title" style="color: var(--primary-color); font-family: 'Lalezar';"></h2>
             <div id="loading">درحال بارگذاری...</div>
             <ul id="product-list" class="product-list"></ul>
         </div>
 
-        <!-- نمای سفارش خاص -->
+        <!-- صفحه سفارش خاص -->
         <div id="special-request-view" class="inner-section">
             <button class="back-btn" onclick="showCategoryView()"><i class="fa-solid fa-arrow-right"></i> بازگشت</button>
             <h2 style="font-family: 'Lalezar'; color: #203a43;">سفارش محصول کمیاب</h2>
-            <p style="font-size: 0.9rem; color: #666;">نام محصول و مقدار مورد نیاز را وارد کنید تا مستقیماً به واتس‌اپ ما ارسال شود.</p>
-            
             <div class="special-form">
-                <div class="form-group">
-                    <label>نام محصول:</label>
-                    <input type="text" id="special-name" class="form-control" placeholder="مثلاً: صمغ عربی اصل">
-                </div>
-                <div class="form-group">
-                    <label>توضیحات و مقدار (وزن):</label>
-                    <input type="text" id="special-details" class="form-control" placeholder="مثلاً: ۵۰۰ گرم، خالص باشد">
-                </div>
-                <button class="btn-submit-special" onclick="sendSpecialRequest()">
-                    <i class="fab fa-whatsapp"></i> ارسال به واتس‌اپ
-                </button>
+                <input type="text" id="special-name" class="form-control" placeholder="نام محصول">
+                <input type="text" id="special-details" class="form-control" placeholder="توضیحات و وزن (مثلا: ۵۰۰ گرم)">
+                <button class="btn-submit-special" onclick="sendSpecialRequest()"><i class="fab fa-whatsapp"></i> ارسال به واتس‌اپ</button>
             </div>
         </div>
 
-        <!-- نمای میکسر ارگانیک (بازی) -->
-        <div id="mixer-view" class="inner-section" style="background: #fff5f8;">
+        <!-- صفحه میکسر (بازی) -->
+        <div id="mixer-view" class="inner-section" style="background: #fff9fc;">
             <button class="back-btn" onclick="showCategoryView()"><i class="fa-solid fa-arrow-right"></i> بازگشت</button>
-            <h2 style="font-family: 'Lalezar'; color: #9733EE; text-align: center;">آزمایشگاه ارگانیک</h2>
-            <p style="text-align: center; font-size: 0.85rem; color: #666;">مکمل‌ها را بکشید و در ظرف رها کنید تا ترکیب خود را بسازید.<br>(هر واحد = ۵۰ گرم)</p>
             
-            <div class="mixer-container">
+            <div class="mixer-wrapper">
+                <h2 style="font-family: 'Lalezar'; color: #8E2DE2; margin:0;">آزمایشگاه مکمل</h2>
+                
+                <!-- انتخاب سایز -->
+                <div class="size-selector">
+                    <button class="size-btn" onclick="setMixerSize(500, 50, this)">نیم کیلو</button>
+                    <button class="size-btn active" onclick="setMixerSize(1000, 100, this)">یک کیلو</button>
+                    <button class="size-btn" onclick="setMixerSize(5000, 250, this)">پنج کیلو</button>
+                </div>
+
                 <!-- شلف مکمل‌ها -->
                 <div class="supplements-shelf" id="shelf"></div>
 
-                <!-- منطقه ترکیب -->
+                <!-- ظرف مخلوط -->
                 <div class="mixing-area">
                     <div class="flask-container" id="flask-target">
                         <div class="flask-neck"></div>
-                        <div class="flask-glass" id="flask-content">
-                            <!-- لایه‌ها اینجا اضافه می‌شوند -->
-                        </div>
+                        <div class="flask-glass" id="flask-content"></div>
                         <div class="flask-stats"><span id="current-weight">0</span>g</div>
                     </div>
                 </div>
 
                 <div class="completed-mixes">
-                    <h4 style="margin: 0 0 10px 0; color: #555;">ترکیب‌های تکمیل شده:</h4>
+                    <h4 style="margin: 0 0 10px 0; color: #555;">ترکیب‌های آماده ارسال:</h4>
                     <div id="mix-list">
-                        <small style="color: #999;">هنوز ترکیبی ساخته نشده.</small>
+                        <small style="color: #999; display:block; text-align:center;">هنوز ترکیبی نساخته‌اید.</small>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- دکمه شناور نهایی -->
     <div id="whatsapp-button" class="whatsapp-fab">
         <i class="fab fa-whatsapp"></i>
         <span id="cart-counter" class="cart-counter"></span>
     </div>
 
-    <!-- گوست برای درگ در موبایل -->
     <div id="drag-ghost" class="drag-ghost"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const whatsappNumber = "989918022066";
             
-            // متغیرهای عمومی
+            // عناصر عمومی
             const categoryView = document.getElementById('category-view');
             const productList = document.getElementById('product-list');
             const categoryTitle = document.getElementById('product-category-title');
@@ -422,15 +354,14 @@
 
             let allProducts = [];
             let shoppingCart = []; 
-            let mixedProducts = []; // آرایه برای محصولات میکس شده
+            let mixedProducts = []; 
 
-            // --- مدیریت ویوها ---
+            // --- ناوبری ---
             window.showCategoryView = function() {
                 document.querySelectorAll('.inner-section').forEach(el => el.style.display = 'none');
                 categoryView.style.display = 'block';
                 window.scrollTo(0, 0);
             }
-
             window.showSection = function(id) {
                 categoryView.style.display = 'none';
                 document.querySelectorAll('.inner-section').forEach(el => el.style.display = 'none');
@@ -438,19 +369,16 @@
                 window.scrollTo(0, 0);
             }
 
-            // --- لاجیک محصولات استاندارد ---
+            // --- مدیریت سبد خرید و دکمه واتس‌اپ ---
             function updateCartAndButton() {
-                // محصولات استاندارد چک‌باکس دار
                 const standardItems = [];
                 document.querySelectorAll('.product-checkbox:checked').forEach(checkbox => {
                     const name = checkbox.dataset.name;
                     const unit = checkbox.dataset.unit;
-                    const quantityInput = document.getElementById(`qty-${name}`);
-                    const quantity = quantityInput.value || 1;
-                    standardItems.push({ name, quantity, unit, type: 'standard' });
+                    const qInput = document.getElementById(`qty-${name}`);
+                    standardItems.push({ name, quantity: qInput.value || 1, unit, type: 'standard' });
                 });
 
-                // ترکیب لیست استاندارد + میکس‌ها
                 shoppingCart = [...standardItems, ...mixedProducts];
 
                 if (shoppingCart.length > 0) {
@@ -461,6 +389,7 @@
                 }
             }
 
+            // --- رندر محصولات عادی ---
             function renderProductList(productsToShow, title) {
                 productList.innerHTML = '';
                 categoryTitle.textContent = title;
@@ -470,163 +399,125 @@
                     productList.innerHTML = '<li style="text-align:center; color:#777; padding:20px;">محصولی یافت نشد.</li>';
                     return;
                 }
-                
                 productsToShow.sort((a, b) => a.name.localeCompare(b.name, 'fa'));
 
                 productsToShow.forEach(product => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'product-item';
-                    
-                    // چک می‌کنیم آیا در سبد خرید (بخش استاندارد) هست یا نه
-                    const cartItem = shoppingCart.find(item => item.name === product.name && item.type === 'standard');
-                    const isSelected = !!cartItem;
-                    if(isSelected) listItem.classList.add('selected');
+                    const item = document.createElement('li');
+                    item.className = 'product-item';
+                    const inCart = shoppingCart.find(i => i.name === product.name && i.type === 'standard');
+                    const isSel = !!inCart;
+                    if(isSel) item.classList.add('selected');
 
                     if (product.available) {
-                        listItem.innerHTML = `
+                        item.innerHTML = `
                             <input type="checkbox" class="product-checkbox" id="prod-${product.name}" 
-                                   data-name="${product.name}" data-unit="${product.unit || 'عدد'}" ${isSelected ? 'checked' : ''}>
-                            
+                                   data-name="${product.name}" data-unit="${product.unit || 'عدد'}" ${isSel ? 'checked' : ''}>
                             <label for="prod-${product.name}" class="product-name">${product.name}</label>
-                            
                             <div class="quantity-input-container">
-                                <input type="number" min="1" class="quantity-input" 
-                                       id="qty-${product.name}" value="${cartItem ? cartItem.quantity : '1'}"
-                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <input type="number" min="1" class="quantity-input" id="qty-${product.name}" value="${inCart ? inCart.quantity : '1'}">
                                 <span style="font-size:0.8rem; color:#888;">${product.unit || 'عدد'}</span>
                                 <div class="delete-btn"><i class="fa-solid fa-trash-can"></i></div>
                             </div>
                         `;
                     } else {
-                        listItem.innerHTML = `
-                            <span class="product-name" style="text-decoration: line-through; color: #aaa;">${product.name}</span>
-                            <span class="status-badge status-unavailable">ناموجود</span>
-                            <div></div>
-                        `;
+                        item.innerHTML = `<span class="product-name" style="text-decoration: line-through; color:#aaa;">${product.name}</span><span class="status-badge" style="background:#fff0f0; color:red;">ناموجود</span>`;
                     }
-                    productList.appendChild(listItem);
+                    productList.appendChild(item);
                 });
             }
 
-            // Event Listeners محصولات
-            productList.addEventListener('change', function(e) {
+            // رویدادهای محصولات عادی
+            productList.addEventListener('change', (e) => {
                 if (e.target.classList.contains('product-checkbox')) {
-                    const listItem = e.target.closest('.product-item');
+                    const li = e.target.closest('.product-item');
                     if (e.target.checked) {
-                        listItem.classList.add('selected');
-                        setTimeout(() => {
-                             const input = listItem.querySelector('.quantity-input');
-                             if(input) input.focus();
-                        }, 50);
+                        li.classList.add('selected');
+                        setTimeout(() => li.querySelector('.quantity-input').focus(), 50);
                     } else {
-                        listItem.classList.remove('selected');
+                        li.classList.remove('selected');
                     }
                     updateCartAndButton();
                 }
             });
-
-            productList.addEventListener('click', function(e) {
+            productList.addEventListener('click', (e) => {
                 if (e.target.closest('.delete-btn')) {
-                    const listItem = e.target.closest('.product-item');
-                    const checkbox = listItem.querySelector('.product-checkbox');
-                    checkbox.checked = false;
-                    listItem.classList.remove('selected');
+                    const li = e.target.closest('.product-item');
+                    li.querySelector('.product-checkbox').checked = false;
+                    li.classList.remove('selected');
                     updateCartAndButton();
                 }
             });
+            productList.addEventListener('input', (e) => { if(e.target.classList.contains('quantity-input')) updateCartAndButton(); });
 
-            productList.addEventListener('input', function(e) {
-                if(e.target.classList.contains('quantity-input')) updateCartAndButton();
-            });
-
+            // کلیک روی دسته‌ها
             document.querySelectorAll('.category-tile[data-category]').forEach(tile => {
                 tile.addEventListener('click', function() {
-                    const category = this.dataset.category;
-                    const categoryName = this.querySelector('h2').textContent;
-                    const filteredProducts = allProducts.filter(p => p.category === category);
-                    renderProductList(filteredProducts, categoryName);
+                    const cat = this.dataset.category;
+                    const name = this.querySelector('h2').textContent;
+                    renderProductList(allProducts.filter(p => p.category === cat), name);
                     showSection('product-view');
                 });
             });
 
+            // جستجو
             searchInput.addEventListener('input', () => {
-                const searchTerm = searchInput.value.trim().toLowerCase();
-                if (searchTerm) {
+                const term = searchInput.value.trim().toLowerCase();
+                if (term) {
                     document.querySelectorAll('.inner-section').forEach(el => el.style.display = 'none');
                     document.getElementById('product-view').style.display = 'block';
-                    const searchResults = allProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
-                    renderProductList(searchResults, `نتایج: «${searchTerm}»`);
+                    renderProductList(allProducts.filter(p => p.name.toLowerCase().includes(term)), `نتایج: «${term}»`);
                 } else {
                     showCategoryView();
                 }
             });
 
-            // --- لاجیک ارسال واتس‌اپ نهایی ---
+            // --- ارسال به واتس‌اپ ---
             whatsappBtn.addEventListener('click', () => {
                 updateCartAndButton();
                 if (shoppingCart.length === 0) return;
+                let msg = "سلام فروشگاه سنجد، سفارش من:\n\n";
                 
-                let message = "سلام فروشگاه سنجد، سفارش جدید:\n\n";
-                
-                // محصولات عادی
-                const standard = shoppingCart.filter(i => i.type === 'standard');
-                if(standard.length > 0) {
-                    message += "📦 محصولات:\n";
-                    standard.forEach(item => {
-                        message += `▪️ ${item.name}: ${item.quantity} ${item.unit}\n`;
-                    });
+                const std = shoppingCart.filter(i => i.type === 'standard');
+                if(std.length) {
+                    msg += "📦 محصولات:\n";
+                    std.forEach(i => msg += `▪️ ${i.name}: ${i.quantity} ${i.unit}\n`);
                 }
 
-                // محصولات میکس
-                const mixes = shoppingCart.filter(i => i.type === 'mix');
-                if(mixes.length > 0) {
-                    message += "\n🧪 ترکیب‌های ارگانیک:\n";
-                    mixes.forEach(item => {
-                        message += `▪️ ${item.name} (${item.quantity} ${item.unit})\n   محتویات: ${item.details}\n`;
-                    });
+                const mix = shoppingCart.filter(i => i.type === 'mix');
+                if(mix.length) {
+                    msg += "\n🧪 ترکیب‌های اختصاصی:\n";
+                    mix.forEach(i => msg += `▪️ ${i.name} (${i.quantity} ظرف)\n   (وزن: ${i.weightLabel})\n   محتویات: ${i.details}\n`);
                 }
-
-                window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
             });
 
-            // --- Fetch Data ---
-            fetch('products.json?v=' + Date.now())
-                .then(res => res.json())
-                .then(data => { allProducts = data; loadingDiv.style.display = 'none'; })
-                .catch(err => { 
-                    loadingDiv.innerHTML = ''; 
-                    // دیتای نمونه در صورت خطا
-                    allProducts = [
-                        { name: "آویشن شیرازی", category: "گیاهان-دارویی", unit: "گرم", available: true },
-                        { name: "زردچوبه اعلاء", category: "ادویه-جات", unit: "گرم", available: true },
-                        { name: "گلاب دوآتیشه", category: "عرقیات", unit: "لیتر", available: true }
-                    ];
-                    console.log('Using sample data due to load error');
-                });
+            // دریافت داده‌ها (موقت)
+            fetch('products.json?v=' + Date.now()).then(res => res.json()).then(data => { allProducts = data; loadingDiv.style.display = 'none'; })
+            .catch(() => { 
+                loadingDiv.style.display = 'none'; 
+                allProducts = [
+                    {name:"تست ۱", category:"گیاهان-دارویی", unit:"گرم", available:true},
+                    {name:"تست ۲", category:"ادویه-جات", unit:"گرم", available:true}
+                ];
+            });
 
-
-            // ==========================================
-            // === لاجیک بخش سفارش محصول خاص ===
-            // ==========================================
+            // --- بخش سفارش خاص ---
             window.sendSpecialRequest = function() {
-                const name = document.getElementById('special-name').value;
-                const details = document.getElementById('special-details').value;
-                
-                if(!name) { alert('لطفا نام محصول را وارد کنید'); return; }
-
-                const msg = `سلام، درخواست محصول خاص دارم:\n\n🏷 نام: ${name}\n📝 توضیحات/مقدار: ${details}`;
-                window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+                const n = document.getElementById('special-name').value;
+                const d = document.getElementById('special-details').value;
+                if(!n) return alert('نام محصول الزامی است');
+                window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`درخواست خاص:\nمحصول: ${n}\nتوضیحات: ${d}`)}`, '_blank');
             }
 
             // ==========================================
-            // === لاجیک بخش میکسر (Gamification) ===
+            // === منطق بازی میکسر پیشرفته (GAMIFICATION) ===
             // ==========================================
             
+            let mixerConfig = { max: 1000, step: 100 }; // پیش‌فرض ۱ کیلو
             let currentFlaskWeight = 0;
-            let flaskIngredients = []; // {name, color}
+            let flaskIngredients = [];
             let mixCounter = 1;
-            
-            // رنگ‌های جذاب برای مکمل‌ها
+
             const jarColors = [
                 '#FF6B6B', '#4ECDC4', '#FFE66D', '#FF9F43', '#54A0FF', 
                 '#5F27CD', '#C4E538', '#FDA7DF', '#D980FA', '#B53471',
@@ -634,161 +525,197 @@
                 '#12CBC4', '#ED4C67', '#B53471', '#833471', '#6F1E51'
             ];
 
+            // تغییر سایز ظرف
+            window.setMixerSize = function(max, step, btn) {
+                if(currentFlaskWeight > 0) {
+                    if(!confirm("با تغییر سایز، محتویات فعلی ظرف خالی می‌شود. ادامه می‌دهید؟")) return;
+                    resetFlask();
+                }
+                mixerConfig = { max, step };
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+
+            function resetFlask() {
+                currentFlaskWeight = 0;
+                flaskIngredients = [];
+                document.getElementById('flask-content').innerHTML = '';
+                document.getElementById('current-weight').textContent = '0';
+            }
+
             window.initMixer = function() {
                 const shelf = document.getElementById('shelf');
-                if(shelf.children.length > 0) return; // قبلا ساخته شده
+                if(shelf.children.length > 0) return; 
 
                 for(let i=1; i<=20; i++) {
                     const color = jarColors[(i-1) % jarColors.length];
                     const div = document.createElement('div');
                     div.className = 'supplement-jar';
-                    div.setAttribute('data-id', i);
                     div.setAttribute('data-name', `مکمل ${i}`);
                     div.setAttribute('data-color', color);
                     
                     div.innerHTML = `
                         <div class="jar-lid"></div>
-                        <div class="jar-body" style="background:${color}"></div>
-                        <div class="jar-label">مکمل ${i}</div>
+                        <div class="jar-body" style="background:${color}"><span style="color:#fff">مکمل ${i}</span></div>
                     `;
                     
-                    // Mouse Events (Desktop)
+                    // Events
                     div.draggable = true;
                     div.addEventListener('dragstart', handleDragStart);
-                    div.addEventListener('dragend', handleDragEnd);
-
-                    // Touch Events (Mobile) - Custom Implementation
                     div.addEventListener('touchstart', handleTouchStart, {passive: false});
                     div.addEventListener('touchmove', handleTouchMove, {passive: false});
                     div.addEventListener('touchend', handleTouchEnd);
-
                     shelf.appendChild(div);
                 }
 
-                // دراپ زون دسکتاپ
-                const flaskTarget = document.getElementById('flask-target');
-                flaskTarget.addEventListener('dragover', (e) => e.preventDefault());
-                flaskTarget.addEventListener('drop', handleDrop);
+                const target = document.getElementById('flask-target');
+                target.addEventListener('dragover', e => e.preventDefault());
+                target.addEventListener('drop', handleDrop);
             }
 
-            let draggedItemData = null;
-            const ghostEl = document.getElementById('drag-ghost');
+            let draggedData = null;
+            const ghost = document.getElementById('drag-ghost');
 
-            // --- Desktop Drag & Drop ---
-            function handleDragStart(e) {
-                draggedItemData = {
-                    name: this.getAttribute('data-name'),
-                    color: this.getAttribute('data-color')
-                };
+            // Desktop Drag
+            function handleDragStart() { 
+                draggedData = { name: this.dataset.name, color: this.dataset.color }; 
             }
-            function handleDragEnd(e) { draggedItemData = null; }
-            function handleDrop(e) {
-                e.preventDefault();
-                if(draggedItemData) addIngredient(draggedItemData);
+            function handleDrop(e) { 
+                e.preventDefault(); 
+                if(draggedData) addIngredient(draggedData); 
             }
 
-            // --- Mobile Touch Drag & Drop ---
+            // Mobile Drag
             function handleTouchStart(e) {
-                e.preventDefault(); // جلوگیری از اسکرول
-                const touch = e.touches[0];
-                draggedItemData = {
-                    name: this.getAttribute('data-name'),
-                    color: this.getAttribute('data-color')
-                };
-                
-                // تنظیم ظاهر گوست
-                ghostEl.style.display = 'flex';
-                ghostEl.style.background = draggedItemData.color;
-                ghostEl.innerHTML = '<i class="fa-solid fa-cube"></i>';
-                moveGhost(touch.clientX, touch.clientY);
-            }
-
-            function handleTouchMove(e) {
                 e.preventDefault();
-                const touch = e.touches[0];
-                moveGhost(touch.clientX, touch.clientY);
+                const t = e.touches[0];
+                draggedData = { name: this.dataset.name, color: this.dataset.color };
+                ghost.style.display = 'flex';
+                ghost.style.background = draggedData.color;
+                ghost.innerHTML = '<i class="fa-solid fa-cube"></i>';
+                moveGhost(t.clientX, t.clientY);
             }
-
+            function handleTouchMove(e) { e.preventDefault(); moveGhost(e.touches[0].clientX, e.touches[0].clientY); }
             function handleTouchEnd(e) {
-                ghostEl.style.display = 'none';
-                const touch = e.changedTouches[0];
-                
-                // بررسی برخورد با ظرف
-                const flask = document.getElementById('flask-target');
-                const rect = flask.getBoundingClientRect();
-                
-                if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-                    touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-                    if(draggedItemData) addIngredient(draggedItemData);
+                ghost.style.display = 'none';
+                const t = e.changedTouches[0];
+                const rect = document.getElementById('flask-target').getBoundingClientRect();
+                if (t.clientX >= rect.left && t.clientX <= rect.right && t.clientY >= rect.top && t.clientY <= rect.bottom) {
+                    if(draggedData) addIngredient(draggedData);
                 }
-                draggedItemData = null;
+                draggedData = null;
             }
+            function moveGhost(x, y) { ghost.style.left = (x-25)+'px'; ghost.style.top = (y-25)+'px'; }
 
-            function moveGhost(x, y) {
-                ghostEl.style.left = (x - 25) + 'px';
-                ghostEl.style.top = (y - 25) + 'px';
-            }
-
-            // --- لاجیک اضافه کردن به ظرف ---
+            // منطق اضافه کردن
             function addIngredient(item) {
-                if (currentFlaskWeight >= 1000) {
-                    alert("ظرف پر شده است! لطفاً ترکیب قبلی را نهایی کنید.");
+                if (currentFlaskWeight >= mixerConfig.max) {
+                    alert("ظرف پر شده است!");
                     return;
                 }
 
                 // اضافه کردن وزن
-                currentFlaskWeight += 50;
+                currentFlaskWeight += mixerConfig.step;
                 document.getElementById('current-weight').textContent = currentFlaskWeight;
 
-                // اضافه کردن بصری لایه
+                // ویژوال لایه
                 const layer = document.createElement('div');
                 layer.className = 'powder-layer';
-                layer.style.height = '5%'; // هر 50 گرم = 5 درصد از 1000 گرم
+                // ارتفاع بر اساس درصد کل ظرف
+                const percentHeight = (mixerConfig.step / mixerConfig.max) * 100;
+                layer.style.height = percentHeight + '%';
                 layer.style.backgroundColor = item.color;
                 document.getElementById('flask-content').appendChild(layer);
 
-                // ذخیره دیتا
+                // افکت Particles
+                createParticles(item.color);
+
+                // دیتا
                 flaskIngredients.push(item.name);
 
-                // چک کردن پر شدن
-                if (currentFlaskWeight >= 1000) {
-                    setTimeout(finishMixing, 500);
+                if (currentFlaskWeight >= mixerConfig.max) {
+                    setTimeout(finishMixing, 600);
+                }
+            }
+
+            function createParticles(color) {
+                const flask = document.getElementById('flask-target');
+                for(let i=0; i<5; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.backgroundColor = color;
+                    p.style.left = (40 + Math.random() * 20) + '%'; // وسط ظرف
+                    p.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+                    flask.appendChild(p);
+                    setTimeout(() => p.remove(), 1000);
                 }
             }
 
             function finishMixing() {
-                const mixName = `ترکیب اختصاصی شماره ${mixCounter}`;
-                // ساختن رشته جزئیات (خلاصه مواد)
+                const mixId = Date.now(); // شناسه منحصر به فرد
                 const counts = {};
-                flaskIngredients.forEach(x => { counts[x] = (counts[x] || 0) + 1; });
-                let detailsStr = Object.entries(counts).map(([key, val]) => `${key} (${val*50}g)`).join('، ');
+                flaskIngredients.forEach(x => counts[x] = (counts[x] || 0) + 1);
+                
+                // متن جزئیات
+                let detailsStr = Object.entries(counts)
+                    .map(([k, v]) => `${k} (${v * mixerConfig.step}g)`).join('، ');
 
-                // اضافه به سبد
-                mixedProducts.push({
+                let weightLabel = mixerConfig.max >= 1000 ? (mixerConfig.max/1000 + " کیلوگرم") : (mixerConfig.max + " گرم");
+                const mixName = `میکس اختصاصی ${mixCounter} (${weightLabel})`;
+
+                // آبجکت محصول میکس شده
+                const newMix = {
+                    id: mixId,
                     name: mixName,
-                    quantity: 1, // یک ظرف
-                    unit: "کیلوگرم",
+                    quantity: 1, 
+                    unit: "عدد",
+                    weightLabel: weightLabel,
                     type: "mix",
                     details: detailsStr
-                });
+                };
+                mixedProducts.push(newMix);
 
-                // نمایش در لیست پایین میکسر
+                // اضافه کردن به لیست نمایشی با دکمه حذف
                 const list = document.getElementById('mix-list');
-                if(mixCounter === 1) list.innerHTML = ''; // پاک کردن متن پیش‌فرض
-                
-                const div = document.createElement('div');
-                div.className = 'mix-item';
-                div.innerHTML = `<span>${mixName}</span> <i class="fa-solid fa-check-circle" style="color:green;"></i>`;
-                list.appendChild(div);
+                if(mixCounter === 1) list.innerHTML = '';
 
-                // ریست کردن ظرف
+                const row = document.createElement('div');
+                row.className = 'mix-item';
+                row.id = `mix-row-${mixId}`;
+                row.innerHTML = `
+                    <div>
+                        <span style="font-weight:bold; display:block;">${mixName}</span>
+                        <span style="font-size:0.7rem; color:#777;">${detailsStr.substring(0,30)}...</span>
+                    </div>
+                    <button class="delete-mix-btn" onclick="removeMix(${mixId})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                list.appendChild(row);
+
                 mixCounter++;
-                currentFlaskWeight = 0;
-                flaskIngredients = [];
-                document.getElementById('flask-content').innerHTML = '';
-                document.getElementById('current-weight').textContent = '0';
+                alert(`"${mixName}" ساخته شد و به سبد خرید اضافه گردید.`);
+                resetFlask();
+                updateCartAndButton();
+            }
+
+            // تابع حذف میکس
+            window.removeMix = function(id) {
+                if(!confirm("این ترکیب حذف شود؟")) return;
                 
-                alert(`ظرف پر شد! "${mixName}" به سبد خرید شما اضافه شد.`);
+                // حذف از آرایه
+                mixedProducts = mixedProducts.filter(p => p.id !== id);
+                
+                // حذف از DOM
+                const row = document.getElementById(`mix-row-${id}`);
+                if(row) row.remove();
+
+                // اگر لیست خالی شد
+                if(mixedProducts.length === 0) {
+                    document.getElementById('mix-list').innerHTML = '<small style="color: #999; display:block; text-align:center;">هنوز ترکیبی نساخته‌اید.</small>';
+                    mixCounter = 1; // ریست شمارنده (اختیاری)
+                }
+
                 updateCartAndButton();
             }
 
