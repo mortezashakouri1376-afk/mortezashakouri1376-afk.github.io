@@ -24,8 +24,9 @@
             margin: 0; padding: 0 0 100px 0;
             background-color: var(--light-bg);
             color: var(--text-color);
-            overflow-x: hidden;
+            overflow-x: hidden; /* جلوگیری از اسکرول افقی */
             -webkit-tap-highlight-color: transparent;
+            width: 100vw; /* اطمینان از عرض کامل */
         }
 
         /* --- هدر --- */
@@ -81,7 +82,7 @@
         #search-input:focus { outline: none; box-shadow: 0 15px 30px rgba(107, 142, 35, 0.25); }
         .search-icon { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); color: var(--primary-color); font-size: 1.3rem; pointer-events: none; }
 
-        /* --- منوی جانبی (BlurView) --- */
+        /* --- منوی جانبی (BlurView) - اصلاح شده --- */
         .side-menu-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.3); z-index: 998;
@@ -93,11 +94,17 @@
             background: rgba(20, 30, 10, 0.9); /* سبز بسیار تیره */
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             z-index: 999; box-shadow: -5px 0 20px rgba(0,0,0,0.2);
-            transition: right 0.4s cubic-bezier(0.19, 1, 0.22, 1);
             padding: 20px; display: flex; flex-direction: column;
             color: white;
+            /* اصلاح اصلی: وقتی بسته است کاملا مخفی شود تا فضا نگیرد */
+            visibility: hidden; 
+            transition: right 0.4s cubic-bezier(0.19, 1, 0.22, 1), visibility 0s linear 0.4s;
         }
-        .side-menu.active { right: 0; }
+        .side-menu.active { 
+            right: 0; 
+            visibility: visible;
+            transition: right 0.4s cubic-bezier(0.19, 1, 0.22, 1), visibility 0s linear 0s;
+        }
         .side-menu-overlay.active { opacity: 1; visibility: visible; }
 
         .side-menu-header {
