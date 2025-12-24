@@ -7,6 +7,7 @@
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#6B8E23">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;700&display=swap" rel="stylesheet">
@@ -88,7 +89,6 @@
         .close-menu-btn { background: none; border: none; color: white; font-size: 2rem; cursor: pointer; }
         
         .nav-links { padding: 20px 0; }
-        /* استفاده از div بجای a برای جلوگیری از باگ کلیک */
         .nav-item {
             display: flex; align-items: center; padding: 15px 25px;
             color: rgba(255,255,255,0.8); text-decoration: none; font-size: 1.1rem;
@@ -175,40 +175,23 @@
         .quantity-input { width:50px; padding:5px; border:2px solid #dce6c5; border-radius:10px; text-align:center; }
         .delete-btn { color:#ff4757; background:#ffeef0; border-radius:10px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
 
-        /* --- MIXER STYLES (Adapted from Pasted Text + User Request for Grid) --- */
         .mixer-wrapper { display:flex; flex-direction:column; align-items:center; gap:20px; user-select: none; }
         .size-selector { display:flex; background:#eee; padding:5px; border-radius:50px; width:100%; max-width:350px; margin-bottom:10px; }
         .size-btn { flex:1; border:none; background:transparent; padding:10px; border-radius:40px; cursor:pointer; font-family:'Lalezar'; font-size:1rem; color:#666; }
         .size-btn.active { background:#fff; color:#8E2DE2; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
 
-        /* گرید ۵ ستونه چوبی (درخواست کاربر) */
         .supplements-shelf {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr); /* 5 ستون */
-            gap: 8px;
-            background: #8B4513; /* رنگ چوب */
-            padding: 15px 10px 25px 10px;
-            border-radius: 15px;
-            width: 100%;
-            box-sizing: border-box;
-            border-bottom: 8px solid #5D3A1A;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            background: #8B4513; padding: 15px 10px 25px 10px; border-radius: 15px; width: 100%; box-sizing: border-box; border-bottom: 8px solid #5D3A1A;
         }
         .supplement-jar {
             background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0.5));
-            border-radius: 5px;
-            height: 55px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: grab;
-            position: relative;
-            touch-action: none; /* جلوگیری از اسکرول هنگام درگ */
+            border-radius: 5px; height: 55px; display: flex; flex-direction: column; align-items: center; cursor: grab; position: relative; touch-action: none;
         }
         .jar-lid { width:70%; height:6px; background:#333; margin-top:-3px; border-radius:2px; }
         .jar-body { width:100%; height:100%; border-radius:5px; display:flex; align-items:center; justify-content:center; }
         .jar-body span { font-size:0.6rem; font-weight:bold; color:rgba(0,0,0,0.6); writing-mode:vertical-rl; transform:rotate(180deg); }
 
-        /* Flask & Area from Pasted Text Chunk 8 */
         .mixing-area { position:relative; width:100%; height:260px; display:flex; justify-content:center; align-items:flex-end; }
         .flask-container { position:relative; width:160px; height:220px; display:flex; flex-direction:column-reverse; align-items:center; }
         .flask-glass {
@@ -218,7 +201,6 @@
         }
         .powder-layer { width:100%; transition:height 0.4s; border-top:1px solid rgba(255,255,255,0.2); }
 
-        /* --- OTHER VIEWS --- */
         .wheel-container { position: relative; width: 300px; height: 300px; margin: 0 auto; }
         .wheel { width: 100%; height: 100%; border-radius: 50%; border: 10px solid #fff; box-shadow: 0 0 20px rgba(0,0,0,0.2); background: conic-gradient(#ff6b6b 0 60deg, #4ecdc4 60deg 120deg, #ffe66d 120deg 180deg, #ff9f43 180deg 240deg, #54a0ff 240deg 300deg, #5f27cd 300deg 360deg); transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
         .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #333; z-index: 10; }
@@ -250,7 +232,6 @@
         .form-control { width:100%; padding:15px; border:2px solid #eee; border-radius:15px; font-size:1rem; box-sizing:border-box; font-family: 'Vazirmatn'; }
         .btn-submit-special { background:linear-gradient(135deg,#203a43,#2c5364); color:white; padding:15px; border:none; border-radius:15px; font-size:1.1rem; width:100%; cursor:pointer; font-family: 'Lalezar'; }
 
-        /* Ghost element for drag and drop (From Chunk 9) */
         .drag-ghost {
             position:fixed; pointer-events:none; z-index:9999; width:50px; height:50px;
             border-radius:50%; display:none; align-items:center; justify-content:center;
@@ -271,7 +252,7 @@
 
     <div class="side-menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 
-    <!-- منوی جانبی اصلاح شده (لینک‌ها DIV هستند برای کلیک‌پذیری) -->
+    <!-- منوی جانبی اصلاح شده -->
     <div class="side-menu" id="sideMenu">
         <div class="side-menu-header">
             <h3 style="margin:0; font-family:'Lalezar'; font-size:1.5rem; color:var(--gold-color)">منوی اصلی</h3>
@@ -303,7 +284,7 @@
         </button>
 
         <div style="text-align:center; font-size:0.8rem; color:rgba(255,255,255,0.4); padding:20px;">
-            Senjed Store v4.0 (Smart Wheel)
+            Senjed Store v4.1 (Install Fixed)
         </div>
     </div>
 
@@ -351,7 +332,6 @@
             </div>
         </div>
 
-        <!-- Mixer View (Code taken from pasted-text.txt Chunk 12) -->
         <div id="mixer-view" class="inner-section" style="background:#fff9fc;">
             <button class="back-btn" onclick="history.back()"><i class="fa-solid fa-arrow-right"></i> بازگشت</button>
             <div class="mixer-wrapper">
@@ -434,6 +414,15 @@
         const sideMenu = document.getElementById('sideMenu');
         const menuOverlay = document.getElementById('menuOverlay');
 
+        // --- SERVICE WORKER REGISTRATION (NEW) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW Registered', reg))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+
         const ailments = [
             { name: 'سرماخوردگی', keywords: ['آویشن', 'پونه', 'عسل', 'نعنا', 'اکالیپتوس'] },
             { name: 'کبد چرب', keywords: ['کاسنی', 'شاتره', 'خارشتر', 'زردچوبه', 'سرکه'] },
@@ -466,7 +455,7 @@
             updateFavoritesMenu();
             renderAilmentButtons();
             updateCartAndButton();
-            checkSpinStatus(); // بررسی وضعیت گردونه در شروع
+            checkSpinStatus();
         }
 
         function normalizeText(text) {
@@ -602,7 +591,6 @@
         }
 
         function updateCartAndButton() {
-            // محصولات عادی
             let newCart = [];
             document.querySelectorAll('.product-item.selected').forEach(li => {
                 const name = li.querySelector('div > div:first-child').textContent;
@@ -610,11 +598,8 @@
                 const unit = li.querySelector('.quantity-input-container span').textContent;
                 if (q > 0) newCart.push({ name, quantity: q, unit, type:'standard' });
             });
-            
-            // ترکیب با میکس‌ها
             shoppingCart = [...newCart, ...mixedProducts];
             localStorage.setItem('senjedCart', JSON.stringify(shoppingCart));
-
             const count = shoppingCart.length;
             cartCounter.textContent = count;
             cartCounter.style.display = count > 0 ? 'flex' : 'none';
@@ -647,7 +632,6 @@
             localStorage.setItem('senjedFavorites', JSON.stringify(favorites));
             updateFavoritesMenu();
             
-            // رفرش آیکون اگر در لیست هستیم
             const btn = document.querySelector(`.star-btn[data-fav-name="${productName}"]`);
             if(btn) {
                 btn.classList.toggle('active');
@@ -676,21 +660,30 @@
             window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`درخواست خاص:\nمحصول: ${n}\nتوضیحات: ${d}`)}`,'_blank');
         };
 
+        // --- INSTALL PWA LOGIC (FIXED) ---
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('install-btn').addEventListener('click', () => {
-                if(deferredPrompt) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(() => deferredPrompt = null);
-                } else {
-                    alert('لطفا از منوی مرورگر گزینه Add to Home Screen را انتخاب کنید.');
-                }
-            });
+            console.log("PWA install prompt ready.");
         });
 
-        // --- UPDATED LUCKY WHEEL LOGIC (Business Friendly + One Time Use) ---
+        document.getElementById('install-btn').addEventListener('click', () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                // نمایش راهنما اگر نصب خودکار در دسترس نبود (مثل iOS یا وقتی روی سرور نیست)
+                alert('برای نصب برنامه:\n\n۱. در مرورگر کروم: روی منوی سه نقطه بزنید و گزینه "Install App" یا "Add to Home Screen" را انتخاب کنید.\n\n۲. در آیفون (Safari): روی دکمه Share پایین صفحه بزنید و "Add to Home Screen" را انتخاب کنید.');
+            }
+        });
+
+        // --- WHEEL LOGIC ---
         window.checkSpinStatus = function() {
             if(localStorage.getItem('senjed_wheel_used_v2')) {
                 const btn = document.querySelector('.spin-btn');
@@ -703,50 +696,41 @@
         };
 
         window.spinWheel = function() {
-            // 1. بررسی آیا قبلا استفاده کرده؟
             if(localStorage.getItem('senjed_wheel_used_v2')) {
                 alert('شما قبلاً شانس خود را امتحان کرده‌اید!');
                 return;
             }
-
             const wheel = document.getElementById('lucky-wheel');
             const btn = document.querySelector('.spin-btn');
-            btn.disabled = true; // غیرفعال سازی آنی دکمه
+            btn.disabled = true;
 
-            // 2. منطق تجاری (وزن دهی احتمالات)
-            // 70% پوچ | 25% تخفیف کم (5درصد) | 5% تخفیف زیاد (10درصد)
             const rand = Math.random() * 100;
             let targetDeg = 0;
             let message = "";
-            const baseSpins = 3600; // 10 دور کامل برای هیجان
+            const baseSpins = 3600;
 
             if (rand < 70) {
-                // باخت (هدف گیری بخش قرمز/آبی/زرد) - مثلا زاویه 30
                 targetDeg = baseSpins + 30; 
                 message = "متاسفانه برنده نشدید. ممنون از همراهی شما!";
             } else if (rand < 95) {
-                // برد کوچک (5% تخفیف) - مثلا زاویه 90 (سبزآبی)
                 targetDeg = baseSpins + 90;
                 message = "تبریک! برنده کد تخفیف 5 درصدی شدید.\nکد: OFF5";
             } else {
-                // برد بزرگ (10% تخفیف) - مثلا زاویه 330 (بنفش)
                 targetDeg = baseSpins + 330;
                 message = "شگفت‌انگیز! برنده کد تخفیف 10 درصدی شدید.\nکد: OFF10";
             }
 
-            // 3. انیمیشن چرخش
             wheel.style.transform = `rotate(${targetDeg}deg)`;
 
-            // 4. نمایش نتیجه و ذخیره وضعیت
             setTimeout(() => {
                 alert(message);
-                localStorage.setItem('senjed_wheel_used_v2', 'true'); // ذخیره در حافظه گوشی
+                localStorage.setItem('senjed_wheel_used_v2', 'true');
                 btn.innerText = "اتمام شانس";
                 btn.style.background = "#ccc";
             }, 4000);
         };
 
-        // --- MIXER LOGIC FROM PASTED-TEXT.TXT (CHUNKS 31 & 32) ---
+        // --- MIXER LOGIC ---
         let mixerConfig={max:1000, step:100}, currentFlaskWeight=0, flaskIngredients=[];
         const jarColors = ['#FF6B6B','#4ECDC4','#FFE66D','#FF9F43','#54A0FF','#5F27CD','#C4E538','#FDA7DF','#D980FA','#B53471','#009432','#F79F1F','#1B1464','#EA2027','#A3CB38','#12CBC4','#ED4C67','#B53471','#833471','#6F1E51'];
 
@@ -831,7 +815,6 @@
             const newMix = { id:mixId, name:mixName, quantity:1, unit:"عدد", weightLabel, type:"mix", details };
             mixedProducts.push(newMix);
             const list=document.getElementById('mix-list');
-            // if(mixCounter===1) list.innerHTML=''; // Commented out to avoid clearing on first add if needed
             const row=document.createElement('div');
             row.style.background='#fff'; row.style.padding='10px'; row.style.borderRadius='10px'; row.style.marginBottom='5px'; row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center';
             row.id=`mix-row-${mixId}`;
