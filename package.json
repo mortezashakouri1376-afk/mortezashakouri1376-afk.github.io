@@ -1,9 +1,11 @@
 {
   "name": "contact-game",
   "version": "1.0.0",
-  "description": "Contact - بازی حدس کلمه چندنفره (WebSocket)",
+  "description": "Contact word game with WebSockets",
   "main": "server.js",
-  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node server.js"
   },
