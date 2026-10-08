@@ -8,134 +8,40 @@
     :root {
       --bg: #0f172a;
       --card: #1e293b;
-      --card-border: #334155;
+      --border: #334155;
       --primary: #6366f1;
-      --primary-hover: #4f46e5;
       --accent: #ec4899;
-      --success: #10b981;
       --danger: #ef4444;
+      --success: #10b981;
       --warning: #f59e0b;
       --text: #f8fafc;
-      --text-muted: #94a3b8;
+      --muted: #94a3b8;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Vazirmatn', sans-serif; }
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1rem;
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    header { text-align: center; margin-bottom: 0.5rem; }
-    header h1 { font-size: 1.8rem; color: #fff; margin-bottom: 0.25rem; }
-    header p { color: var(--text-muted); font-size: 0.9rem; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 1rem;
-      padding: 1.25rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-    }
-    .hidden { display: none !important; }
-    input, button {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid var(--card-border);
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.2s;
-    }
-    input {
-      background: #0b1120;
-      color: var(--text);
-      margin-bottom: 0.75rem;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 1rem; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 1rem; }
+    header { text-align: center; }
+    header h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; }
+    .hide { display: none !important; }
+    input, button { width: 100%; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 1rem; outline: none; margin-bottom: 0.6rem; }
+    input { background: #0b1120; color: var(--text); }
     input:focus { border-color: var(--primary); }
-    button {
-      background: var(--primary);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-      margin-bottom: 0.5rem;
-    }
-    button:hover { background: var(--primary-hover); }
+    button { background: var(--primary); color: white; font-weight: bold; cursor: pointer; border: none; }
     button.secondary { background: #334155; }
-    button.secondary:hover { background: #475569; }
-    button.danger { background: var(--danger); }
+    button.coral { background: var(--danger); }
     button.accent { background: var(--accent); }
-    .letter-board {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin: 1rem 0;
-      flex-wrap: wrap;
-    }
-    .letter-box {
-      width: 44px;
-      height: 48px;
-      background: #0b1120;
-      border: 2px solid var(--primary);
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #38bdf8;
-    }
-    .letter-box.empty { border-color: var(--card-border); color: var(--text-muted); }
-    .countdown-bar {
-      height: 6px;
-      background: var(--card-border);
-      border-radius: 3px;
-      overflow: hidden;
-      margin: 0.5rem 0;
-    }
-    .countdown-fill {
-      height: 100%;
-      background: var(--accent);
-      width: 100%;
-      transition: width 0.1s linear;
-    }
-    .players-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .badge {
-      background: #0b1120;
-      padding: 0.25rem 0.6rem;
-      border-radius: 1rem;
-      font-size: 0.8rem;
-      border: 1px solid var(--card-border);
-    }
+    .letters { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+    .letter-box { width: 44px; height: 48px; background: #0b1120; border: 2px solid var(--primary); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: #38bdf8; }
+    .clue-banner { background: #0b1120; border: 2px solid #38bdf8; border-radius: 0.75rem; padding: 1rem; margin: 0.8rem 0; text-align: center; }
+    .badge { background: #0b1120; padding: 0.25rem 0.6rem; border-radius: 1rem; font-size: 0.8rem; border: 1px solid var(--border); }
     .badge.host { border-color: var(--warning); color: var(--warning); }
-    .badge.me { border-color: var(--primary); color: #818cf8; }
-    .log-box {
-      background: #0b1120;
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-      font-size: 0.85rem;
-      max-height: 140px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .log-entry { color: var(--text-muted); }
-    .log-entry.system { color: #38bdf8; }
+    .players { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+    .log-box { background: #0b1120; border-radius: 0.5rem; padding: 0.75rem; font-size: 0.85rem; max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem; }
+    .log-item { color: var(--muted); }
+    .log-item.system { color: #38bdf8; font-weight: 500; }
+    .countdown-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+    .countdown-bar-fill { height: 100%; background: var(--danger); width: 100%; transition: width 0.1s linear; }
   </style>
 </head>
 <body>
@@ -143,90 +49,99 @@
 <div class="container">
   <header>
     <h1>بازی کانتکت 💬</h1>
-    <p>بازی واژه‌یابی تیمی و تلپاتی کلمات</p>
+    <p style="color:var(--muted); font-size:0.9rem;">حدس کلمات و تله‌پاتی گروهی</p>
   </header>
 
-  <!-- کارت عضویت / ساخت اتاق -->
+  <!-- ورود / لابی -->
   <div id="authCard" class="card">
-    <h2 style="font-size:1.2rem; margin-bottom:1rem;">ورود به بازی</h2>
-    <input type="text" id="playerName" placeholder="نام شما (مثلاً: رضا)">
+    <h2 style="font-size:1.1rem; margin-bottom:0.8rem;">ورود به بازی</h2>
+    <input type="text" id="nameInput" placeholder="نام شما (مثلاً: سارا)">
     <button onclick="createRoom()">➕ ساخت اتاق جدید</button>
-    <div style="text-align:center; margin:0.5rem 0; color:var(--text-muted);">یا</div>
-    <input type="text" id="roomCodeInput" placeholder="کد ۴ حرفی اتاق" style="text-transform:uppercase;">
+    <div style="text-align:center; margin:0.4rem 0; color:var(--muted);">یا</div>
+    <input type="text" id="codeInput" placeholder="کد اتاق (۴ حرفی)" style="text-transform:uppercase;">
     <button class="secondary" onclick="joinRoom()">🚪 ورود به اتاق</button>
   </div>
 
   <!-- کارت بازی اصلی -->
-  <div id="gameCard" class="card hidden">
+  <div id="gameCard" class="card hide">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span>کد اتاق: <strong id="displayRoomCode" style="color:var(--primary); font-size:1.2rem;">----</strong></span>
-      <span id="roleBadge" class="badge">نقش: بازیکن</span>
+      <span>کد اتاق: <b id="roomCodeDisplay" style="color:var(--primary); font-size:1.2rem;">----</b></span>
+      <span id="roleTag" class="badge">نقش: نامشخص</span>
     </div>
 
-    <!-- حروف کشف‌شده کلمه -->
-    <div class="letter-board" id="lettersContainer"></div>
+    <!-- حروف باز شده -->
+    <div style="text-align:center; margin-top:1rem; font-size:0.85rem; color:var(--muted);">حروف آشکار شده:</div>
+    <div class="letters" id="lettersWrap"></div>
 
-    <!-- تایمر شمارش معکوس کانتکت -->
-    <div id="countdownBox" class="hidden">
-      <div style="text-align:center; color:var(--accent); font-weight:bold; margin-bottom:0.25rem;">
-        ⏳ کانکت برقرار شد! شمارش ۵ ثانیه‌ای...
+    <!-- بخش عمومی راهنمایی (حتماً برای همه از جمله میزبان نمایش داده می‌شود) -->
+    <div id="activeClueBox" class="clue-banner hide">
+      <div style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">
+        راهنمایی مطرح‌شده توسط <strong id="clueAuthorName" style="color:#fff;"></strong>:
       </div>
-      <div class="countdown-bar">
-        <div id="countdownBar" class="countdown-fill"></div>
+      <div id="clueTextDisplay" style="font-size:1.25rem; font-weight:bold; color:#38bdf8; margin:0.5rem 0;"></div>
+      
+      <!-- دکمه اتصال برای سایر بازیکنان -->
+      <button id="connectBtn" class="accent hide" onclick="connectClue()">⚡ من هم کلمه را فهمیدم! (کانتکت)</button>
+    </div>
+
+    <!-- شمارش معکوس حدس میزبان -->
+    <div id="countdownBox" class="hide" style="background:#1e1b4b; padding:0.75rem; border-radius:0.5rem; margin:0.5rem 0; border:1px solid #4338ca;">
+      <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#f43f5e; font-weight:bold;">
+        <span>⏳ فرصت حدس میزبان:</span>
+        <span id="countdownText">5.0 ثانیه</span>
+      </div>
+      <div class="countdown-bar-wrap">
+        <div id="countdownFill" class="countdown-bar-fill"></div>
       </div>
     </div>
 
-    <!-- کنترل‌های اختصاصی میزبان -->
-    <div id="hostControls" class="hidden" style="margin-top:1rem; border-top:1px solid var(--card-border); padding-top:1rem;">
-      <h3 style="font-size:1rem; margin-bottom:0.5rem; color:var(--warning);">تنظیمات میزبان</h3>
+    <!-- پنل میزبان (ادمین) -->
+    <div id="hostPanel" class="hide" style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;">
+      <h3 style="font-size:1rem; color:var(--warning); margin-bottom:0.5rem;">👑 پنل میزبان</h3>
+      
+      <!-- تعیین کلمه مخفی -->
       <div id="secretWordSection">
-        <input type="text" id="secretWordInput" placeholder="کلمه مخفی نهایی را وارد کنید">
-        <button onclick="setSecretWord()">ثبت کلمه مخفی و شروع</button>
+        <input type="text" id="secretWordInput" placeholder="کلمه مخفی بازی را بنویسید (مثلاً: آبمیوه)">
+        <button onclick="setSecretWord()">ثبت کلمه و شروع دور</button>
       </div>
-      <div id="hostDisconnectSection" class="hidden" style="margin-top:0.5rem;">
-        <input type="text" id="hostGuessInput" placeholder="حدس برای دیس‌کانتکت کردن راهنمایی">
-        <button class="danger" onclick="disconnectGuess()">🚫 دیس‌کانتکت (حدس کلمه)</button>
+
+      <!-- حدس میزبان برای دیس‌کانتکت -->
+      <div id="hostGuessSection" class="hide" style="background:#271212; padding:0.75rem; border-radius:0.5rem; border:1px solid var(--danger); margin-top:0.5rem;">
+        <p style="font-size:0.85rem; color:#fca5a5; margin-bottom:0.4rem;">راهنمایی بالا را دیدید؟ حدس خود را بنویسید تا ارتباط بازیکنان را باطل (دیس‌کانتکت) کنید:</p>
+        <input type="text" id="hostGuessInput" placeholder="کلمه مورد حدس شما...">
+        <button class="coral" onclick="disconnectGuess()">🚫 دیس‌کانتکت (حدس کلمه)</button>
       </div>
     </div>
 
-    <!-- بخش راهنمایی و کانکت شدن (برای بازیکنان) -->
-    <div id="playerControls" class="hidden" style="margin-top:1rem; border-top:1px solid var(--card-border); padding-top:1rem;">
+    <!-- پنل بازیکنان عادی -->
+    <div id="playerPanel" class="hide" style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;">
       <!-- ارسال راهنمایی جدید -->
-      <div id="clueCreateSection">
-        <h3 style="font-size:1rem; margin-bottom:0.5rem;">ارسال راهنمایی</h3>
-        <input type="text" id="clueTextInput" placeholder="راهنمایی (مثال: حیوانی بارکش)">
-        <input type="text" id="underlyingWordInput" placeholder="کلمه مد نظرتان (مثال: خر)">
-        <button onclick="postClue()">ارسال راهنمایی</button>
+      <div id="postClueSection">
+        <h3 style="font-size:1rem; color:#38bdf8; margin-bottom:0.5rem;">طرح راهنمایی تازه</h3>
+        <input type="text" id="clueTextInput" placeholder="متن راهنمایی (مثال: میوه‌ای قرمز و ترش)">
+        <input type="text" id="underlyingWordInput" placeholder="کلمه‌ای که در ذهن دارید و با حروف بالا شروع می‌شود (مثال: انار)">
+        <button onclick="postClue()">ثبت و ارسال راهنمایی</button>
       </div>
 
-      <!-- راهنمایی فعال روی میز -->
-      <div id="activeClueSection" class="hidden" style="background:#0b1120; padding:0.75rem; border-radius:0.5rem; margin-top:0.75rem;">
-        <p style="font-size:0.9rem; color:var(--text-muted);">راهنمایی از طرف <span id="clueAuthor" style="color:#fff;"></span>:</p>
-        <p id="clueTextDisplay" style="font-size:1.1rem; font-weight:bold; margin:0.5rem 0; color:#38bdf8;"></p>
-        <button id="connectBtn" class="accent" onclick="connectToClue()">⚡ کانکت شدم! (منم فهمیدم)</button>
-      </div>
-
-      <!-- آشکارسازی نهایی کلمه (در پایان ۵ ثانیه) -->
-      <div id="submitWordSection" class="hidden" style="margin-top:0.75rem;">
-        <p style="color:var(--success); font-size:0.9rem; margin-bottom:0.5rem;">کلمه مد نظر خود را تایپ و ارسال کنید:</p>
-        <input type="text" id="revealWordInput" placeholder="کلمه شما">
-        <button class="accent" onclick="submitRevealWord()">ارسال کلمه</button>
+      <!-- ارسال کلمه نهایی در فاز ثبت نهایی -->
+      <div id="submitWordSection" class="hide" style="background:#064e3b; padding:0.75rem; border-radius:0.5rem; border:1px solid var(--success); margin-top:0.5rem;">
+        <p style="font-size:0.85rem; color:#6ee7b7; margin-bottom:0.4rem;">زمان میزبان تمام شد! کلمه خود را بنویسید تا بررسی شود:</p>
+        <input type="text" id="finalWordInput" placeholder="کلمه مد نظرتان">
+        <button class="accent" onclick="submitFinalWord()">ثبت کلمه</button>
       </div>
     </div>
 
-    <!-- لیست بازیکنان -->
+    <!-- بازیکنان -->
     <div style="margin-top:1rem;">
-      <div style="font-size:0.85rem; color:var(--text-muted);">بازیکنان حاضر:</div>
-      <div class="players-list" id="playersList"></div>
+      <div style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">حاضرین در اتاق:</div>
+      <div class="players" id="playersList"></div>
     </div>
   </div>
 
-  <!-- لاگ پیام‌های بازی -->
+  <!-- لاگ بازی -->
   <div class="card">
-    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.4rem;">رویدادهای بازی:</div>
-    <div class="log-box" id="logBox">
-      <div class="log-entry system">به بازی خوش آمدید.</div>
-    </div>
+    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">پیام‌های بازی:</div>
+    <div class="log-box" id="logBox"></div>
   </div>
 </div>
 
@@ -234,99 +149,90 @@
 (() => {
   let ws = null;
   let myId = null;
-  let myRoomCode = null;
-  let currentState = null;
-  let countdownTimer = null;
+  let timerInterval = null;
 
-  function connectSocket() {
+  function connect() {
     const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
     ws = new WebSocket(`${proto}//${location.host}`);
+
+    ws.onopen = () => addLog('به سرور متصل شدید ✅', true);
 
     ws.onmessage = (e) => {
       const msg = JSON.parse(e.data);
       if (msg.type === 'room_created' || msg.type === 'joined') {
         myId = msg.myId;
-        myRoomCode = msg.code;
-        document.getElementById('authCard').classList.add('hidden');
-        document.getElementById('gameCard').classList.remove('hidden');
-        document.getElementById('displayRoomCode').innerText = myRoomCode;
+        document.getElementById('authCard').classList.add('hide');
+        document.getElementById('gameCard').classList.remove('hide');
+        document.getElementById('roomCodeDisplay').innerText = msg.code;
       } else if (msg.type === 'state') {
-        currentState = msg.state;
-        render(currentState);
+        render(msg.state);
       } else if (msg.type === 'system') {
         addLog(msg.message, true);
       } else if (msg.type === 'error') {
         alert(msg.message);
-      } else if (msg.type === 'host_assigned') {
-        addLog('شما اکنون میزبان بازی هستید!', true);
       }
     };
 
     ws.onclose = () => {
-      addLog('ارتباط با سرور قطع شد. در حال تلاش برای اتصال مجدد...', true);
-      setTimeout(connectSocket, 2000);
+      addLog('ارتباط قطع شد. در حال تلاش برای اتصال...', true);
+      setTimeout(connect, 2000);
     };
   }
 
-  connectSocket();
+  connect();
 
   function send(data) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(data));
-    }
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(data));
   }
 
   window.createRoom = () => {
-    const name = document.getElementById('playerName').value.trim();
-    if (!name) return alert('لطفاً نام خود را بنویسید.');
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) return alert('نام خود را وارد کنید.');
     send({ action: 'create_room', name });
   };
 
   window.joinRoom = () => {
-    const name = document.getElementById('playerName').value.trim();
-    const code = document.getElementById('roomCodeInput').value.trim();
-    if (!name || !code) return alert('لطفاً نام و کد اتاق را بنویسید.');
+    const name = document.getElementById('nameInput').value.trim();
+    const code = document.getElementById('codeInput').value.trim();
+    if (!name || !code) return alert('نام و کد اتاق را وارد کنید.');
     send({ action: 'join_room', name, code });
   };
 
   window.setSecretWord = () => {
     const word = document.getElementById('secretWordInput').value.trim();
-    if (!word) return alert('لطفاً کلمه را وارد کنید.');
+    if (!word) return alert('کلمه مخفی را وارد کنید.');
     send({ action: 'set_secret', word });
-    send({ action: 'start_game' });
   };
 
   window.postClue = () => {
     const clueText = document.getElementById('clueTextInput').value.trim();
     const underlyingWord = document.getElementById('underlyingWordInput').value.trim();
-    if (!clueText) return alert('متن راهنمایی را بنویسید.');
+    if (!clueText || !underlyingWord) return alert('هم راهنمایی و هم کلمه مد نظر را وارد کنید.');
     send({ action: 'post_clue', clueText, underlyingWord });
     document.getElementById('clueTextInput').value = '';
     document.getElementById('underlyingWordInput').value = '';
   };
 
-  window.connectToClue = () => {
-    send({ action: 'connect' });
-  };
+  window.connectClue = () => send({ action: 'connect' });
 
   window.disconnectGuess = () => {
     const guess = document.getElementById('hostGuessInput').value.trim();
-    if (!guess) return alert('حدس خود را وارد کنید.');
+    if (!guess) return alert('کلمه مورد حدس را وارد کنید.');
     send({ action: 'disconnect_guess', guess });
     document.getElementById('hostGuessInput').value = '';
   };
 
-  window.submitRevealWord = () => {
-    const word = document.getElementById('revealWordInput').value.trim();
+  window.submitFinalWord = () => {
+    const word = document.getElementById('finalWordInput').value.trim();
     if (!word) return alert('کلمه را تایپ کنید.');
     send({ action: 'submit_word', word });
-    document.getElementById('revealWordInput').value = '';
+    document.getElementById('finalWordInput').value = '';
   };
 
   function addLog(text, isSystem = false) {
     const box = document.getElementById('logBox');
     const el = document.createElement('div');
-    el.className = 'log-entry' + (isSystem ? ' system' : '');
+    el.className = 'log-item' + (isSystem ? ' system' : '');
     el.innerText = text;
     box.appendChild(el);
     box.scrollTop = box.scrollHeight;
@@ -334,90 +240,106 @@
 
   function render(state) {
     const isHost = state.hostId === myId;
-    const roleBadge = document.getElementById('roleBadge');
-    roleBadge.innerText = isHost ? '👑 شما میزبان هستید' : '🎮 شما بازیکن هستید';
-    roleBadge.className = 'badge ' + (isHost ? 'host' : 'me');
+    const roleTag = document.getElementById('roleTag');
+    roleTag.innerText = isHost ? '👑 شما میزبان هستید' : '🎮 شما بازیکن هستید';
+    roleTag.className = 'badge ' + (isHost ? 'host' : '');
 
-    // حروف آشکار شده
-    const lettersContainer = document.getElementById('lettersContainer');
-    lettersContainer.innerHTML = '';
+    // حروف باز شده
+    const lettersWrap = document.getElementById('lettersWrap');
+    lettersWrap.innerHTML = '';
     const letters = state.revealedLetters ? state.revealedLetters.split('') : [];
-    letters.forEach(char => {
-      const box = document.createElement('div');
-      box.className = 'letter-box';
-      box.innerText = char;
-      lettersContainer.appendChild(box);
+    letters.forEach(l => {
+      const b = document.createElement('div');
+      b.className = 'letter-box';
+      b.innerText = l;
+      lettersWrap.appendChild(b);
     });
 
-    // پنل‌ها
-    const hostControls = document.getElementById('hostControls');
-    const playerControls = document.getElementById('playerControls');
-    const secretWordSection = document.getElementById('secretWordSection');
-    const hostDisconnectSection = document.getElementById('hostDisconnectSection');
-
-    if (isHost) {
-      hostControls.classList.remove('hidden');
-      playerControls.classList.add('hidden');
-      secretWordSection.classList.toggle('hidden', state.phase !== 'lobby' && !!state.hostSecret);
-      hostDisconnectSection.classList.toggle('hidden', !state.currentClue);
-    } else {
-      hostControls.classList.add('hidden');
-      playerControls.classList.remove('hidden');
-    }
-
-    // راهنمایی فعال
-    const activeClueSection = document.getElementById('activeClueSection');
-    const clueCreateSection = document.getElementById('clueCreateSection');
-    const submitWordSection = document.getElementById('submitWordSection');
+    // نمایش راهنمایی برای همه (از جمله ادمین)
+    const activeClueBox = document.getElementById('activeClueBox');
+    const clueAuthorName = document.getElementById('clueAuthorName');
+    const clueTextDisplay = document.getElementById('clueTextDisplay');
+    const connectBtn = document.getElementById('connectBtn');
 
     if (state.currentClue) {
-      activeClueSection.classList.remove('hidden');
-      clueCreateSection.classList.add('hidden');
-      document.getElementById('clueAuthor').innerText = state.currentClue.authorName;
-      document.getElementById('clueTextDisplay').innerText = state.currentClue.clueText;
-      document.getElementById('connectBtn').classList.toggle('hidden', state.currentClue.authorId === myId || !!state.currentClue.connectorId);
+      activeClueBox.classList.remove('hide');
+      clueAuthorName.innerText = state.currentClue.authorName;
+      clueTextDisplay.innerText = `« ${state.currentClue.clueText} »`;
+
+      // فقط بازیکنان عادی (غیر از نویسنده و میزبان) دکمه کانتکت را می‌بینند
+      if (!isHost && state.currentClue.authorId !== myId && !state.currentClue.connectorId) {
+        connectBtn.classList.remove('hide');
+      } else {
+        connectBtn.classList.add('hide');
+      }
     } else {
-      activeClueSection.classList.add('hidden');
-      clueCreateSection.classList.remove('hidden');
+      activeClueBox.classList.add('hide');
     }
 
-    // ثبت کلمه (Submit phase)
-    if (state.phase === 'submit' && state.currentClue) {
-      const amIInvolved = state.currentClue.authorId === myId || state.currentClue.connectorId === myId;
-      submitWordSection.classList.toggle('hidden', !amIInvolved);
+    // کنترل‌های میزبان
+    const hostPanel = document.getElementById('hostPanel');
+    const secretWordSection = document.getElementById('secretWordSection');
+    const hostGuessSection = document.getElementById('hostGuessSection');
+
+    if (isHost) {
+      hostPanel.classList.remove('hide');
+      secretWordSection.classList.toggle('hide', state.phase !== 'lobby');
+      // هر زمان سرنخی مطرح باشد، فرم حدس برای میزبان باز است
+      hostGuessSection.classList.toggle('hide', !state.currentClue);
     } else {
-      submitWordSection.classList.add('hidden');
+      hostPanel.classList.add('hide');
+    }
+
+    // کنترل‌های بازیکنان
+    const playerPanel = document.getElementById('playerPanel');
+    const postClueSection = document.getElementById('postClueSection');
+    const submitWordSection = document.getElementById('submitWordSection');
+
+    if (!isHost) {
+      playerPanel.classList.remove('hide');
+      postClueSection.classList.toggle('hide', !!state.currentClue || state.phase === 'lobby');
+
+      if (state.phase === 'submit' && state.currentClue) {
+        const involved = state.currentClue.authorId === myId || state.currentClue.connectorId === myId;
+        submitWordSection.classList.toggle('hide', !involved);
+      } else {
+        submitWordSection.classList.add('hide');
+      }
+    } else {
+      playerPanel.classList.add('hide');
     }
 
     // تایمر ۵ ثانیه‌ای
     const countdownBox = document.getElementById('countdownBox');
+    const countdownText = document.getElementById('countdownText');
+    const countdownFill = document.getElementById('countdownFill');
+
     if (state.phase === 'countdown' && state.countdownEndsAt) {
-      countdownBox.classList.remove('hidden');
-      if (countdownTimer) clearInterval(countdownTimer);
-      const endsAt = state.countdownEndsAt;
-      countdownTimer = setInterval(() => {
-        const remaining = Math.max(0, endsAt - Date.now());
-        const pct = (remaining / 5000) * 100;
-        document.getElementById('countdownBar').style.width = pct + '%';
-        if (remaining <= 0) clearInterval(countdownTimer);
+      countdownBox.classList.remove('hide');
+      if (timerInterval) clearInterval(timerInterval);
+
+      timerInterval = setInterval(() => {
+        const remaining = Math.max(0, state.countdownEndsAt - Date.now());
+        countdownFill.style.width = (remaining / 5000) * 100 + '%';
+        countdownText.innerText = (remaining / 1000).toFixed(1) + ' ثانیه';
+        if (remaining <= 0) clearInterval(timerInterval);
       }, 50);
     } else {
-      countdownBox.classList.add('hidden');
-      if (countdownTimer) clearInterval(countdownTimer);
+      countdownBox.classList.add('hide');
+      if (timerInterval) clearInterval(timerInterval);
     }
 
     // لیست بازیکنان
     const playersList = document.getElementById('playersList');
     playersList.innerHTML = '';
     state.players.forEach(p => {
-      const badge = document.createElement('span');
-      badge.className = 'badge' + (p.isHost ? ' host' : '') + (p.id === myId ? ' me' : '');
-      badge.innerText = p.name + (p.isHost ? ' (میزبان)' : '') + (p.id === myId ? ' [شما]' : '');
-      playersList.appendChild(badge);
+      const b = document.createElement('span');
+      b.className = 'badge' + (p.isHost ? ' host' : '');
+      b.innerText = p.name + (p.isHost ? ' (میزبان)' : '') + (p.id === myId ? ' [شما]' : '');
+      playersList.appendChild(b);
     });
   }
 })();
 </script>
 </body>
-  </html>
-  
+</html>
