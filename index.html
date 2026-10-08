@@ -697,14 +697,18 @@
             </div>
           </div>
 
-          <!-- Clue Creation Form (For Non-hosts) -->
-          <div id="clueForm" class="field mt-4">
-            <label for="clueInput">یک راهنمایی برای کلمه‌ای که به این حرف می‌خورد بنویسید:</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="text" id="clueInput" placeholder="مثلاً: یه حشره قشنگ با بال‌های رنگی...">
-              <button id="postClueBtn" class="btn btn-sm" style="width: 120px;">ارسال</button>
-            </div>
-          </div>
+          <!-- جایگزین کن id="clueForm" را با این: -->
+<div id="clueForm" class="field mt-4">
+  <label>یک کلمه (با حرف فاش‌شده) در ذهن دارید؟ راهنمایی مبهم بنویسید:</label>
+  <div class="field">
+    <input type="text" id="clueWordInput" placeholder="کلمه‌ای که در ذهن دارید (مثلاً: پروانه)" autocomplete="off">
+  </div>
+  <div style="display:flex; gap:8px;">
+    <input type="text" id="clueInput" placeholder="راهنمایی مبهم (مثلاً: یه حشره قشنگ با بال‌های رنگی...)">
+    <button id="postClueBtn" class="btn btn-sm" style="width:120px;">ارسال</button>
+  </div>
+</div>
+
 
           <!-- Secret Word Submit Form (After Contact) -->
           <div id="submitArea" class="card hide" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
@@ -762,267 +766,259 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast">پیام سیستم</div>
+<script>
+  const $ = (sel) => document.querySelector(sel);
+  const esc = (text) => {
+    const p = document.createElement('p');
+    p.textContent = text || '';
+    return p.innerHTML;
+  };
 
-  <script>
-    const $ = (sel) => document.querySelector(sel);
-    const esc = (text) => {
-      const p = document.createElement('p');
-      p.textContent = text || '';
-      return p.innerHTML;
+  let ws = null;
+  let state = null;
+  let playerId = null;
+  let roomCode = null;
+  let toastTimer = null;
+  let clockTimer = null;
+
+  function toast(text) {
+    const el = $('#toast');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  function show(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $('#' + screenId).classList.add('active');
+  }
+
+  function connect() {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${proto}//${location.host}`);
+
+    ws.onopen = () => {
+      $('#netdot').classList.add('on');
+      $('#nettext').textContent = 'متصل به سرور';
     };
 
-    let ws = null;
-    let state = null;
-    let playerId = null;
-    let roomCode = null;
-    let toastTimer = null;
-    let clockTimer = null;
+    ws.onclose = () => {
+      $('#netdot').classList.remove('on');
+      $('#nettext').textContent = 'قطع ارتباط (تلاش مجدد...)';
+      setTimeout(connect, 2000);
+    };
 
-    function toast(text) {
-      const el = $('#toast');
-      el.textContent = text;
-      el.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
-    }
+    ws.onmessage = (ev) => {
+      let msg = {};
+      try { msg = JSON.parse(ev.data); } catch { return; }
 
-    function show(screenId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      $('#' + screenId).classList.add('active');
-    }
-
-    function connect() {
-      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      ws = new WebSocket(`${proto}//${location.host}`);
-
-      ws.onopen = () => {
-        $('#netdot').classList.add('on');
-        $('#nettext').textContent = 'متصل به سرور';
-      };
-
-      ws.onclose = () => {
-        $('#netdot').classList.remove('on');
-        $('#nettext').textContent = 'قطع ارتباط (تلاش مجدد...)';
-        setTimeout(connect, 2000);
-      };
-
-      ws.onmessage = (ev) => {
-        let msg = {};
-        try { msg = JSON.parse(ev.data); } catch (e) { return; }
-
-        if (msg.type === 'error') {
-          toast(msg.message || 'خطایی رخ داد');
-        } else if (msg.type === 'room_created' || msg.type === 'joined') {
-          playerId = msg.playerId;
-          roomCode = msg.roomCode;
-          $('#roomCode').textContent = roomCode;
-          show('room');
-        } else if (msg.type === 'host_assigned') {
-          toast('شما اکنون میزبان بازی شدید!');
-        } else if (msg.type === 'state') {
-          state = msg.state;
-          render();
-        }
-      };
-    }
-
-    function send(type, props = {}) {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type, ...props }));
+      if (msg.type === 'error') {
+        toast(msg.message || 'خطایی رخ داد');
+      } else if (msg.type === 'room_created' || msg.type === 'joined') {
+        playerId = msg.playerId;
+        roomCode = msg.roomCode;
+        $('#roomCode').textContent = roomCode;
+        show('room');
+      } else if (msg.type === 'state') {
+        state = msg.state;
+        render();
       }
+    };
+  }
+
+  function send(type, props = {}) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type, ...props }));
     }
+  }
 
-    function render() {
-      if (!state) return;
+  function render() {
+    if (!state) return;
+    const youAreHost = state.hostId === playerId;
 
-      const youAreHost = state.hostId === playerId;
-
-      // Update Players List
-      $('#playerCount').textContent = state.players.length;
-      $('#players').innerHTML = state.players.map(p => `
-        <div class="player-item">
-          <span class="player-name">
-            ${p.id === playerId ? '👤 (شما) ' : ''}${esc(p.name)}
-          </span>
-          <div>
-            ${p.id === state.hostId ? '<span class="badge badge-host">👑 میزبان</span>' : ''}
-            ${state.connectedPlayerId === p.id ? '<span class="badge badge-contact">⚡ متصل</span>' : ''}
-          </div>
+    // بازیکنان
+    $('#playerCount').textContent = state.players.length;
+    $('#players').innerHTML = state.players.map(p => `
+      <div class="player-item">
+        <span class="player-name">
+          ${p.id === playerId ? '👤 (شما) ' : ''}${esc(p.name)}
+        </span>
+        <div>
+          ${p.id === state.hostId ? '<span class="badge badge-host">👑 میزبان</span>' : ''}
+          ${state.connectedPlayerId === p.id ? '<span class="badge badge-contact">⚡ متصل</span>' : ''}
         </div>
-      `).join('');
+      </div>
+    `).join('');
 
-      // Setup vs Game View
-      if (state.phase === 'setup') {
-        $('#setupCard').classList.remove('hide');
-        $('#gameCard').classList.add('hide');
-
-        if (youAreHost) {
-          $('#hostSetup').classList.remove('hide');
-          $('#guestWait').classList.add('hide');
-          $('#startBtn').disabled = !state.hasSecret;
-        } else {
-          $('#hostSetup').classList.add('hide');
-          $('#guestWait').classList.remove('hide');
-        }
+    // setup vs game
+    if (state.phase === 'setup') {
+      $('#setupCard').classList.remove('hide');
+      $('#gameCard').classList.add('hide');
+      if (youAreHost) {
+        $('#hostSetup').classList.remove('hide');
+        $('#guestWait').classList.add('hide');
+        $('#startBtn').disabled = !state.hasSecret;
       } else {
-        $('#setupCard').classList.add('hide');
-        $('#gameCard').classList.remove('hide');
+        $('#hostSetup').classList.add('hide');
+        $('#guestWait').classList.remove('hide');
+      }
+    } else {
+      $('#setupCard').classList.add('hide');
+      $('#gameCard').classList.remove('hide');
 
-        // Word boxes display
-        let lettersHtml = '';
-        if (state.revealedPrefix) {
-          for (let char of state.revealedPrefix) {
-            lettersHtml += `<div class="letter-box">${esc(char)}</div>`;
-          }
-          if (state.wordLength) {
-            const remaining = Math.max(0, state.wordLength - state.revealedPrefix.length);
-            for (let i = 0; i < remaining; i++) {
-              lettersHtml += `<div class="letter-box empty">?</div>`;
-            }
-          }
+      // جعبه‌های حروف
+      let lettersHtml = '';
+      if (state.revealedPrefix) {
+        for (const char of state.revealedPrefix) {
+          lettersHtml += `<div class="letter-box">${esc(char)}</div>`;
         }
-        $('#prefix').innerHTML = lettersHtml || '<div class="letter-box empty">-</div>';
-        $('#roundStatus').textContent = `کلمه شروع می‌شود با: «${state.revealedPrefix || ''}»`;
-
-        // Active Clue
-        if (state.currentClue) {
-          $('#activeWrap').classList.remove('hide');
-          $('#activeClue').textContent = state.currentClue.clueText;
-          const authorName = state.players.find(p => p.id === state.currentClue.playerId)?.name || 'ناشناس';
-          $('#clueMeta').textContent = `طراح سرنخ: ${authorName}`;
-          
-          // Connect Button Visibility
-          const canConnect = !youAreHost && state.phase === 'clue' && state.currentClue.playerId !== playerId;
-          $('#connectActions').classList.toggle('hide', !canConnect);
-        } else {
-          $('#activeWrap').classList.add('hide');
-        }
-
-        // Countdown Timer Handling
-        if (state.phase === 'countdown' && state.countdownEndsAt) {
-          $('#countdownWrap').classList.remove('hide');
-          clearInterval(clockTimer);
-          const updateTimer = () => {
-            const left = Math.max(0, Math.ceil((state.countdownEndsAt - Date.now()) / 1000));
-            $('#countdown').textContent = left;
-            if (left <= 0) clearInterval(clockTimer);
-          };
-          updateTimer();
-          clockTimer = setInterval(updateTimer, 200);
-        } else {
-          $('#countdownWrap').classList.add('hide');
-          clearInterval(clockTimer);
-        }
-
-        // Clue Form (Allowed when in clue phase and not host and no current clue)
-        const canPostClue = !youAreHost && state.phase === 'clue' && !state.currentClue;
-        $('#clueForm').classList.toggle('hide', !canPostClue);
-
-        // Secret Submit Word Form
-        const isParticipant = state.currentClue && (state.currentClue.playerId === playerId || state.connectedPlayerId === playerId);
-        const canSubmit = state.phase === 'submit' && isParticipant;
-        $('#submitArea').classList.toggle('hide', !canSubmit);
-
-        // Host Disconnect Form
-        const canHostGuess = youAreHost && (state.phase === 'clue' || state.phase === 'countdown') && state.currentClue;
-        $('#hostGuess').classList.toggle('hide', !canHostGuess);
-
-        // Ended Box
-        if (state.phase === 'ended') {
-          $('#endedBox').classList.remove('hide');
-          $('#winnerText').textContent = state.winnerMessage || 'بازی به اتمام رسید!';
-        } else {
-          $('#endedBox').classList.add('hide');
+        const remaining = Math.max(0, state.wordLength - state.revealedPrefix.length);
+        for (let i = 0; i < remaining; i++) {
+          lettersHtml += `<div class="letter-box empty">?</div>`;
         }
       }
+      $('#prefix').innerHTML = lettersHtml || '<div class="letter-box empty">-</div>';
+      $('#roundStatus').textContent = `کلمه شروع می‌شود با: «${state.revealedPrefix || ''}»`;
 
-      // History
-      if (state.history) {
-        $('#history').innerHTML = state.history.slice().reverse().map(h => `
-          <div class="history-item">
-            <strong>${esc(h.author)}:</strong> ${esc(h.text)}
-          </div>
-        `).join('') || '<div style="color: var(--text-dim); font-size: 0.85rem;">هنوز سرنخی ثبت نشده.</div>';
+      // سرنخ فعال
+      if (state.currentClue) {
+        $('#activeWrap').classList.remove('hide');
+        $('#activeClue').textContent = state.currentClue.clueText;
+        const authorName = state.players.find(p => p.id === state.currentClue.playerId)?.name || 'ناشناس';
+        $('#clueMeta').textContent = `طراح سرنخ: ${authorName}`;
+        const canConnect = !youAreHost && state.phase === 'clue' && state.currentClue.playerId !== playerId;
+        $('#connectActions').classList.toggle('hide', !canConnect);
+      } else {
+        $('#activeWrap').classList.add('hide');
       }
 
-      // Host Quick Controls
-      $('#restartBtn').disabled = !youAreHost || !state.hasSecret;
-      $('#endBtn').disabled = !youAreHost;
+      // تایمر شمارش معکوس
+      if (state.phase === 'countdown' && state.countdownEndsAt) {
+        $('#countdownWrap').classList.remove('hide');
+        clearInterval(clockTimer);
+        const tick = () => {
+          const left = Math.max(0, Math.ceil((state.countdownEndsAt - Date.now()) / 1000));
+          $('#countdown').textContent = left;
+          if (left <= 0) clearInterval(clockTimer);
+        };
+        tick();
+        clockTimer = setInterval(tick, 200);
+      } else {
+        $('#countdownWrap').classList.add('hide');
+        clearInterval(clockTimer);
+      }
+
+      // فرم سرنخ (دو فیلد)
+      const canPostClue = !youAreHost && state.phase === 'clue' && !state.currentClue;
+      $('#clueForm').classList.toggle('hide', !canPostClue);
+
+      // فرم ثبت کلمه نهایی
+      const isParticipant = state.currentClue &&
+        (state.currentClue.playerId === playerId || state.connectedPlayerId === playerId);
+      const canSubmit = state.phase === 'submit' && isParticipant;
+      $('#submitArea').classList.toggle('hide', !canSubmit);
+
+      // فرم دیس‌کانکت میزبان
+      const canHostGuess = youAreHost &&
+        (state.phase === 'clue' || state.phase === 'countdown') && state.currentClue;
+      $('#hostGuess').classList.toggle('hide', !canHostGuess);
+
+      // پایان بازی
+      if (state.phase === 'ended') {
+        $('#endedBox').classList.remove('hide');
+        $('#winnerText').textContent = state.winnerMessage || 'بازی به اتمام رسید!';
+      } else {
+        $('#endedBox').classList.add('hide');
+      }
     }
 
-    // Event Listeners
-    $('#createBtn').addEventListener('click', () => {
-      const name = $('#createName').value.trim();
-      if (!name) return toast('لطفاً نام خود را وارد کنید');
-      send('create_room', { name });
-    });
+    // تاریخچه
+    if (state.history) {
+      $('#history').innerHTML = state.history.slice().reverse().map(h =>
+        `<div class="history-item"><strong>${esc(h.author)}:</strong> ${esc(h.text)}</div>`
+      ).join('') || '<div style="color:var(--text-dim);font-size:.85rem">هنوز رویدادی ثبت نشده.</div>';
+    }
 
-    $('#joinBtn').addEventListener('click', () => {
-      const name = $('#joinName').value.trim();
-      const code = $('#joinCode').value.trim().toUpperCase();
-      if (!name || !code) return toast('لطفاً نام و کد اتاق را وارد کنید');
-      send('join_room', { name, roomCode: code });
-    });
+    // کنترل‌های میزبان
+    $('#restartBtn').disabled = !youAreHost;
+    $('#endBtn').disabled = !youAreHost;
+    $('#hostControlsCard').classList.toggle('hide', !youAreHost);
+  }
 
-    $('#setSecretBtn').addEventListener('click', () => {
-      const word = $('#secretInput').value.trim();
-      if (!word) return toast('لطفاً کلمه مخفی را وارد کنید');
-      send('set_secret', { secret: word });
-      $('#secretInput').value = '';
-    });
+  // ── Event Listeners ───────────────────────────────────────────
+  $('#createBtn').addEventListener('click', () => {
+    const name = $('#createName').value.trim();
+    if (!name) return toast('لطفاً نام خود را وارد کنید');
+    send('create_room', { name });
+  });
 
-    $('#startBtn').addEventListener('click', () => send('start_game'));
+  $('#joinBtn').addEventListener('click', () => {
+    const name = $('#joinName').value.trim();
+    const code = $('#joinCode').value.trim().toUpperCase();
+    if (!name || !code) return toast('لطفاً نام و کد اتاق را وارد کنید');
+    send('join_room', { name, roomCode: code });
+  });
 
-    $('#postClueBtn').addEventListener('click', () => {
-      const clue = $('#clueInput').value.trim();
-      if (!clue) return toast('متن راهنمایی را بنویسید');
-      send('post_clue', { clue });
-      $('#clueInput').value = '';
-    });
+  $('#setSecretBtn').addEventListener('click', () => {
+    const secretVal = $('#secretInput').value.trim();
+    if (!secretVal) return toast('لطفاً کلمه مخفی را وارد کنید');
+    send('set_secret', { secret: secretVal });
+    $('#secretInput').value = '';
+  });
 
-    $('#connectBtn')?.addEventListener('click', () => send('connect_clue'));
+  $('#startBtn').addEventListener('click', () => send('start_game'));
 
-    $('#guessBtn')?.addEventListener('click', () => {
-      const guess = $('#guessInput').value.trim();
-      if (!guess) return toast('حدس خود را بنویسید');
-      send('disconnect_guess', { guess });
-      $('#guessInput').value = '';
-    });
+  $('#postClueBtn').addEventListener('click', () => {
+    const clue = $('#clueInput').value.trim();
+    const word = $('#clueWordInput').value.trim();
+    if (!clue) return toast('متن راهنمایی را بنویسید');
+    if (!word) return toast('کلمه‌ای که در ذهن دارید را بنویسید');
+    send('post_clue', { clue, word });
+    $('#clueInput').value = '';
+    $('#clueWordInput').value = '';
+  });
 
-    $('#submitWordBtn')?.addEventListener('click', () => {
-      const word = $('#wordInput').value.trim();
-      if (!word) return toast('کلمه را بنویسید');
-      send('submit_word', { word });
-      $('#wordInput').value = '';
-    });
+  $('#connectBtn')?.addEventListener('click', () => send('connect_clue'));
 
-    $('#restartBtn').addEventListener('click', () => send('restart_round'));
-    $('#endBtn').addEventListener('click', () => send('end_game'));
+  $('#guessBtn')?.addEventListener('click', () => {
+    const guess = $('#guessInput').value.trim();
+    if (!guess) return toast('حدس خود را بنویسید');
+    send('disconnect_guess', { guess });
+    $('#guessInput').value = '';
+  });
 
-    $('#copyBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(window.location.origin + '?room=' + roomCode);
-      toast('لینک اتاق کپی شد!');
-    });
+  $('#submitWordBtn')?.addEventListener('click', () => {
+    const secretVal = $('#wordInput').value.trim();
+    if (!secretVal) return toast('کلمه را بنویسید');
+    send('submit_word', { secret: secretVal });
+    $('#wordInput').value = '';
+  });
 
-    $('#tabBtn').addEventListener('click', () => {
-      window.open(window.location.origin, '_blank');
-    });
+  $('#restartBtn').addEventListener('click', () => send('restart_round'));
+  $('#endBtn').addEventListener('click', () => send('end_game'));
 
-    // Enter key shortcuts
-    const bindEnter = (inputId, btnId) => {
-      $(inputId)?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') $(btnId)?.click();
-      });
-    };
-    bindEnter('#createName', '#createBtn');
-    bindEnter('#joinCode', '#joinBtn');
-    bindEnter('#secretInput', '#setSecretBtn');
-    bindEnter('#clueInput', '#postClueBtn');
-    bindEnter('#guessInput', '#guessBtn');
-    bindEnter('#wordInput', '#submitWordBtn');
+  $('#copyBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(window.location.origin + '?room=' + roomCode);
+    toast('لینک اتاق کپی شد!');
+  });
 
-    // Initialize Connection
-    connect();
-  </script>
+  $('#tabBtn').addEventListener('click', () => window.open(window.location.origin, '_blank'));
+
+  // Enter shortcuts
+  const bindEnter = (inputId, btnId) =>
+    $(inputId)?.addEventListener('keydown', e => { if (e.key === 'Enter') $(btnId)?.click(); });
+
+  bindEnter('#createName',  '#createBtn');
+  bindEnter('#joinCode',    '#joinBtn');
+  bindEnter('#secretInput', '#setSecretBtn');
+  bindEnter('#clueInput',   '#postClueBtn');
+  bindEnter('#clueWordInput','#postClueBtn');
+  bindEnter('#guessInput',  '#guessBtn');
+  bindEnter('#wordInput',   '#submitWordBtn');
+
+  connect();
+</script>
+
 </body>
 </html>
