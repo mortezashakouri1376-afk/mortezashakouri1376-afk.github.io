@@ -599,7 +599,7 @@
           <label for="createName">نام مستعار شما:</label>
           <input type="text" id="createName" placeholder="مثال: علی" maxlength="15">
         </div>
-        <button id="createBtn" class="btn">ایجاد اتاق و میزبانی</button>
+        <button id="createBtn" class="btn" disabled>ایجاد اتاق و میزبانی</button>
       </div>
 
       <!-- Join Room Card -->
@@ -613,7 +613,7 @@
           <label for="joinCode">کد ۴ حرفی اتاق:</label>
           <input type="text" id="joinCode" placeholder="مثلاً ABCD" maxlength="4" style="text-transform: uppercase; font-family: monospace; letter-spacing: 2px;">
         </div>
-        <button id="joinBtn" class="btn btn-accent">ورود به بازی</button>
+        <button id="joinBtn" class="btn btn-accent" disabled>ورود به بازی</button>
       </div>
     </div>
 
@@ -657,7 +657,7 @@
               <input type="password" id="secretInput" placeholder="کلمه مخفی (مثلاً پروانه)">
             </div>
             <div class="btn-group">
-              <button id="setSecretBtn" class="btn">ثبت کلمه</button>
+              <button id="setSecretBtn" class="btn" disabled>ثبت کلمه</button>
               <button id="startBtn" class="btn btn-accent" disabled>شروع مسابقه</button>
             </div>
           </div>
@@ -693,22 +693,21 @@
 
             <!-- Contact Button -->
             <div id="connectActions" class="mt-4">
-              <button id="connectBtn" class="btn btn-accent">⚡ من میدونم! (کانتکت)</button>
+              <button id="connectBtn" class="btn btn-accent" disabled>⚡ من میدونم! (کانتکت)</button>
             </div>
           </div>
 
-          <!-- جایگزین کن id="clueForm" را با این: -->
-<div id="clueForm" class="field mt-4">
-  <label>یک کلمه (با حرف فاش‌شده) در ذهن دارید؟ راهنمایی مبهم بنویسید:</label>
-  <div class="field">
-    <input type="text" id="clueWordInput" placeholder="کلمه‌ای که در ذهن دارید (مثلاً: پروانه)" autocomplete="off">
-  </div>
-  <div style="display:flex; gap:8px;">
-    <input type="text" id="clueInput" placeholder="راهنمایی مبهم (مثلاً: یه حشره قشنگ با بال‌های رنگی...)">
-    <button id="postClueBtn" class="btn btn-sm" style="width:120px;">ارسال</button>
-  </div>
-</div>
-
+          <!-- Clue Form -->
+          <div id="clueForm" class="field mt-4 hide">
+            <label>یک کلمه (با حرف فاش‌شده) در ذهن دارید؟ راهنمایی مبهم بنویسید:</label>
+            <div class="field">
+              <input type="text" id="clueWordInput" placeholder="کلمه‌ای که در ذهن دارید (مثلاً: پروانه)" autocomplete="off">
+            </div>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="clueInput" placeholder="راهنمایی مبهم (مثلاً: یه حشره قشنگ با بال‌های رنگی...)">
+              <button id="postClueBtn" class="btn btn-sm" style="width:120px;" disabled>ارسال</button>
+            </div>
+          </div>
 
           <!-- Secret Word Submit Form (After Contact) -->
           <div id="submitArea" class="card hide" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
@@ -716,7 +715,7 @@
             <p id="submitHint" style="font-size: 0.88rem; color: #a7f3d0; margin-bottom: 12px;">کلمه‌ای که منظورتان بود را محرمانه تایپ کنید:</p>
             <div style="display: flex; gap: 8px;">
               <input type="text" id="wordInput" placeholder="کلمه نهایی...">
-              <button id="submitWordBtn" class="btn btn-accent btn-sm" style="width: 120px;">ثبت</button>
+              <button id="submitWordBtn" class="btn btn-accent btn-sm" style="width: 120px;" disabled>ثبت</button>
             </div>
           </div>
 
@@ -726,7 +725,7 @@
             <p style="font-size: 0.88rem; color: #fca5a5; margin-bottom: 12px;">اگر فهمیدید راهنمایی برای چه کلمه‌ای است، سریع حدس بزنید:</p>
             <div style="display: flex; gap: 8px;">
               <input type="text" id="guessInput" placeholder="حدس میزبان...">
-              <button id="guessBtn" class="btn btn-danger btn-sm" style="width: 130px;">دیس‌کانکت!</button>
+              <button id="guessBtn" class="btn btn-danger btn-sm" style="width: 130px;" disabled>دیس‌کانکت!</button>
             </div>
           </div>
 
@@ -766,6 +765,7 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast">پیام سیستم</div>
+
 <script>
   const $ = (sel) => document.querySelector(sel);
   const esc = (text) => {
@@ -780,6 +780,27 @@
   let roomCode = null;
   let toastTimer = null;
   let clockTimer = null;
+  let reconnectAttempts = 0;
+  const MAX_RECONNECT = 10;
+
+  // ذخیره‌سازی برای rejoin
+  function saveSession() {
+    if (playerId && roomCode) {
+      sessionStorage.setItem('contact_game_session', JSON.stringify({
+        playerId, roomCode, name: state?.players?.find(p => p.id === playerId)?.name || ''
+      }));
+    }
+  }
+
+  function loadSession() {
+    try {
+      return JSON.parse(sessionStorage.getItem('contact_game_session'));
+    } catch { return null; }
+  }
+
+  function clearSession() {
+    sessionStorage.removeItem('contact_game_session');
+  }
 
   function toast(text) {
     const el = $('#toast');
@@ -794,19 +815,56 @@
     $('#' + screenId).classList.add('active');
   }
 
+  function setButtonsEnabled(enabled) {
+    $('#createBtn').disabled = !enabled;
+    $('#joinBtn').disabled = !enabled;
+    $('#setSecretBtn').disabled = !enabled;
+    $('#startBtn').disabled = !enabled || !(state?.hasSecret);
+    $('#postClueBtn').disabled = !enabled;
+    $('#connectBtn').disabled = !enabled;
+    $('#guessBtn').disabled = !enabled;
+    $('#submitWordBtn').disabled = !enabled;
+    $('#restartBtn').disabled = !enabled;
+    $('#endBtn').disabled = !enabled;
+  }
+
   function connect() {
+    if (reconnectAttempts >= MAX_RECONNECT) {
+      $('#nettext').textContent = 'اتصال ناموفق. صفحه را رفرش کنید.';
+      return;
+    }
+    
     const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
     ws = new WebSocket(`${proto}//${location.host}`);
 
     ws.onopen = () => {
       $('#netdot').classList.add('on');
       $('#nettext').textContent = 'متصل به سرور';
+      reconnectAttempts = 0;
+      setButtonsEnabled(true);
+      
+      // تلاش برای rejoin
+      const session = loadSession();
+      if (session && session.playerId && session.roomCode) {
+        send('rejoin', { 
+          oldPlayerId: session.playerId, 
+          roomCode: session.roomCode,
+          name: session.name 
+        });
+      }
     };
 
     ws.onclose = () => {
       $('#netdot').classList.remove('on');
       $('#nettext').textContent = 'قطع ارتباط (تلاش مجدد...)';
+      setButtonsEnabled(false);
+      reconnectAttempts++;
       setTimeout(connect, 2000);
+    };
+
+    ws.onerror = (err) => {
+      console.error('WebSocket error:', err);
+      $('#nettext').textContent = 'خطای اتصال';
     };
 
     ws.onmessage = (ev) => {
@@ -815,11 +873,12 @@
 
       if (msg.type === 'error') {
         toast(msg.message || 'خطایی رخ داد');
-      } else if (msg.type === 'room_created' || msg.type === 'joined') {
+      } else if (msg.type === 'room_created' || msg.type === 'joined' || msg.type === 'rejoined') {
         playerId = msg.playerId;
         roomCode = msg.roomCode;
         $('#roomCode').textContent = roomCode;
         show('room');
+        saveSession();
       } else if (msg.type === 'state') {
         state = msg.state;
         render();
@@ -830,7 +889,26 @@
   function send(type, props = {}) {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type, ...props }));
+    } else {
+      toast('اتصال برقرار نیست. لطفاً صبر کنید...');
     }
+  }
+
+  // تایمر شمارش معکوس بر اساس زمان سرور
+  function startCountdown(serverEndsAt, serverNow) {
+    clearInterval(clockTimer);
+    const offset = Date.now() - serverNow; // اختلاف ساعت کلاینت و سرور
+    
+    const tick = () => {
+      const left = Math.max(0, Math.ceil((serverEndsAt + offset - Date.now()) / 1000));
+      $('#countdown').textContent = left;
+      if (left <= 0) {
+        clearInterval(clockTimer);
+      }
+    };
+    
+    tick();
+    clockTimer = setInterval(tick, 100);
   }
 
   function render() {
@@ -881,7 +959,7 @@
       $('#prefix').innerHTML = lettersHtml || '<div class="letter-box empty">-</div>';
       $('#roundStatus').textContent = `کلمه شروع می‌شود با: «${state.revealedPrefix || ''}»`;
 
-      // سرنخ فعال
+      // سرنخ فعلی
       if (state.currentClue) {
         $('#activeWrap').classList.remove('hide');
         $('#activeClue').textContent = state.currentClue.clueText;
@@ -889,6 +967,7 @@
         $('#clueMeta').textContent = `طراح سرنخ: ${authorName}`;
         const canConnect = !youAreHost && state.phase === 'clue' && state.currentClue.playerId !== playerId;
         $('#connectActions').classList.toggle('hide', !canConnect);
+        $('#connectBtn').disabled = !canConnect;
       } else {
         $('#activeWrap').classList.add('hide');
       }
@@ -896,38 +975,35 @@
       // تایمر شمارش معکوس
       if (state.phase === 'countdown' && state.countdownEndsAt) {
         $('#countdownWrap').classList.remove('hide');
-        clearInterval(clockTimer);
-        const tick = () => {
-          const left = Math.max(0, Math.ceil((state.countdownEndsAt - Date.now()) / 1000));
-          $('#countdown').textContent = left;
-          if (left <= 0) clearInterval(clockTimer);
-        };
-        tick();
-        clockTimer = setInterval(tick, 200);
+        startCountdown(state.countdownEndsAt, state.serverNow);
       } else {
         $('#countdownWrap').classList.add('hide');
         clearInterval(clockTimer);
       }
 
-      // فرم سرنخ (دو فیلد)
+      // فرم سرنخ
       const canPostClue = !youAreHost && state.phase === 'clue' && !state.currentClue;
       $('#clueForm').classList.toggle('hide', !canPostClue);
+      $('#postClueBtn').disabled = !canPostClue;
 
       // فرم ثبت کلمه نهایی
       const isParticipant = state.currentClue &&
         (state.currentClue.playerId === playerId || state.connectedPlayerId === playerId);
       const canSubmit = state.phase === 'submit' && isParticipant;
       $('#submitArea').classList.toggle('hide', !canSubmit);
+      $('#submitWordBtn').disabled = !canSubmit;
 
       // فرم دیس‌کانکت میزبان
       const canHostGuess = youAreHost &&
         (state.phase === 'clue' || state.phase === 'countdown') && state.currentClue;
       $('#hostGuess').classList.toggle('hide', !canHostGuess);
+      $('#guessBtn').disabled = !canHostGuess;
 
       // پایان بازی
       if (state.phase === 'ended') {
         $('#endedBox').classList.remove('hide');
         $('#winnerText').textContent = state.winnerMessage || 'بازی به اتمام رسید!';
+        clearSession(); // پاک کردن session
       } else {
         $('#endedBox').classList.add('hide');
       }
@@ -944,6 +1020,9 @@
     $('#restartBtn').disabled = !youAreHost;
     $('#endBtn').disabled = !youAreHost;
     $('#hostControlsCard').classList.toggle('hide', !youAreHost);
+    
+    // ذخیره session
+    saveSession();
   }
 
   // ── Event Listeners ───────────────────────────────────────────
@@ -956,14 +1035,15 @@
   $('#joinBtn').addEventListener('click', () => {
     const name = $('#joinName').value.trim();
     const code = $('#joinCode').value.trim().toUpperCase();
-    if (!name || !code) return toast('لطفاً نام و کد اتاق را وارد کنید');
+    if (!name) return toast('لطفاً نام خود را وارد کنید');
+    if (!code) return toast('لطفاً کد اتاق را وارد کنید');
     send('join_room', { name, roomCode: code });
   });
 
   $('#setSecretBtn').addEventListener('click', () => {
-    const secretVal = $('#secretInput').value.trim();
-    if (!secretVal) return toast('لطفاً کلمه مخفی را وارد کنید');
-    send('set_secret', { secret: secretVal });
+    const secret = $('#secretInput').value.trim();
+    if (!secret) return toast('لطفاً کلمه مخفی را وارد کنید');
+    send('set_secret', { secret });
     $('#secretInput').value = '';
   });
 
@@ -979,28 +1059,40 @@
     $('#clueWordInput').value = '';
   });
 
-  $('#connectBtn')?.addEventListener('click', () => send('connect_clue'));
+  $('#connectBtn').addEventListener('click', () => send('connect_clue'));
 
-  $('#guessBtn')?.addEventListener('click', () => {
+  $('#guessBtn').addEventListener('click', () => {
     const guess = $('#guessInput').value.trim();
     if (!guess) return toast('حدس خود را بنویسید');
     send('disconnect_guess', { guess });
     $('#guessInput').value = '';
   });
 
-  $('#submitWordBtn')?.addEventListener('click', () => {
-    const secretVal = $('#wordInput').value.trim();
-    if (!secretVal) return toast('کلمه را بنویسید');
-    send('submit_word', { secret: secretVal });
+  $('#submitWordBtn').addEventListener('click', () => {
+    const secret = $('#wordInput').value.trim();
+    if (!secret) return toast('کلمه را بنویسید');
+    send('submit_word', { secret });
     $('#wordInput').value = '';
   });
 
   $('#restartBtn').addEventListener('click', () => send('restart_round'));
   $('#endBtn').addEventListener('click', () => send('end_game'));
 
-  $('#copyBtn').addEventListener('click', () => {
-    navigator.clipboard.writeText(window.location.origin + '?room=' + roomCode);
-    toast('لینک اتاق کپی شد!');
+  $('#copyBtn').addEventListener('click', async () => {
+    const url = window.location.origin + '?room=' + roomCode;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast('لینک اتاق کپی شد!');
+    } catch (err) {
+      // fallback برای http
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      toast('لینک اتاق کپی شد!');
+    }
   });
 
   $('#tabBtn').addEventListener('click', () => window.open(window.location.origin, '_blank'));
@@ -1010,6 +1102,7 @@
     $(inputId)?.addEventListener('keydown', e => { if (e.key === 'Enter') $(btnId)?.click(); });
 
   bindEnter('#createName',  '#createBtn');
+  bindEnter('#joinName',    '#joinBtn');
   bindEnter('#joinCode',    '#joinBtn');
   bindEnter('#secretInput', '#setSecretBtn');
   bindEnter('#clueInput',   '#postClueBtn');
@@ -1017,6 +1110,15 @@
   bindEnter('#guessInput',  '#guessBtn');
   bindEnter('#wordInput',   '#submitWordBtn');
 
+  // خواندن کد از URL
+  const urlRoom = new URLSearchParams(location.search).get('room');
+  if (urlRoom) {
+    $('#joinCode').value = urlRoom.toUpperCase().slice(0, 4);
+    $('#joinName').focus();
+  }
+
+  // شروع اتصال
+  setButtonsEnabled(false);
   connect();
 </script>
 
