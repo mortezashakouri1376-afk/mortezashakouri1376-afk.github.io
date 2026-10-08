@@ -2,344 +2,1027 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بازی کانتکت (Contact)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>کانتکت | بازی دورهمی آنلاین</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --border: #334155;
+      --bg: #0b0f19;
+      --bg-card: rgba(23, 32, 54, 0.75);
+      --bg-card-solid: #151d30;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.4);
       --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.35);
       --accent: #ec4899;
-      --danger: #ef4444;
+      --accent-hover: #db2777;
       --success: #10b981;
+      --danger: #ef4444;
       --warning: #f59e0b;
       --text: #f8fafc;
-      --muted: #94a3b8;
+      --text-dim: #94a3b8;
+      --radius: 18px;
+      --radius-sm: 12px;
+      --font: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 1rem; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 1rem; }
-    header { text-align: center; }
-    header h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .top {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #a5b4fc, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-icon {
+      font-size: 1.6rem;
+      filter: drop-shadow(0 0 8px var(--primary-glow));
+    }
+
+    .net {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 8px var(--danger);
+      transition: all 0.3s ease;
+    }
+
+    .dot.on {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    /* Screens */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 900px;
+      animation: fadeIn 0.35s ease-out;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Glassmorphism */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+
+    /* Hero / Landing */
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: 2.3rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--text-dim);
+      font-size: 1.05rem;
+    }
+
+    .lobby-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media(max-width: 768px) {
+      .lobby-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .lobby-card h2 {
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #e2e8f0;
+    }
+
+    /* Forms & Inputs */
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      box-shadow: 0 4px 18px var(--primary-glow);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      filter: grayscale(0.5);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      box-shadow: 0 4px 18px rgba(236, 72, 153, 0.35);
+    }
+    .btn-accent:hover:not(:disabled) {
+      box-shadow: 0 6px 22px rgba(236, 72, 153, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: none;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), #dc2626);
+      box-shadow: 0 4px 18px rgba(239, 68, 68, 0.35);
+    }
+
+    .btn-sm {
+      padding: 8px 14px;
+      font-size: 0.88rem;
+      width: auto;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Room Layout */
+    .room-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+
+    .room-code-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .code-badge {
+      font-family: monospace;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid var(--primary-glow);
+      color: #a5b4fc;
+      padding: 4px 12px;
+      border-radius: 8px;
+    }
+
+    .room-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media(max-width: 820px) {
+      .room-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Word Letters Display (Big Hero Boxes) */
+    .word-display {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .word-boxes {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+      direction: rtl;
+    }
+
+    .letter-box {
+      width: 48px;
+      height: 58px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 0 15px var(--primary-glow);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .letter-box.empty {
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.2);
+      color: transparent;
+      box-shadow: none;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Active Clue Box */
+    .clue-box {
+      background: rgba(236, 72, 153, 0.08);
+      border: 1.5px solid rgba(236, 72, 153, 0.3);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .clue-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f472b6;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .clue-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .clue-author {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    /* Countdown Pulsing Timer */
+    .timer-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+      border-radius: var(--radius);
+      margin: 16px 0;
+      animation: pulse 1s infinite alternate;
+    }
+
+    .timer-num {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #fca5a5;
+      text-shadow: 0 0 25px rgba(239, 68, 68, 0.8);
+      line-height: 1;
+    }
+
+    .timer-label {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f87171;
+      margin-top: 6px;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+
+    /* Players Sidebar */
+    .player-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .player-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    .player-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-weight: 700;
+    }
+
+    .badge-host {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .badge-contact {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    /* History & Messages Log */
+    .history-list {
+      max-height: 240px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 4px;
+    }
+
+    .history-item {
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .history-item strong {
+      color: #a5b4fc;
+    }
+
+    /* Instructions Collapse */
+    details.help {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    details.help summary {
+      font-weight: 700;
+      color: #cbd5e1;
+      outline: none;
+    }
+
+    details.help .content {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      font-size: 0.95rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
     .hide { display: none !important; }
-    input, button { width: 100%; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border); font-size: 1rem; outline: none; margin-bottom: 0.6rem; }
-    input { background: #0b1120; color: var(--text); }
-    input:focus { border-color: var(--primary); }
-    button { background: var(--primary); color: white; font-weight: bold; cursor: pointer; border: none; }
-    button.secondary { background: #334155; }
-    button.coral { background: var(--danger); }
-    button.accent { background: var(--accent); }
-    .letters { display: flex; justify-content: center; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
-    .letter-box { width: 44px; height: 48px; background: #0b1120; border: 2px solid var(--primary); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; color: #38bdf8; }
-    .clue-banner { background: #0b1120; border: 2px solid #38bdf8; border-radius: 0.75rem; padding: 1rem; margin: 0.8rem 0; text-align: center; }
-    .badge { background: #0b1120; padding: 0.25rem 0.6rem; border-radius: 1rem; font-size: 0.8rem; border: 1px solid var(--border); }
-    .badge.host { border-color: var(--warning); color: var(--warning); }
-    .players { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
-    .log-box { background: #0b1120; border-radius: 0.5rem; padding: 0.75rem; font-size: 0.85rem; max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.35rem; }
-    .log-item { color: var(--muted); }
-    .log-item.system { color: #38bdf8; font-weight: 500; }
-    .countdown-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
-    .countdown-bar-fill { height: 100%; background: var(--danger); width: 100%; transition: width 0.1s linear; }
+    .text-center { text-align: center; }
+    .mt-2 { margin-top: 10px; }
+    .mt-4 { margin-top: 18px; }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <header>
-    <h1>بازی کانتکت 💬</h1>
-    <p style="color:var(--muted); font-size:0.9rem;">حدس کلمات و تله‌پاتی گروهی</p>
+  <!-- Top Bar -->
+  <header class="top">
+    <div class="brand">
+      <span class="brand-icon">⚡</span>
+      <span>کانتکت (Contact)</span>
+    </div>
+    <div class="net">
+      <div id="netdot" class="dot"></div>
+      <span id="nettext">در حال اتصال...</span>
+    </div>
   </header>
 
-  <!-- ورود / لابی -->
-  <div id="authCard" class="card">
-    <h2 style="font-size:1.1rem; margin-bottom:0.8rem;">ورود به بازی</h2>
-    <input type="text" id="nameInput" placeholder="نام شما (مثلاً: سارا)">
-    <button onclick="createRoom()">➕ ساخت اتاق جدید</button>
-    <div style="text-align:center; margin:0.4rem 0; color:var(--muted);">یا</div>
-    <input type="text" id="codeInput" placeholder="کد اتاق (۴ حرفی)" style="text-transform:uppercase;">
-    <button class="secondary" onclick="joinRoom()">🚪 ورود به اتاق</button>
-  </div>
-
-  <!-- کارت بازی اصلی -->
-  <div id="gameCard" class="card hide">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span>کد اتاق: <b id="roomCodeDisplay" style="color:var(--primary); font-size:1.2rem;">----</b></span>
-      <span id="roleTag" class="badge">نقش: نامشخص</span>
+  <!-- Landing Screen (Lobby) -->
+  <main id="landing" class="screen active">
+    <div class="hero">
+      <h1>دورهمی حدس کلمات و تله‌پاتی</h1>
+      <p>یک بازی جذاب، سرعتی و ذهنی برای جمع‌های چندنفره</p>
     </div>
 
-    <!-- حروف باز شده -->
-    <div style="text-align:center; margin-top:1rem; font-size:0.85rem; color:var(--muted);">حروف آشکار شده:</div>
-    <div class="letters" id="lettersWrap"></div>
-
-    <!-- بخش عمومی راهنمایی (حتماً برای همه از جمله میزبان نمایش داده می‌شود) -->
-    <div id="activeClueBox" class="clue-banner hide">
-      <div style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">
-        راهنمایی مطرح‌شده توسط <strong id="clueAuthorName" style="color:#fff;"></strong>:
+    <div class="lobby-grid">
+      <!-- Create Room Card -->
+      <div class="card lobby-card">
+        <h2>✨ ساخت اتاق جدید</h2>
+        <div class="field">
+          <label for="createName">نام مستعار شما:</label>
+          <input type="text" id="createName" placeholder="مثال: علی" maxlength="15">
+        </div>
+        <button id="createBtn" class="btn">ایجاد اتاق و میزبانی</button>
       </div>
-      <div id="clueTextDisplay" style="font-size:1.25rem; font-weight:bold; color:#38bdf8; margin:0.5rem 0;"></div>
-      
-      <!-- دکمه اتصال برای سایر بازیکنان -->
-      <button id="connectBtn" class="accent hide" onclick="connectClue()">⚡ من هم کلمه را فهمیدم! (کانتکت)</button>
-    </div>
 
-    <!-- شمارش معکوس حدس میزبان -->
-    <div id="countdownBox" class="hide" style="background:#1e1b4b; padding:0.75rem; border-radius:0.5rem; margin:0.5rem 0; border:1px solid #4338ca;">
-      <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:#f43f5e; font-weight:bold;">
-        <span>⏳ فرصت حدس میزبان:</span>
-        <span id="countdownText">5.0 ثانیه</span>
-      </div>
-      <div class="countdown-bar-wrap">
-        <div id="countdownFill" class="countdown-bar-fill"></div>
+      <!-- Join Room Card -->
+      <div class="card lobby-card">
+        <h2>🚪 ورود به اتاق</h2>
+        <div class="field">
+          <label for="joinName">نام مستعار شما:</label>
+          <input type="text" id="joinName" placeholder="مثال: سارا" maxlength="15">
+        </div>
+        <div class="field">
+          <label for="joinCode">کد ۴ حرفی اتاق:</label>
+          <input type="text" id="joinCode" placeholder="مثلاً ABCD" maxlength="4" style="text-transform: uppercase; font-family: monospace; letter-spacing: 2px;">
+        </div>
+        <button id="joinBtn" class="btn btn-accent">ورود به بازی</button>
       </div>
     </div>
 
-    <!-- پنل میزبان (ادمین) -->
-    <div id="hostPanel" class="hide" style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;">
-      <h3 style="font-size:1rem; color:var(--warning); margin-bottom:0.5rem;">👑 پنل میزبان</h3>
-      
-      <!-- تعیین کلمه مخفی -->
-      <div id="secretWordSection">
-        <input type="text" id="secretWordInput" placeholder="کلمه مخفی بازی را بنویسید (مثلاً: آبمیوه)">
-        <button onclick="setSecretWord()">ثبت کلمه و شروع دور</button>
+    <!-- Help / Rules -->
+    <details class="help">
+      <summary>📜 راهنمای سریع بازی کانتکت</summary>
+      <div class="content">
+        <p>۱. <strong>میزبان (طراح کلمه):</strong> یک کلمه مخفی انتخاب می‌کند (مثلاً «باران»). فقط حرف اول آن فاش می‌شود (بـ).</p>
+        <p>۲. <strong>حدس‌زنندگان:</strong> باید کلمه‌ای پیدا کنند که با همان حرف شروع شود (مثلاً «بستنی») و برای آن یک راهنمایی مبهم بگویند (مثلاً «خوراکی تابستونی خنک»).</p>
+        <p>۳. <strong>کانتکت:</strong> اگر بازیکن دیگری فهمید منظور چیست، دکمه <em>«کانتکت!»</em> را می‌زند و شمارش معکوس ۵ ثانیه‌ای آغاز می‌شود.</p>
+        <p>۴. <strong>دیس‌کانکت (میزبان):</strong> در این ۵ ثانیه، میزبان اگر کلمه را حدس بزند می‌تواند بگوید «بستنی نیست!» و مانع فاش شدن حرف شود.</p>
+        <p>۵. اگر میزبان متوجه نشود و هر دو نفر کلمه یکسان را تایپ کنند، یک حرف دیگر از کلمه اصلی فاش خواهد شد!</p>
       </div>
+    </details>
+  </main>
 
-      <!-- حدس میزبان برای دیس‌کانتکت -->
-      <div id="hostGuessSection" class="hide" style="background:#271212; padding:0.75rem; border-radius:0.5rem; border:1px solid var(--danger); margin-top:0.5rem;">
-        <p style="font-size:0.85rem; color:#fca5a5; margin-bottom:0.4rem;">راهنمایی بالا را دیدید؟ حدس خود را بنویسید تا ارتباط بازیکنان را باطل (دیس‌کانتکت) کنید:</p>
-        <input type="text" id="hostGuessInput" placeholder="کلمه مورد حدس شما...">
-        <button class="coral" onclick="disconnectGuess()">🚫 دیس‌کانتکت (حدس کلمه)</button>
+  <!-- Game Room Screen -->
+  <main id="room" class="screen">
+    <!-- Room Header -->
+    <div class="room-header">
+      <div class="room-code-wrap">
+        <span>کد اتاق:</span>
+        <span id="roomCode" class="code-badge">----</span>
       </div>
-    </div>
-
-    <!-- پنل بازیکنان عادی -->
-    <div id="playerPanel" class="hide" style="margin-top:1rem; border-top:1px solid var(--border); padding-top:1rem;">
-      <!-- ارسال راهنمایی جدید -->
-      <div id="postClueSection">
-        <h3 style="font-size:1rem; color:#38bdf8; margin-bottom:0.5rem;">طرح راهنمایی تازه</h3>
-        <input type="text" id="clueTextInput" placeholder="متن راهنمایی (مثال: میوه‌ای قرمز و ترش)">
-        <input type="text" id="underlyingWordInput" placeholder="کلمه‌ای که در ذهن دارید و با حروف بالا شروع می‌شود (مثال: انار)">
-        <button onclick="postClue()">ثبت و ارسال راهنمایی</button>
-      </div>
-
-      <!-- ارسال کلمه نهایی در فاز ثبت نهایی -->
-      <div id="submitWordSection" class="hide" style="background:#064e3b; padding:0.75rem; border-radius:0.5rem; border:1px solid var(--success); margin-top:0.5rem;">
-        <p style="font-size:0.85rem; color:#6ee7b7; margin-bottom:0.4rem;">زمان میزبان تمام شد! کلمه خود را بنویسید تا بررسی شود:</p>
-        <input type="text" id="finalWordInput" placeholder="کلمه مد نظرتان">
-        <button class="accent" onclick="submitFinalWord()">ثبت کلمه</button>
+      <div class="btn-group">
+        <button id="copyBtn" class="btn btn-secondary btn-sm">📋 کپی لینک</button>
+        <button id="tabBtn" class="btn btn-secondary btn-sm">➕ تب دوم (تست)</button>
       </div>
     </div>
 
-    <!-- بازیکنان -->
-    <div style="margin-top:1rem;">
-      <div style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">حاضرین در اتاق:</div>
-      <div class="players" id="playersList"></div>
+    <div class="room-grid">
+      <!-- Main Game Area -->
+      <div class="main-column">
+
+        <!-- Setup Phase Card (Host picks word) -->
+        <div id="setupCard" class="card">
+          <div id="hostSetup" class="hide">
+            <h2>🎯 شما میزبان هستید</h2>
+            <p style="color: var(--text-dim); margin-bottom: 16px;">یک کلمه مخفی تعیین کنید تا بازیکنان آن را حدس بزنند:</p>
+            <div class="field">
+              <input type="password" id="secretInput" placeholder="کلمه مخفی (مثلاً پروانه)">
+            </div>
+            <div class="btn-group">
+              <button id="setSecretBtn" class="btn">ثبت کلمه</button>
+              <button id="startBtn" class="btn btn-accent" disabled>شروع مسابقه</button>
+            </div>
+          </div>
+          <div id="guestWait" class="text-center">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">⏳</div>
+            <h3>در انتظار میزبان...</h3>
+            <p style="color: var(--text-dim); margin-top: 6px;">میزبان در حال انتخاب کلمه مخفی است.</p>
+          </div>
+        </div>
+
+        <!-- Active Game Play Area -->
+        <div id="gameCard" class="card hide">
+          <!-- Word Boxes Display -->
+          <div class="word-display">
+            <div style="font-size: 0.9rem; color: var(--text-dim); font-weight: 600;" id="phaseLabel">کلمه مخفی:</div>
+            <div id="prefix" class="word-boxes">
+              <!-- Dynamically populated letters -->
+            </div>
+            <div id="roundStatus" style="margin-top: 12px; font-size: 0.88rem; color: #a5b4fc;"></div>
+          </div>
+
+          <!-- Active Clue Section -->
+          <div id="activeWrap" class="clue-box hide">
+            <div class="clue-title">سرنخ فعلی روی میز:</div>
+            <div id="activeClue" class="clue-text">...</div>
+            <div id="clueMeta" class="clue-author">طراح: -</div>
+            
+            <!-- Countdown timer overlay -->
+            <div id="countdownWrap" class="timer-wrap hide">
+              <div id="countdown" class="timer-num">5</div>
+              <div class="timer-label">ثانیه تا ثبت نهایی حدس!</div>
+            </div>
+
+            <!-- Contact Button -->
+            <div id="connectActions" class="mt-4">
+              <button id="connectBtn" class="btn btn-accent">⚡ من میدونم! (کانتکت)</button>
+            </div>
+          </div>
+
+          <!-- Clue Creation Form (For Non-hosts) -->
+          <div id="clueForm" class="field mt-4">
+            <label for="clueInput">یک راهنمایی برای کلمه‌ای که به این حرف می‌خورد بنویسید:</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="clueInput" placeholder="مثلاً: یه حشره قشنگ با بال‌های رنگی...">
+              <button id="postClueBtn" class="btn btn-sm" style="width: 120px;">ارسال</button>
+            </div>
+          </div>
+
+          <!-- Secret Word Submit Form (After Contact) -->
+          <div id="submitArea" class="card hide" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
+            <h3>🔒 تله‌پاتی کلمه!</h3>
+            <p id="submitHint" style="font-size: 0.88rem; color: #a7f3d0; margin-bottom: 12px;">کلمه‌ای که منظورتان بود را محرمانه تایپ کنید:</p>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="wordInput" placeholder="کلمه نهایی...">
+              <button id="submitWordBtn" class="btn btn-accent btn-sm" style="width: 120px;">ثبت</button>
+            </div>
+          </div>
+
+          <!-- Host Guess / Disconnect Form -->
+          <div id="hostGuess" class="card hide" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);">
+            <h3 style="color: #fca5a5;">🛡️ دیس‌کانکت (مخصوص میزبان)</h3>
+            <p style="font-size: 0.88rem; color: #fca5a5; margin-bottom: 12px;">اگر فهمیدید راهنمایی برای چه کلمه‌ای است، سریع حدس بزنید:</p>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="guessInput" placeholder="حدس میزبان...">
+              <button id="guessBtn" class="btn btn-danger btn-sm" style="width: 130px;">دیس‌کانکت!</button>
+            </div>
+          </div>
+
+          <!-- Game Over Banner -->
+          <div id="endedBox" class="card hide text-center" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));">
+            <h2 style="font-size: 1.8rem; margin-bottom: 8px;">🎉 پایان مسابقه!</h2>
+            <p id="winnerText" style="font-size: 1.1rem; color: #f8fafc;"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar (Players & Log) -->
+      <div class="sidebar">
+        <!-- Players List Card -->
+        <div class="card">
+          <h3>👥 بازیکنان (<span id="playerCount">0</span>)</h3>
+          <div id="players" class="player-list"></div>
+        </div>
+
+        <!-- History Log Card -->
+        <div class="card">
+          <h3>📜 گزارش بازی</h3>
+          <div id="history" class="history-list"></div>
+        </div>
+
+        <!-- Host Quick Controls Card -->
+        <div class="card" id="hostControlsCard">
+          <h3>⚙️ مدیریت اتاق</h3>
+          <div class="btn-group mt-2">
+            <button id="restartBtn" class="btn btn-secondary btn-sm" disabled>دست جدید</button>
+            <button id="endBtn" class="btn btn-danger btn-sm" disabled>پایان بازی</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </main>
 
-  <!-- لاگ بازی -->
-  <div class="card">
-    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:0.3rem;">پیام‌های بازی:</div>
-    <div class="log-box" id="logBox"></div>
-  </div>
-</div>
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">پیام سیستم</div>
 
-<script>
-(() => {
-  let ws = null;
-  let myId = null;
-  let timerInterval = null;
-
-  function connect() {
-    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    ws = new WebSocket(`${proto}//${location.host}`);
-
-    ws.onopen = () => addLog('به سرور متصل شدید ✅', true);
-
-    ws.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      if (msg.type === 'room_created' || msg.type === 'joined') {
-        myId = msg.myId;
-        document.getElementById('authCard').classList.add('hide');
-        document.getElementById('gameCard').classList.remove('hide');
-        document.getElementById('roomCodeDisplay').innerText = msg.code;
-      } else if (msg.type === 'state') {
-        render(msg.state);
-      } else if (msg.type === 'system') {
-        addLog(msg.message, true);
-      } else if (msg.type === 'error') {
-        alert(msg.message);
-      }
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+    const esc = (text) => {
+      const p = document.createElement('p');
+      p.textContent = text || '';
+      return p.innerHTML;
     };
 
-    ws.onclose = () => {
-      addLog('ارتباط قطع شد. در حال تلاش برای اتصال...', true);
-      setTimeout(connect, 2000);
+    let ws = null;
+    let state = null;
+    let playerId = null;
+    let roomCode = null;
+    let toastTimer = null;
+    let clockTimer = null;
+
+    function toast(text) {
+      const el = $('#toast');
+      el.textContent = text;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    function show(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      $('#' + screenId).classList.add('active');
+    }
+
+    function connect() {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${proto}//${location.host}`);
+
+      ws.onopen = () => {
+        $('#netdot').classList.add('on');
+        $('#nettext').textContent = 'متصل به سرور';
+      };
+
+      ws.onclose = () => {
+        $('#netdot').classList.remove('on');
+        $('#nettext').textContent = 'قطع ارتباط (تلاش مجدد...)';
+        setTimeout(connect, 2000);
+      };
+
+      ws.onmessage = (ev) => {
+        let msg = {};
+        try { msg = JSON.parse(ev.data); } catch (e) { return; }
+
+        if (msg.type === 'error') {
+          toast(msg.message || 'خطایی رخ داد');
+        } else if (msg.type === 'room_created' || msg.type === 'joined') {
+          playerId = msg.playerId;
+          roomCode = msg.roomCode;
+          $('#roomCode').textContent = roomCode;
+          show('room');
+        } else if (msg.type === 'host_assigned') {
+          toast('شما اکنون میزبان بازی شدید!');
+        } else if (msg.type === 'state') {
+          state = msg.state;
+          render();
+        }
+      };
+    }
+
+    function send(type, props = {}) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type, ...props }));
+      }
+    }
+
+    function render() {
+      if (!state) return;
+
+      const youAreHost = state.hostId === playerId;
+
+      // Update Players List
+      $('#playerCount').textContent = state.players.length;
+      $('#players').innerHTML = state.players.map(p => `
+        <div class="player-item">
+          <span class="player-name">
+            ${p.id === playerId ? '👤 (شما) ' : ''}${esc(p.name)}
+          </span>
+          <div>
+            ${p.id === state.hostId ? '<span class="badge badge-host">👑 میزبان</span>' : ''}
+            ${state.connectedPlayerId === p.id ? '<span class="badge badge-contact">⚡ متصل</span>' : ''}
+          </div>
+        </div>
+      `).join('');
+
+      // Setup vs Game View
+      if (state.phase === 'setup') {
+        $('#setupCard').classList.remove('hide');
+        $('#gameCard').classList.add('hide');
+
+        if (youAreHost) {
+          $('#hostSetup').classList.remove('hide');
+          $('#guestWait').classList.add('hide');
+          $('#startBtn').disabled = !state.hasSecret;
+        } else {
+          $('#hostSetup').classList.add('hide');
+          $('#guestWait').classList.remove('hide');
+        }
+      } else {
+        $('#setupCard').classList.add('hide');
+        $('#gameCard').classList.remove('hide');
+
+        // Word boxes display
+        let lettersHtml = '';
+        if (state.revealedPrefix) {
+          for (let char of state.revealedPrefix) {
+            lettersHtml += `<div class="letter-box">${esc(char)}</div>`;
+          }
+          if (state.wordLength) {
+            const remaining = Math.max(0, state.wordLength - state.revealedPrefix.length);
+            for (let i = 0; i < remaining; i++) {
+              lettersHtml += `<div class="letter-box empty">?</div>`;
+            }
+          }
+        }
+        $('#prefix').innerHTML = lettersHtml || '<div class="letter-box empty">-</div>';
+        $('#roundStatus').textContent = `کلمه شروع می‌شود با: «${state.revealedPrefix || ''}»`;
+
+        // Active Clue
+        if (state.currentClue) {
+          $('#activeWrap').classList.remove('hide');
+          $('#activeClue').textContent = state.currentClue.clueText;
+          const authorName = state.players.find(p => p.id === state.currentClue.playerId)?.name || 'ناشناس';
+          $('#clueMeta').textContent = `طراح سرنخ: ${authorName}`;
+          
+          // Connect Button Visibility
+          const canConnect = !youAreHost && state.phase === 'clue' && state.currentClue.playerId !== playerId;
+          $('#connectActions').classList.toggle('hide', !canConnect);
+        } else {
+          $('#activeWrap').classList.add('hide');
+        }
+
+        // Countdown Timer Handling
+        if (state.phase === 'countdown' && state.countdownEndsAt) {
+          $('#countdownWrap').classList.remove('hide');
+          clearInterval(clockTimer);
+          const updateTimer = () => {
+            const left = Math.max(0, Math.ceil((state.countdownEndsAt - Date.now()) / 1000));
+            $('#countdown').textContent = left;
+            if (left <= 0) clearInterval(clockTimer);
+          };
+          updateTimer();
+          clockTimer = setInterval(updateTimer, 200);
+        } else {
+          $('#countdownWrap').classList.add('hide');
+          clearInterval(clockTimer);
+        }
+
+        // Clue Form (Allowed when in clue phase and not host and no current clue)
+        const canPostClue = !youAreHost && state.phase === 'clue' && !state.currentClue;
+        $('#clueForm').classList.toggle('hide', !canPostClue);
+
+        // Secret Submit Word Form
+        const isParticipant = state.currentClue && (state.currentClue.playerId === playerId || state.connectedPlayerId === playerId);
+        const canSubmit = state.phase === 'submit' && isParticipant;
+        $('#submitArea').classList.toggle('hide', !canSubmit);
+
+        // Host Disconnect Form
+        const canHostGuess = youAreHost && (state.phase === 'clue' || state.phase === 'countdown') && state.currentClue;
+        $('#hostGuess').classList.toggle('hide', !canHostGuess);
+
+        // Ended Box
+        if (state.phase === 'ended') {
+          $('#endedBox').classList.remove('hide');
+          $('#winnerText').textContent = state.winnerMessage || 'بازی به اتمام رسید!';
+        } else {
+          $('#endedBox').classList.add('hide');
+        }
+      }
+
+      // History
+      if (state.history) {
+        $('#history').innerHTML = state.history.slice().reverse().map(h => `
+          <div class="history-item">
+            <strong>${esc(h.author)}:</strong> ${esc(h.text)}
+          </div>
+        `).join('') || '<div style="color: var(--text-dim); font-size: 0.85rem;">هنوز سرنخی ثبت نشده.</div>';
+      }
+
+      // Host Quick Controls
+      $('#restartBtn').disabled = !youAreHost || !state.hasSecret;
+      $('#endBtn').disabled = !youAreHost;
+    }
+
+    // Event Listeners
+    $('#createBtn').addEventListener('click', () => {
+      const name = $('#createName').value.trim();
+      if (!name) return toast('لطفاً نام خود را وارد کنید');
+      send('create_room', { name });
+    });
+
+    $('#joinBtn').addEventListener('click', () => {
+      const name = $('#joinName').value.trim();
+      const code = $('#joinCode').value.trim().toUpperCase();
+      if (!name || !code) return toast('لطفاً نام و کد اتاق را وارد کنید');
+      send('join_room', { name, roomCode: code });
+    });
+
+    $('#setSecretBtn').addEventListener('click', () => {
+      const word = $('#secretInput').value.trim();
+      if (!word) return toast('لطفاً کلمه مخفی را وارد کنید');
+      send('set_secret', { secret: word });
+      $('#secretInput').value = '';
+    });
+
+    $('#startBtn').addEventListener('click', () => send('start_game'));
+
+    $('#postClueBtn').addEventListener('click', () => {
+      const clue = $('#clueInput').value.trim();
+      if (!clue) return toast('متن راهنمایی را بنویسید');
+      send('post_clue', { clue });
+      $('#clueInput').value = '';
+    });
+
+    $('#connectBtn')?.addEventListener('click', () => send('connect_clue'));
+
+    $('#guessBtn')?.addEventListener('click', () => {
+      const guess = $('#guessInput').value.trim();
+      if (!guess) return toast('حدس خود را بنویسید');
+      send('disconnect_guess', { guess });
+      $('#guessInput').value = '';
+    });
+
+    $('#submitWordBtn')?.addEventListener('click', () => {
+      const word = $('#wordInput').value.trim();
+      if (!word) return toast('کلمه را بنویسید');
+      send('submit_word', { word });
+      $('#wordInput').value = '';
+    });
+
+    $('#restartBtn').addEventListener('click', () => send('restart_round'));
+    $('#endBtn').addEventListener('click', () => send('end_game'));
+
+    $('#copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.origin + '?room=' + roomCode);
+      toast('لینک اتاق کپی شد!');
+    });
+
+    $('#tabBtn').addEventListener('click', () => {
+      window.open(window.location.origin, '_blank');
+    });
+
+    // Enter key shortcuts
+    const bindEnter = (inputId, btnId) => {
+      $(inputId)?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') $(btnId)?.click();
+      });
     };
-  }
+    bindEnter('#createName', '#createBtn');
+    bindEnter('#joinCode', '#joinBtn');
+    bindEnter('#secretInput', '#setSecretBtn');
+    bindEnter('#clueInput', '#postClueBtn');
+    bindEnter('#guessInput', '#guessBtn');
+    bindEnter('#wordInput', '#submitWordBtn');
 
-  connect();
-
-  function send(data) {
-    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(data));
-  }
-
-  window.createRoom = () => {
-    const name = document.getElementById('nameInput').value.trim();
-    if (!name) return alert('نام خود را وارد کنید.');
-    send({ action: 'create_room', name });
-  };
-
-  window.joinRoom = () => {
-    const name = document.getElementById('nameInput').value.trim();
-    const code = document.getElementById('codeInput').value.trim();
-    if (!name || !code) return alert('نام و کد اتاق را وارد کنید.');
-    send({ action: 'join_room', name, code });
-  };
-
-  window.setSecretWord = () => {
-    const word = document.getElementById('secretWordInput').value.trim();
-    if (!word) return alert('کلمه مخفی را وارد کنید.');
-    send({ action: 'set_secret', word });
-  };
-
-  window.postClue = () => {
-    const clueText = document.getElementById('clueTextInput').value.trim();
-    const underlyingWord = document.getElementById('underlyingWordInput').value.trim();
-    if (!clueText || !underlyingWord) return alert('هم راهنمایی و هم کلمه مد نظر را وارد کنید.');
-    send({ action: 'post_clue', clueText, underlyingWord });
-    document.getElementById('clueTextInput').value = '';
-    document.getElementById('underlyingWordInput').value = '';
-  };
-
-  window.connectClue = () => send({ action: 'connect' });
-
-  window.disconnectGuess = () => {
-    const guess = document.getElementById('hostGuessInput').value.trim();
-    if (!guess) return alert('کلمه مورد حدس را وارد کنید.');
-    send({ action: 'disconnect_guess', guess });
-    document.getElementById('hostGuessInput').value = '';
-  };
-
-  window.submitFinalWord = () => {
-    const word = document.getElementById('finalWordInput').value.trim();
-    if (!word) return alert('کلمه را تایپ کنید.');
-    send({ action: 'submit_word', word });
-    document.getElementById('finalWordInput').value = '';
-  };
-
-  function addLog(text, isSystem = false) {
-    const box = document.getElementById('logBox');
-    const el = document.createElement('div');
-    el.className = 'log-item' + (isSystem ? ' system' : '');
-    el.innerText = text;
-    box.appendChild(el);
-    box.scrollTop = box.scrollHeight;
-  }
-
-  function render(state) {
-    const isHost = state.hostId === myId;
-    const roleTag = document.getElementById('roleTag');
-    roleTag.innerText = isHost ? '👑 شما میزبان هستید' : '🎮 شما بازیکن هستید';
-    roleTag.className = 'badge ' + (isHost ? 'host' : '');
-
-    // حروف باز شده
-    const lettersWrap = document.getElementById('lettersWrap');
-    lettersWrap.innerHTML = '';
-    const letters = state.revealedLetters ? state.revealedLetters.split('') : [];
-    letters.forEach(l => {
-      const b = document.createElement('div');
-      b.className = 'letter-box';
-      b.innerText = l;
-      lettersWrap.appendChild(b);
-    });
-
-    // نمایش راهنمایی برای همه (از جمله ادمین)
-    const activeClueBox = document.getElementById('activeClueBox');
-    const clueAuthorName = document.getElementById('clueAuthorName');
-    const clueTextDisplay = document.getElementById('clueTextDisplay');
-    const connectBtn = document.getElementById('connectBtn');
-
-    if (state.currentClue) {
-      activeClueBox.classList.remove('hide');
-      clueAuthorName.innerText = state.currentClue.authorName;
-      clueTextDisplay.innerText = `« ${state.currentClue.clueText} »`;
-
-      // فقط بازیکنان عادی (غیر از نویسنده و میزبان) دکمه کانتکت را می‌بینند
-      if (!isHost && state.currentClue.authorId !== myId && !state.currentClue.connectorId) {
-        connectBtn.classList.remove('hide');
-      } else {
-        connectBtn.classList.add('hide');
-      }
-    } else {
-      activeClueBox.classList.add('hide');
-    }
-
-    // کنترل‌های میزبان
-    const hostPanel = document.getElementById('hostPanel');
-    const secretWordSection = document.getElementById('secretWordSection');
-    const hostGuessSection = document.getElementById('hostGuessSection');
-
-    if (isHost) {
-      hostPanel.classList.remove('hide');
-      secretWordSection.classList.toggle('hide', state.phase !== 'lobby');
-      // هر زمان سرنخی مطرح باشد، فرم حدس برای میزبان باز است
-      hostGuessSection.classList.toggle('hide', !state.currentClue);
-    } else {
-      hostPanel.classList.add('hide');
-    }
-
-    // کنترل‌های بازیکنان
-    const playerPanel = document.getElementById('playerPanel');
-    const postClueSection = document.getElementById('postClueSection');
-    const submitWordSection = document.getElementById('submitWordSection');
-
-    if (!isHost) {
-      playerPanel.classList.remove('hide');
-      postClueSection.classList.toggle('hide', !!state.currentClue || state.phase === 'lobby');
-
-      if (state.phase === 'submit' && state.currentClue) {
-        const involved = state.currentClue.authorId === myId || state.currentClue.connectorId === myId;
-        submitWordSection.classList.toggle('hide', !involved);
-      } else {
-        submitWordSection.classList.add('hide');
-      }
-    } else {
-      playerPanel.classList.add('hide');
-    }
-
-    // تایمر ۵ ثانیه‌ای
-    const countdownBox = document.getElementById('countdownBox');
-    const countdownText = document.getElementById('countdownText');
-    const countdownFill = document.getElementById('countdownFill');
-
-    if (state.phase === 'countdown' && state.countdownEndsAt) {
-      countdownBox.classList.remove('hide');
-      if (timerInterval) clearInterval(timerInterval);
-
-      timerInterval = setInterval(() => {
-        const remaining = Math.max(0, state.countdownEndsAt - Date.now());
-        countdownFill.style.width = (remaining / 5000) * 100 + '%';
-        countdownText.innerText = (remaining / 1000).toFixed(1) + ' ثانیه';
-        if (remaining <= 0) clearInterval(timerInterval);
-      }, 50);
-    } else {
-      countdownBox.classList.add('hide');
-      if (timerInterval) clearInterval(timerInterval);
-    }
-
-    // لیست بازیکنان
-    const playersList = document.getElementById('playersList');
-    playersList.innerHTML = '';
-    state.players.forEach(p => {
-      const b = document.createElement('span');
-      b.className = 'badge' + (p.isHost ? ' host' : '');
-      b.innerText = p.name + (p.isHost ? ' (میزبان)' : '') + (p.id === myId ? ' [شما]' : '');
-      playersList.appendChild(b);
-    });
-  }
-})();
-</script>
+    // Initialize Connection
+    connect();
+  </script>
 </body>
 </html>
