@@ -660,7 +660,7 @@
       <!-- Main Game Area -->
       <div class="main-column">
 
-        <div id="tableArea"><svg id="lineLayer" aria-hidden="true"></svg><div id="roundTable"><div id="tableCenter"><div id="tableClue"></div><div id="tableTimer"></div></div></div><div id="avatarLayer"></div><div id="confettiLayer"></div></div>
+        <div id="tableArea"><svg id="lineLayer" aria-hidden="true"></svg><div id="roundTable"><div id="tableCenter"><div id="tableClue"></div><div id="tableTimer"></div></div></div><div id="avatarLayer"></div><div id="bubbleLayer"></div><div id="confettiLayer"></div></div>
 
         <!-- Setup Phase Card (Host picks word) -->
         <div id="setupCard" class="card">
@@ -747,6 +747,7 @@
           <div id="endedBox" class="card hide text-center" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.2));">
             <h2 style="font-size: 1.8rem; margin-bottom: 8px;">🎉 پایان مسابقه!</h2>
             <p id="winnerText" style="font-size: 1.1rem; color: #f8fafc;"></p>
+            <div class="ended-actions"><button id="homeBtn" class="btn btn-secondary">🏠 بازگشت به صفحه اصلی</button></div>
           </div>
         </div>
       </div>
@@ -807,6 +808,11 @@
   let lastPhase = null;
   const bubbleTimers = new Map();
   const seenChatKeys = new Set();
+  const seatEls = new Map();
+  const seatCoordinates = new Map();
+  const activeBubbles = new Map();
+  let seatRosterSignature = '', lastTableSignature = '', lastLineSize = '', lastLineD = '';
+  let electricPath = null, lastLineSignature = '';
 
   // ذخیره‌سازی برای rejoin
   function saveSession() {
@@ -906,8 +912,9 @@
         saveSession();
       } else if (msg.type === 'state') {
         const nextState = msg.state;
-        processChatSnapshot(nextState);
         state = nextState;
+        renderTable();
+        processChatSnapshot(nextState);
         render();
       }
     };
@@ -1105,34 +1112,42 @@
   }
 
   function showChatBubble(id, text) {
-    const seat = [...document.querySelectorAll('.seat')].find(el => el.dataset.playerId === String(id));
-    if (!seat) return;
-    const wrap = seat.querySelector('.avatar-wrap');
-    if (!wrap) return;
-    const old = wrap.querySelector('.chat-bubble');
-    if (old) old.remove();
-    clearTimeout(bubbleTimers.get(String(id)));
+    const key = String(id), layer = $('#bubbleLayer');
+    const point = seatCoordinates.get(key);
+    if (!layer || !point) return;
+    const old = activeBubbles.get(key);
+    if (old) { clearTimeout(old.timer); old.element.remove(); }
     const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble'; bubble.textContent = text;
-    wrap.appendChild(bubble);
+    bubble.className = 'chat-bubble pop-in';
+    bubble.textContent = String(text || '').slice(0, 200);
+    bubble.style.left = `${point.x}%`;
+    bubble.style.top = `${point.y}%`;
+    bubble.setAttribute('role', 'button');
+    bubble.setAttribute('aria-label', 'برای ثابت‌کردن حباب کلیک کنید');
+    layer.appendChild(bubble);
+    const item = {element:bubble,timer:null};
+    activeBubbles.set(key,item);
     const startFade = () => {
-      clearTimeout(bubbleTimers.get(String(id)));
+      clearTimeout(item.timer);
       if (bubble.classList.contains('pinned')) return;
-      bubbleTimers.set(String(id), setTimeout(() => {
+      item.timer = setTimeout(() => {
         bubble.classList.add('fading');
-        setTimeout(() => { if (bubble.isConnected && !bubble.classList.contains('pinned')) bubble.remove(); }, 400);
-      }, 4500));
+        setTimeout(() => {
+          if (activeBubbles.get(key) === item) activeBubbles.delete(key);
+          bubble.remove();
+        }, 400);
+      }, 4500);
     };
     bubble.addEventListener('click', () => {
       bubble.classList.toggle('pinned');
-      if (bubble.classList.contains('pinned')) clearTimeout(bubbleTimers.get(String(id)));
+      bubble.classList.remove('fading');
+      if (bubble.classList.contains('pinned')) clearTimeout(item.timer);
       else startFade();
     });
     startFade();
   }
 
   function appendChatMessage(entry) {
-    // Re-rendering keeps game-system history and chat together, oldest first.
     renderChatPanel();
   }
 
@@ -1155,43 +1170,107 @@
     if (open) { unreadCount = 0; updateChatBadge(); requestAnimationFrame(() => { $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight; $('#chatInput').focus(); }); }
   }
 
-  function renderTable() {
+  function makeSeat(player) {
+    const seat = document.createElement('div');
+    seat.className = 'seat';
+    seat.dataset.playerId = String(player.id);
+    const wrap = document.createElement('div'); wrap.className = 'avatar-wrap';
+    const ring = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    ring.setAttribute('class','seat-ring'); ring.setAttribute('viewBox','0 0 64 64');
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx','32'); circle.setAttribute('cy','32'); circle.setAttribute('r','28'); ring.appendChild(circle);
+    const avatar = document.createElement('div'); avatar.className='avatar';
+    const crown = document.createElement('span'); crown.className='seat-crown'; crown.textContent='👑';
+    const name = document.createElement('span'); name.className='seat-name';
+    wrap.append(ring,avatar,crown); seat.append(wrap,name);
+    seatEls.set(String(player.id),seat);
+    return seat;
+  }
+
+  function renderTable(forceLine = false) {
     if (!state) return;
     const layer = $('#avatarLayer'), area = $('#tableArea');
     if (!layer || !area) return;
     const players = state.players || [], n = players.length;
+    const ids = players.map(p => String(p.id));
+    const rosterSignature = `${n}|${ids.join('|')}`;
     const myIndex = Math.max(0, players.findIndex(p => p.id === playerId));
-    layer.innerHTML = players.map((p, i) => {
-      const angle = (90 + (i - myIndex) * 360 / Math.max(n,1)) * Math.PI / 180;
-      const x = 50 + 44 * Math.cos(angle), y = 50 + 40 * Math.sin(angle);
-      const classes = ['seat', p.id === playerId ? 'is-me' : '', p.id === state.hostId ? 'is-host' : '', state.currentClue?.playerId === p.id ? 'is-clue-author' : '', state.connectedPlayerId === p.id ? 'is-connected' : ''].filter(Boolean).join(' ');
-      const ring = state.phase === 'countdown' && (state.currentClue?.playerId === p.id || state.connectedPlayerId === p.id);
-      return `<div class="${classes}${ring?' ring-active':''}" data-player-id="${esc(p.id)}" style="left:${x}%;top:${y}%;--pcolor:${esc(p.color || '#6366f1')}"><div class="avatar-wrap"><svg class="seat-ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28"></circle></svg><div class="avatar">${esc(p.avatar || '🙂')}</div>${p.id === state.hostId ? '<span class="seat-crown">👑</span>' : ''}</div><span class="seat-name">${esc(p.name)}</span></div>`;
-    }).join('');
-    const clue = state.currentClue;
-    if (clue) {
-      const author = players.find(p => p.id === clue.playerId)?.name || 'ناشناس';
-      $('#tableClue').textContent = `«${clue.clueText}» — ${author}`;
-    } else $('#tableClue').textContent = state.phase === 'setup' ? 'در انتظار سرنخ…' : 'در انتظار سرنخ…';
-    $('#tableTimer').textContent = state.phase === 'countdown' ? ($('#countdown').textContent || '۵') : '';
-    drawElectricLine();
+    const stateSignature = [rosterSignature,state.hostId,state.currentClue?.playerId || '',state.connectedPlayerId || '',state.phase].join('::');
+    const rosterChanged = rosterSignature !== seatRosterSignature;
+    if (rosterChanged) {
+      const wanted = new Set(ids);
+      for (const [id,el] of seatEls) {
+        if (!wanted.has(id)) { el.remove(); seatEls.delete(id); seatCoordinates.delete(id); }
+      }
+      players.forEach(p => {
+        const id=String(p.id);
+        if (!seatEls.has(id)) makeSeat(p);
+        const el=seatEls.get(id);
+        if (el.parentNode !== layer || el !== layer.lastElementChild) layer.appendChild(el);
+      });
+      seatRosterSignature = rosterSignature;
+    }
+    // Calculate all positions first, then batch DOM style/class writes.
+    const updates = players.map((p,i) => {
+      const angle=(90+(i-myIndex)*360/Math.max(n,1))*Math.PI/180;
+      return {p,id:String(p.id),x:50+44*Math.cos(angle),y:50+40*Math.sin(angle)};
+    });
+    for (const u of updates) {
+      const {p,id,x,y}=u, el=seatEls.get(id);
+      if (!el) continue;
+      const px=`${x.toFixed(3)}%`, py=`${y.toFixed(3)}%`;
+      if (el.style.left !== px) el.style.left=px;
+      if (el.style.top !== py) el.style.top=py;
+      seatCoordinates.set(id,{x,y});
+      el.classList.toggle('is-me',p.id===playerId);
+      el.classList.toggle('is-host',p.id===state.hostId);
+      el.classList.toggle('is-clue-author',p.id===state.currentClue?.playerId);
+      el.classList.toggle('is-connected',p.id===state.connectedPlayerId);
+      el.classList.toggle('ring-active',state.phase==='countdown'&&(p.id===state.currentClue?.playerId||p.id===state.connectedPlayerId));
+      el.style.setProperty('--pcolor',p.color||'#6366f1');
+      const avatar=el.querySelector('.avatar'),name=el.querySelector('.seat-name');
+      if (avatar.textContent !== (p.avatar||'🙂')) avatar.textContent=p.avatar||'🙂';
+      if (name.textContent !== (p.name||'')) name.textContent=p.name||'';
+      const crown=el.querySelector('.seat-crown'); crown.classList.toggle('hide',p.id!==state.hostId);
+      const bubble=activeBubbles.get(id)?.element;
+      if (bubble) { bubble.style.left=`${x}%`; bubble.style.top=`${y}%`; }
+    }
+    const clue=state.currentClue;
+    const clueText=clue?`«${clue.clueText}» — ${players.find(p=>p.id===clue.playerId)?.name||'ناشناس'}`:'در انتظار سرنخ…';
+    if ($('#tableClue').textContent!==clueText) $('#tableClue').textContent=clueText;
+    const timerText=state.phase==='countdown'?($('#countdown').textContent||'۵'):'';
+    if ($('#tableTimer').textContent!==timerText) $('#tableTimer').textContent=timerText;
+    if (stateSignature!==lastTableSignature || rosterChanged || forceLine) {
+      lastTableSignature=stateSignature;
+      drawElectricLine(forceLine);
+    }
   }
 
-  function drawElectricLine() {
-    const svg = $('#lineLayer'), area = $('#tableArea');
-    if (!svg || !area) return;
-    const rect = area.getBoundingClientRect();
-    svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
-    svg.setAttribute('width', rect.width); svg.setAttribute('height', rect.height);
-    const clue = state?.currentClue;
-    if (!clue || !state.connectedPlayerId || !rect.width || !rect.height) { svg.innerHTML = ''; return; }
-    const findSeat = id => [...document.querySelectorAll('.seat')].find(el => el.dataset.playerId === String(id));
-    const a = findSeat(clue.playerId), b = findSeat(state.connectedPlayerId);
-    if (!a || !b) { svg.innerHTML = ''; return; }
-    const center = el => { const r = el.querySelector('.avatar').getBoundingClientRect(); return {x:r.left+r.width/2-rect.left,y:r.top+r.height/2-rect.top}; };
-    const p1 = center(a), p2 = center(b), cx = rect.width/2, cy = rect.height/2;
-    const qx = (p1.x + p2.x)/2 + (cx-(p1.x+p2.x)/2)*.55, qy = (p1.y+p2.y)/2 + (cy-(p1.y+p2.y)/2)*.55;
-    svg.innerHTML = `<path class="electric-line electric-path" d="M ${p1.x} ${p1.y} Q ${qx} ${qy} ${p2.x} ${p2.y}"></path>`;
+  function drawElectricLine(force = false) {
+    const svg=$('#lineLayer'), area=$('#tableArea');
+    if (!svg||!area||!state) return;
+    const width=area.clientWidth,height=area.clientHeight,size=`${width}x${height}`;
+    if (!electricPath) { electricPath=document.createElementNS('http://www.w3.org/2000/svg','path');electricPath.setAttribute('class','electric-line electric-path');svg.appendChild(electricPath); }
+    if (!width||!height||!state.currentClue||!state.connectedPlayerId) {
+      if (lastLineD!=='') { electricPath.setAttribute('d','');lastLineD=''; }
+      lastLineSize=size; svg.setAttribute('viewBox',`0 0 ${width} ${height}`);return;
+    }
+    const signature=stateSignatureForLine();
+    if (!force && lastLineSize===size && lastLineSignature===signature) return;
+    svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('width',width);svg.setAttribute('height',height);
+    const a=seatEls.get(String(state.currentClue.playerId)),b=seatEls.get(String(state.connectedPlayerId));
+    if (!a||!b) { if(lastLineD!==''){electricPath.setAttribute('d','');lastLineD='';}return; }
+    const rect=area.getBoundingClientRect();
+    const center=el=>{const r=el.querySelector('.avatar').getBoundingClientRect();return{x:r.left+r.width/2-rect.left,y:r.top+r.height/2-rect.top};};
+    const p1=center(a),p2=center(b),cx=width/2,cy=height/2;
+    const qx=(p1.x+p2.x)/2+(cx-(p1.x+p2.x)/2)*.55,qy=(p1.y+p2.y)/2+(cy-(p1.y+p2.y)/2)*.55;
+    const d=`M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${qx.toFixed(1)} ${qy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    if (d!==lastLineD) { electricPath.setAttribute('d',d);lastLineD=d; }
+    lastLineSize=size; lastLineSignature=signature;
+  }
+
+  function stateSignatureForLine() {
+    return `${state?.currentClue?.playerId||''}|${state?.connectedPlayerId||''}|${seatRosterSignature}|${state?.phase||''}`;
   }
 
   function updateCountdownRings(fraction) {
@@ -1209,6 +1288,28 @@
     }
   }
 
+
+  function resetToLanding() {
+    if (ws && ws.readyState === WebSocket.OPEN) send('leave');
+    clearSession();
+    state=null; playerId=null; roomCode=null;
+    lastChatKey=null;chatInitialized=false;unreadCount=0;lastPhase=null;
+    seenChatKeys.clear();updateChatBadge();
+    for (const item of activeBubbles.values()) { clearTimeout(item.timer); item.element.remove(); }
+    activeBubbles.clear();bubbleTimers.forEach(t=>clearTimeout(t));bubbleTimers.clear();
+    $('#chatMessages').innerHTML='';$('#chatInput').value='';toggleChat(false);
+    $('#bubbleLayer').innerHTML='';$('#confettiLayer').innerHTML='';
+    $('#lineLayer').innerHTML='';electricPath=null;lastLineD='';lastLineSize='';lastLineSignature='';
+    $('#avatarLayer').innerHTML='';seatEls.clear();seatCoordinates.clear();seatRosterSignature='';lastTableSignature='';
+    $('#roomCode').textContent='----';
+    selAvatar=AVATARS[Math.floor(Math.random()*AVATARS.length)];
+    selColor=COLORS[Math.floor(Math.random()*COLORS.length)];
+    document.querySelectorAll('.avatar-opt').forEach(el=>el.classList.toggle('selected',el.textContent===selAvatar));
+    document.querySelectorAll('.color-opt').forEach(el=>el.classList.toggle('selected',el.getAttribute('aria-label')===selColor));
+    $('#createName').value='';$('#joinName').value='';$('#joinCode').value='';
+    show('landing');
+  }
+
   setupPickers();
   $('#chatFab').addEventListener('click', () => toggleChat(!$('#chatPanel').classList.contains('open')));
   $('#chatClose').addEventListener('click', () => toggleChat(false));
@@ -1219,7 +1320,7 @@
   }
   $('#chatSendBtn').addEventListener('click', sendChat);
   $('#chatInput').addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();sendChat();} });
-  window.addEventListener('resize', drawElectricLine);
+  window.addEventListener('resize', () => { lastLineSize=''; drawElectricLine(true); });
 
   // ── Event Listeners ───────────────────────────────────────────
   $('#createBtn').addEventListener('click', () => {
@@ -1271,6 +1372,7 @@
     $('#wordInput').value = '';
   });
 
+  $('#homeBtn').addEventListener('click', resetToLanding);
   $('#restartBtn').addEventListener('click', () => send('restart_round'));
   $('#endBtn').addEventListener('click', () => send('end_game'));
 
