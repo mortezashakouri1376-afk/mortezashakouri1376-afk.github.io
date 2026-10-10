@@ -4,6 +4,8 @@ const path = require('path');
 const { WebSocketServer, WebSocket } = require('ws');
 
 const PORT = process.env.PORT || 3000;
+const AVATARS = ['😀','😎','🥳','🤠','🦊','🐼','🐸','🐯','🦉','🐙','🦄','🐝'];
+const COLORS = ['#6366f1','#ec4899','#22c55e','#f59e0b','#06b6d4','#a855f7','#ef4444','#84cc16'];
 const PUBLIC_DIR = path.join(__dirname, 'public'); // همیشه public، بدون fallback ناامن
 
 // اطمینان از وجود پوشه public
@@ -75,6 +77,18 @@ const wss = new WebSocketServer({
 const rooms   = new Map(); // code -> room
 const clients = new Map(); // ws -> me
 
+function pickAvatar(msg, room = null) {
+  const usedAvatars = new Set((room?.players || []).map(p => p.avatar).filter(Boolean));
+  const usedColors = new Set((room?.players || []).map(p => p.color).filter(Boolean));
+  const choose = (value, choices, used) => {
+    if (typeof value === 'string' && choices.includes(value)) return value;
+    const unused = choices.filter(item => !used.has(item));
+    const pool = unused.length ? unused : choices;
+    return pool[Math.floor(Math.random() * pool.length)];
+  };
+  return { avatar: choose(msg?.avatar, AVATARS, usedAvatars), color: choose(msg?.color, COLORS, usedColors) };
+}
+
 function generateRoomCode() {
   const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
   let code = '';
@@ -119,8 +133,9 @@ function buildState(room, viewerId) {
     connectedPlayerId: room.currentClue?.connectorId || null,
     countdownEndsAt:   room.countdownEndsAt || null,
     winnerMessage:     room.winnerMessage || '',
-    players:           room.players.map(p => ({ id: p.id, name: p.name })),
+    players:           room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, color: p.color })),
     history:           room.history,
+    chatLog:           room.chatLog,
     serverNow:         Date.now() // برای همگام‌سازی تایمر کلاینت
   };
 }
@@ -219,6 +234,7 @@ function handleMessage(me, msg) {
     
     const code = generateRoomCode();
     me.roomCode = code;
+    const appearance = pickAvatar(msg);
     
     const room = {
       code, 
@@ -232,7 +248,8 @@ function handleMessage(me, msg) {
       submitTimer: null,
       winnerMessage: '',
       history: [],
-      players: [{ id: me.id, name: me.name, ws: me.ws }]
+      chatLog: [],
+      players: [{ id: me.id, name: me.name, ws: me.ws, ...appearance }]
     };
     
     rooms.set(code, room);
@@ -256,7 +273,8 @@ function handleMessage(me, msg) {
     
     me.name = name; 
     me.roomCode = code;
-    room.players.push({ id: me.id, name: me.name, ws: me.ws });
+    const appearance = pickAvatar(msg, room);
+    room.players.push({ id: me.id, name: me.name, ws: me.ws, ...appearance });
     
     addHistory(room, '🔔 سیستم', `${me.name} وارد اتاق شد.`);
     sendTo(me, { type: 'joined', playerId: me.id, roomCode: code });
@@ -298,6 +316,20 @@ function handleMessage(me, msg) {
   }
   
   const isHost = room.hostId === me.id;
+
+  // ── گفت‌وگو ────────────────────────────────────────────────
+  if (msg.type === 'chat') {
+    const text = String(msg.text || '').trim();
+    if (!text) return sendTo(me, { type: 'error', message: 'پیام نمی‌تواند خالی باشد.' });
+    if (text.length > 200) return sendTo(me, { type: 'error', message: 'پیام خیلی طولانی است.' });
+    const now = Date.now();
+    if (now - (me.lastChatAt || 0) < 800) return;
+    me.lastChatAt = now;
+    room.chatLog.push({ playerId: me.id, name: me.name, avatar: room.players.find(p => p.id === me.id)?.avatar, color: room.players.find(p => p.id === me.id)?.color, text, at: now });
+    if (room.chatLog.length > 60) room.chatLog.shift();
+    broadcastRoom(room);
+    return;
+  }
 
   // ── ثبت کلمه مخفی ──────────────────────────────────────────
   if (msg.type === 'set_secret') {
