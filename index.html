@@ -568,7 +568,17 @@
     .text-center { text-align: center; }
     .mt-2 { margin-top: 10px; }
     .mt-4 { margin-top: 18px; }
-  </style>
+  
+   .avatar-options,.color-options{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.avatar-opt,.color-opt{cursor:pointer;border:2px solid transparent;background:rgba(255,255,255,.06);border-radius:10px;padding:5px 8px;font-size:1.2rem}.color-opt{width:28px;height:28px;padding:0;border-radius:50%;background:var(--swatch)}.avatar-opt.selected,.color-opt.selected{border-color:#fff;box-shadow:0 0 12px var(--primary)}
+    #tableArea{position:relative;width:100%;aspect-ratio:2/1;max-height:380px;margin:0 0 20px;overflow:visible}#roundTable{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:66%;height:62%;border-radius:50%;background:radial-gradient(ellipse,rgba(34,48,78,.85),rgba(13,20,38,.88));border:2px solid rgba(99,102,241,.75);box-shadow:inset 0 0 32px rgba(99,102,241,.2),0 0 25px rgba(99,102,241,.16);display:grid;place-items:center}#tableCenter{text-align:center;max-width:75%;color:#cbd5e1}#tableClue{font-weight:700;color:#f9a8d4;font-size:.9rem}#tableTimer{font-size:1.8rem;font-weight:900;color:#fca5a5}#avatarLayer,#confettiLayer,#lineLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}#lineLayer{z-index:1;overflow:visible}.seat{position:absolute;z-index:2;transform:translate(-50%,-50%);text-align:center;pointer-events:auto}.avatar-wrap{position:relative;width:58px;height:58px;margin:auto}.avatar{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;border:3px solid rgba(255,255,255,.45);box-shadow:0 0 12px color-mix(in srgb,var(--pcolor),transparent 30%);background:var(--pcolor)}.seat.is-me .avatar{border-color:white;box-shadow:0 0 18px var(--pcolor)}.seat.is-clue-author .avatar{animation:seatGlow 1s infinite alternate}.seat.is-connected .avatar{box-shadow:0 0 18px var(--success);border-color:var(--success)}.seat.is-host .avatar{border-color:#fbbf24}.seat-name{display:block;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(10,15,25,.88);border:1px solid var(--border);border-radius:99px;padding:2px 7px;font-size:.72rem;margin-top:3px}.seat-crown{position:absolute;top:-11px;right:-4px;filter:drop-shadow(0 0 5px #fbbf24)}.seat-ring{position:absolute;inset:-3px;width:64px;height:64px;transform:rotate(-90deg);display:none}.seat.ring-active .seat-ring{display:block}.seat-ring circle{fill:none;stroke:#fbbf24;stroke-width:3;stroke-dasharray:176;stroke-dashoffset:calc(176 * (1 - var(--ring,1)));transition:stroke-dashoffset .1s linear}.chat-bubble{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translate(-50%,0);z-index:5;max-width:180px;min-width:54px;padding:7px 10px;background:#f8fafc;color:#111827;border-radius:12px;font-size:.75rem;line-height:1.35;box-shadow:0 5px 20px #0008;opacity:1;transition:opacity .35s,transform .35s;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word;cursor:pointer}.chat-bubble:after{content:'';position:absolute;left:calc(50% - 5px);bottom:-5px;border-width:6px 5px 0;border-style:solid;border-color:#f8fafc transparent transparent}.chat-bubble.pinned{display:block;overflow:visible;-webkit-line-clamp:unset;max-width:240px;z-index:10}.chat-bubble.fading{opacity:0;transform:translate(-50%,-8px)}@keyframes seatGlow{to{box-shadow:0 0 20px var(--accent);border-color:var(--accent)}}.electric-line{stroke:#34d399;stroke-width:3;fill:none;stroke-dasharray:8 8;filter:drop-shadow(0 0 6px #34d399);animation:flow  .45s linear infinite}@keyframes flow{to{stroke-dashoffset:-32}}.confetti{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:2px;animation:burst 1.2s ease-out forwards}@keyframes burst{to{transform:translate(var(--dx),var(--dy)) rotate(600deg);opacity:0}}
+    .electric-path{stroke-dasharray:8 8;animation:flow .45s linear infinite;filter:drop-shadow(0 0 6px #34d399)}
+    #chatFab{position:fixed;left:20px;bottom:82px;z-index:1001;border:0;border-radius:50%;width:56px;height:56px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-size:1.4rem;box-shadow:0 6px 22px #0008;cursor:pointer}#chatBadge{position:absolute;top:-4px;right:-4px;background:var(--danger);border-radius:99px;min-width:20px;height:20px;padding:1px 5px;font-size:.75rem}#chatBadge:empty,#chatBadge[data-count="0"]{display:none}#chatPanel{position:fixed;left:0;top:0;bottom:0;width:320px;max-width:90vw;z-index:1002;display:flex;flex-direction:column;background:rgba(18,25,43,.97);border:1px solid var(--border);box-shadow:10px 0 35px #0007;backdrop-filter:blur(16px);transform:translateX(-105%);transition:transform .3s}#chatPanel.open{transform:translateX(0)}#chatPanel header,#chatPanel footer{padding:14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}#chatPanel header{justify-content:space-between}#chatPanel header button{background:none;color:white;border:0;font-size:1.2rem;cursor:pointer}#chatMessages{padding:12px;flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}#chatPanel footer{border-top:1px solid var(--border);border-bottom:0}#chatInput{min-width:0;padding:9px!important}#chatSendBtn{border:0;border-radius:8px;padding:10px;background:var(--primary);color:white;cursor:pointer}.chat-message,.chat-system{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07);font-size:.84rem;line-height:1.4;overflow-wrap:anywhere}.chat-message strong{margin-inline-start:5px}.chat-system{background:rgba(99,102,241,.1);color:var(--text-dim);font-size:.78rem}
+    @media(max-width:640px){#tableArea{aspect-ratio:1.6/1;max-height:340px}.avatar-wrap{width:44px;height:44px}.avatar{width:42px;height:42px;font-size:1.35rem}.seat-ring{width:50px;height:50px}.seat-ring circle{stroke-dasharray:138;stroke-dashoffset:calc(138 * (1 - var(--ring,1)))}.seat-name{font-size:.65rem;max-width:72px}.chat-bubble{max-width:125px;font-size:.68rem}#chatPanel{top:auto;bottom:0;left:0;width:100%;max-width:none;height:55vh;transform:translateY(105%);border-radius:18px 18px 0 0}#chatPanel.open{transform:translateY(0)}}
+
+  
+    .seat-ring circle{stroke-dasharray:176;stroke-dashoffset:calc(176 * (1 - var(--ring,1)))}
+    @media(max-width:640px){.seat-ring circle{stroke-dasharray:176;stroke-dashoffset:calc(176 * (1 - var(--ring,1)))}}
+</style>
 </head>
 <body>
 
@@ -599,6 +609,7 @@
           <label for="createName">نام مستعار شما:</label>
           <input type="text" id="createName" placeholder="مثال: علی" maxlength="15">
         </div>
+        <div class="picker-group"><label>آواتار و رنگ شما:</label><div id="createAvatarRow" class="avatar-options"></div><div id="createColorRow" class="color-options"></div></div>
         <button id="createBtn" class="btn" disabled>ایجاد اتاق و میزبانی</button>
       </div>
 
@@ -609,6 +620,7 @@
           <label for="joinName">نام مستعار شما:</label>
           <input type="text" id="joinName" placeholder="مثال: سارا" maxlength="15">
         </div>
+        <div class="picker-group"><label>آواتار و رنگ شما:</label><div id="joinAvatarRow" class="avatar-options"></div><div id="joinColorRow" class="color-options"></div></div>
         <div class="field">
           <label for="joinCode">کد ۴ حرفی اتاق:</label>
           <input type="text" id="joinCode" placeholder="مثلاً ABCD" maxlength="4" style="text-transform: uppercase; font-family: monospace; letter-spacing: 2px;">
@@ -647,6 +659,8 @@
     <div class="room-grid">
       <!-- Main Game Area -->
       <div class="main-column">
+
+        <div id="tableArea"><svg id="lineLayer" aria-hidden="true"></svg><div id="roundTable"><div id="tableCenter"><div id="tableClue"></div><div id="tableTimer"></div></div></div><div id="avatarLayer"></div><div id="confettiLayer"></div></div>
 
         <!-- Setup Phase Card (Host picks word) -->
         <div id="setupCard" class="card">
@@ -763,6 +777,9 @@
     </div>
   </main>
 
+  <button id="chatFab" aria-label="گفت‌وگو">💬<span id="chatBadge" data-count="0">0</span></button>
+  <section id="chatPanel" aria-label="گفت‌وگو"><header><strong>گفت‌وگو</strong><button id="chatClose" aria-label="بستن">✕</button></header><div id="chatMessages"></div><footer><input id="chatInput" type="text" maxlength="200" placeholder="پیامت را بنویس..."><button id="chatSendBtn">ارسال</button></footer></section>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast">پیام سیستم</div>
 
@@ -782,6 +799,14 @@
   let clockTimer = null;
   let reconnectAttempts = 0;
   const MAX_RECONNECT = 10;
+  const AVATARS = ['😀','😎','🥳','🤠','🦊','🐼','🐸','🐯','🦉','🐙','🦄','🐝'];
+  const COLORS = ['#6366f1','#ec4899','#22c55e','#f59e0b','#06b6d4','#a855f7','#ef4444','#84cc16'];
+  let selAvatar = AVATARS[Math.floor(Math.random()*AVATARS.length)];
+  let selColor = COLORS[Math.floor(Math.random()*COLORS.length)];
+  let lastChatKey = null, chatInitialized = false, unreadCount = 0, lastChatSentAt = 0;
+  let lastPhase = null;
+  const bubbleTimers = new Map();
+  const seenChatKeys = new Set();
 
   // ذخیره‌سازی برای rejoin
   function saveSession() {
@@ -880,7 +905,9 @@
         show('room');
         saveSession();
       } else if (msg.type === 'state') {
-        state = msg.state;
+        const nextState = msg.state;
+        processChatSnapshot(nextState);
+        state = nextState;
         render();
       }
     };
@@ -902,7 +929,9 @@
     const tick = () => {
       const left = Math.max(0, Math.ceil((serverEndsAt + offset - Date.now()) / 1000));
       $('#countdown').textContent = left;
+      updateCountdownRings(Math.max(0, Math.min(1, (serverEndsAt + offset - Date.now()) / 5000)));
       if (left <= 0) {
+        updateCountdownRings(0);
         clearInterval(clockTimer);
       }
     };
@@ -1023,13 +1052,180 @@
     
     // ذخیره session
     saveSession();
+    renderTable();
+    renderChatPanel();
+    if (lastPhase && lastPhase !== 'submit' && state.phase === 'submit') spawnConfetti();
+    lastPhase = state.phase;
   }
+
+
+  function setupPickers() {
+    const rows = [
+      ['createAvatarRow','avatar', AVATARS], ['joinAvatarRow','avatar', AVATARS],
+      ['createColorRow','color', COLORS], ['joinColorRow','color', COLORS]
+    ];
+    rows.forEach(([id,type,items]) => {
+      const row = document.getElementById(id);
+      items.forEach(value => {
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = type === 'avatar' ? 'avatar-opt' : 'color-opt';
+        if (type === 'avatar') btn.textContent = value;
+        else { btn.style.setProperty('--swatch', value); btn.setAttribute('aria-label', value); }
+        const selected = type === 'avatar' ? value === selAvatar : value === selColor;
+        if (selected) btn.classList.add('selected');
+        btn.addEventListener('click', () => {
+          if (type === 'avatar') selAvatar = value; else selColor = value;
+          row.querySelectorAll('button').forEach(el => el.classList.remove('selected'));
+          btn.classList.add('selected');
+          document.querySelectorAll(type === 'avatar' ? '.avatar-opt' : '.color-opt').forEach(el => el.classList.toggle('selected', (type === 'avatar' ? el.textContent : el.getAttribute('aria-label')) === value));
+        });
+        row.appendChild(btn);
+      });
+    });
+  }
+
+  function processChatSnapshot(snapshot) {
+    const entries = Array.isArray(snapshot.chatLog) ? snapshot.chatLog : [];
+    const keys = entries.map(e => `${e.at}|${e.playerId}`);
+    if (!chatInitialized) {
+      keys.forEach(k => seenChatKeys.add(k));
+      lastChatKey = keys[keys.length - 1] || null;
+      chatInitialized = true;
+      return;
+    }
+    entries.forEach((entry, i) => {
+      const key = keys[i];
+      if (seenChatKeys.has(key)) return;
+      seenChatKeys.add(key); lastChatKey = key;
+      showChatBubble(entry.playerId, entry.text);
+      appendChatMessage(entry);
+      if (!$('#chatPanel').classList.contains('open')) { unreadCount++; updateChatBadge(); }
+    });
+    if (seenChatKeys.size > 500) { seenChatKeys.clear(); keys.forEach(k => seenChatKeys.add(k)); }
+  }
+
+  function showChatBubble(id, text) {
+    const seat = [...document.querySelectorAll('.seat')].find(el => el.dataset.playerId === String(id));
+    if (!seat) return;
+    const wrap = seat.querySelector('.avatar-wrap');
+    if (!wrap) return;
+    const old = wrap.querySelector('.chat-bubble');
+    if (old) old.remove();
+    clearTimeout(bubbleTimers.get(String(id)));
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble'; bubble.textContent = text;
+    wrap.appendChild(bubble);
+    const startFade = () => {
+      clearTimeout(bubbleTimers.get(String(id)));
+      if (bubble.classList.contains('pinned')) return;
+      bubbleTimers.set(String(id), setTimeout(() => {
+        bubble.classList.add('fading');
+        setTimeout(() => { if (bubble.isConnected && !bubble.classList.contains('pinned')) bubble.remove(); }, 400);
+      }, 4500));
+    };
+    bubble.addEventListener('click', () => {
+      bubble.classList.toggle('pinned');
+      if (bubble.classList.contains('pinned')) clearTimeout(bubbleTimers.get(String(id)));
+      else startFade();
+    });
+    startFade();
+  }
+
+  function appendChatMessage(entry) {
+    // Re-rendering keeps game-system history and chat together, oldest first.
+    renderChatPanel();
+  }
+
+  function renderChatPanel() {
+    const box = $('#chatMessages');
+    if (!box || !state) return;
+    const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 50;
+    const rows = [];
+    (state.history || []).forEach(h => rows.push(`<div class="chat-system">⚙ ${esc(h.author)}: ${esc(h.text)}</div>`));
+    (state.chatLog || []).forEach(e => rows.push(`<div class="chat-message"><strong>${esc(e.name)}:</strong> ${esc(e.text)}</div>`));
+    box.innerHTML = rows.join('');
+    if (nearBottom) box.scrollTop = box.scrollHeight;
+  }
+
+  function updateChatBadge() {
+    const badge = $('#chatBadge'); badge.textContent = unreadCount; badge.dataset.count = String(unreadCount);
+  }
+  function toggleChat(open) {
+    $('#chatPanel').classList.toggle('open', open);
+    if (open) { unreadCount = 0; updateChatBadge(); requestAnimationFrame(() => { $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight; $('#chatInput').focus(); }); }
+  }
+
+  function renderTable() {
+    if (!state) return;
+    const layer = $('#avatarLayer'), area = $('#tableArea');
+    if (!layer || !area) return;
+    const players = state.players || [], n = players.length;
+    const myIndex = Math.max(0, players.findIndex(p => p.id === playerId));
+    layer.innerHTML = players.map((p, i) => {
+      const angle = (90 + (i - myIndex) * 360 / Math.max(n,1)) * Math.PI / 180;
+      const x = 50 + 44 * Math.cos(angle), y = 50 + 40 * Math.sin(angle);
+      const classes = ['seat', p.id === playerId ? 'is-me' : '', p.id === state.hostId ? 'is-host' : '', state.currentClue?.playerId === p.id ? 'is-clue-author' : '', state.connectedPlayerId === p.id ? 'is-connected' : ''].filter(Boolean).join(' ');
+      const ring = state.phase === 'countdown' && (state.currentClue?.playerId === p.id || state.connectedPlayerId === p.id);
+      return `<div class="${classes}${ring?' ring-active':''}" data-player-id="${esc(p.id)}" style="left:${x}%;top:${y}%;--pcolor:${esc(p.color || '#6366f1')}"><div class="avatar-wrap"><svg class="seat-ring" viewBox="0 0 64 64"><circle cx="32" cy="32" r="28"></circle></svg><div class="avatar">${esc(p.avatar || '🙂')}</div>${p.id === state.hostId ? '<span class="seat-crown">👑</span>' : ''}</div><span class="seat-name">${esc(p.name)}</span></div>`;
+    }).join('');
+    const clue = state.currentClue;
+    if (clue) {
+      const author = players.find(p => p.id === clue.playerId)?.name || 'ناشناس';
+      $('#tableClue').textContent = `«${clue.clueText}» — ${author}`;
+    } else $('#tableClue').textContent = state.phase === 'setup' ? 'در انتظار سرنخ…' : 'در انتظار سرنخ…';
+    $('#tableTimer').textContent = state.phase === 'countdown' ? ($('#countdown').textContent || '۵') : '';
+    drawElectricLine();
+  }
+
+  function drawElectricLine() {
+    const svg = $('#lineLayer'), area = $('#tableArea');
+    if (!svg || !area) return;
+    const rect = area.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+    svg.setAttribute('width', rect.width); svg.setAttribute('height', rect.height);
+    const clue = state?.currentClue;
+    if (!clue || !state.connectedPlayerId || !rect.width || !rect.height) { svg.innerHTML = ''; return; }
+    const findSeat = id => [...document.querySelectorAll('.seat')].find(el => el.dataset.playerId === String(id));
+    const a = findSeat(clue.playerId), b = findSeat(state.connectedPlayerId);
+    if (!a || !b) { svg.innerHTML = ''; return; }
+    const center = el => { const r = el.querySelector('.avatar').getBoundingClientRect(); return {x:r.left+r.width/2-rect.left,y:r.top+r.height/2-rect.top}; };
+    const p1 = center(a), p2 = center(b), cx = rect.width/2, cy = rect.height/2;
+    const qx = (p1.x + p2.x)/2 + (cx-(p1.x+p2.x)/2)*.55, qy = (p1.y+p2.y)/2 + (cy-(p1.y+p2.y)/2)*.55;
+    svg.innerHTML = `<path class="electric-line electric-path" d="M ${p1.x} ${p1.y} Q ${qx} ${qy} ${p2.x} ${p2.y}"></path>`;
+  }
+
+  function updateCountdownRings(fraction) {
+    document.querySelectorAll('.seat.ring-active').forEach(seat => seat.style.setProperty('--ring', String(Math.max(0, Math.min(1, fraction)))));
+  }
+
+  function spawnConfetti() {
+    const layer = $('#confettiLayer'); if (!layer) return;
+    const colors = COLORS;
+    for (let i=0;i<24;i++) {
+      const p = document.createElement('i'); p.className='confetti'; p.style.background=colors[i%colors.length];
+      const angle = Math.random()*Math.PI*2, distance=70+Math.random()*150;
+      p.style.setProperty('--dx', `${Math.cos(angle)*distance}px`); p.style.setProperty('--dy', `${Math.sin(angle)*distance}px`);
+      layer.appendChild(p); setTimeout(()=>p.remove(),1300);
+    }
+  }
+
+  setupPickers();
+  $('#chatFab').addEventListener('click', () => toggleChat(!$('#chatPanel').classList.contains('open')));
+  $('#chatClose').addEventListener('click', () => toggleChat(false));
+  function sendChat() {
+    const text = $('#chatInput').value.trim(); if (!text) return;
+    const now=Date.now(); if (now-lastChatSentAt<900) { toast('آروم‌تر!'); return; }
+    lastChatSentAt=now; send('chat',{text}); $('#chatInput').value='';
+  }
+  $('#chatSendBtn').addEventListener('click', sendChat);
+  $('#chatInput').addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();sendChat();} });
+  window.addEventListener('resize', drawElectricLine);
 
   // ── Event Listeners ───────────────────────────────────────────
   $('#createBtn').addEventListener('click', () => {
     const name = $('#createName').value.trim();
     if (!name) return toast('لطفاً نام خود را وارد کنید');
-    send('create_room', { name });
+    send('create_room', { name, avatar: selAvatar, color: selColor });
   });
 
   $('#joinBtn').addEventListener('click', () => {
@@ -1037,7 +1233,7 @@
     const code = $('#joinCode').value.trim().toUpperCase();
     if (!name) return toast('لطفاً نام خود را وارد کنید');
     if (!code) return toast('لطفاً کد اتاق را وارد کنید');
-    send('join_room', { name, roomCode: code });
+    send('join_room', { name, roomCode: code, avatar: selAvatar, color: selColor });
   });
 
   $('#setSecretBtn').addEventListener('click', () => {
