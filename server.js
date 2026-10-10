@@ -310,6 +310,11 @@ function handleMessage(me, msg) {
     return;
   }
 
+  if (msg.type === 'leave') {
+    leaveCurrentRoom(me);
+    return;
+  }
+
   const room = rooms.get(me.roomCode);
   if (!room) {
     return sendTo(me, { type: 'error', message: 'شما در هیچ اتاقی نیستید.' });
