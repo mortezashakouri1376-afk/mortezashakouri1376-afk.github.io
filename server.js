@@ -136,6 +136,7 @@ function buildState(room, viewerId) {
     players:           room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, color: p.color })),
     history:           room.history,
     chatLog:           room.chatLog,
+    voice:             Array.from(room.voice || []),
     serverNow:         Date.now() // برای همگام‌سازی تایمر کلاینت
   };
 }
@@ -197,6 +198,7 @@ function leaveCurrentRoom(me) {
     }
   }
   
+  if (room.voice) room.voice.delete(me.id);
   room.players = room.players.filter(p => p.id !== me.id);
   
   if (room.players.length === 0) {
@@ -249,6 +251,7 @@ function handleMessage(me, msg) {
       winnerMessage: '',
       history: [],
       chatLog: [],
+      voice: new Set(),
       players: [{ id: me.id, name: me.name, ws: me.ws, ...appearance }]
     };
     
@@ -312,6 +315,26 @@ function handleMessage(me, msg) {
 
   if (msg.type === 'leave') {
     leaveCurrentRoom(me);
+    return;
+  }
+
+  if (msg.type === 'voice_state') {
+    if (!me.roomCode) return;
+    const room = rooms.get(me.roomCode);
+    if (!room) return;
+    if (msg.on === true) room.voice.add(me.id);
+    else room.voice.delete(me.id);
+    broadcastRoom(room);
+    return;
+  }
+
+  if (msg.type === 'voice_signal') {
+    if (!me.roomCode) return;
+    const room = rooms.get(me.roomCode);
+    if (!room) return;
+    const target = room.players.find(p => p.id === msg.to);
+    if (!target) return;
+    sendTo(target, { type: 'voice_signal', from: me.id, signal: msg.signal });
     return;
   }
 
