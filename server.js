@@ -16,8 +16,9 @@ if (!fs.existsSync(PUBLIC_DIR)) {
 // کپی index.html به public اگر وجود ندارد (برای dev)
 const indexPath = path.join(__dirname, 'index.html');
 const publicIndexPath = path.join(PUBLIC_DIR, 'index.html');
-if (fs.existsSync(indexPath) && !fs.existsSync(publicIndexPath)) {
-  fs.copyFileSync(indexPath, publicIndexPath);
+if (fs.existsSync(indexPath)) {
+  try { fs.copyFileSync(indexPath, publicIndexPath); }
+  catch (err) { console.error('Could not copy sibling index.html:', err.message); }
 }
 
 function normalizeText(text) {
@@ -180,12 +181,37 @@ function startCountdown(room) {
   }, 5000);
 }
 
+// حذف بازیکن پس از پایان مهلت اتصال مجدد
+function removePlayerFromRoom(room, player) {
+  if (!room || !player || !room.players.includes(player)) return;
+  if (player.graceTimer) { clearTimeout(player.graceTimer); player.graceTimer = null; }
+  if (room.currentClue) {
+    const c = room.currentClue;
+    if (c.authorId === player.id || c.connectorId === player.id) {
+      clearTimer(room); room.currentClue = null; room.phase = 'clue'; room.countdownEndsAt = null;
+      addHistory(room, '⚠️ سیستم', 'طرف سرنخ اتاق را ترک کرد؛ سرنخ لغو شد.');
+    }
+  }
+  if (room.voice) room.voice.delete(player.id);
+  room.players = room.players.filter(p => p !== player);
+  if (room.players.length === 0) { clearTimer(room); rooms.delete(room.code); return; }
+  if (room.hostId === player.id) {
+    room.hostId = room.players[0].id; room.secretWord = ''; room.revealedLength = 0; room.phase = 'setup';
+    room.currentClue = null; room.countdownEndsAt = null;
+    addHistory(room, '👑 سیستم', `${room.players[0].name} میزبان جدید شد. کلمه مخفی پاک شد.`);
+  }
+  addHistory(room, '👋 سیستم', `${player.name} از اتاق خارج شد.`);
+  broadcastRoom(room);
+}
+
 // خارج کردن بازیکن از اتاق قبلی
 function leaveCurrentRoom(me) {
   if (!me.roomCode || !rooms.has(me.roomCode)) return;
   
   const room = rooms.get(me.roomCode);
   
+  const oldPlayer = room.players.find(p => p.id === me.id);
+  if (oldPlayer?.graceTimer) { clearTimeout(oldPlayer.graceTimer); oldPlayer.graceTimer = null; }
   // اگر در حال سرنخ‌دهی یا کانتکت بود، لغو کن
   if (room.currentClue) {
     const c = room.currentClue;
@@ -252,7 +278,7 @@ function handleMessage(me, msg) {
       history: [],
       chatLog: [],
       voice: new Set(),
-      players: [{ id: me.id, name: me.name, ws: me.ws, ...appearance }]
+      players: [{ id: me.id, name: me.name, ws: me.ws, graceTimer: null, ...appearance }]
     };
     
     rooms.set(code, room);
@@ -277,7 +303,7 @@ function handleMessage(me, msg) {
     me.name = name; 
     me.roomCode = code;
     const appearance = pickAvatar(msg, room);
-    room.players.push({ id: me.id, name: me.name, ws: me.ws, ...appearance });
+    room.players.push({ id: me.id, name: me.name, ws: me.ws, graceTimer: null, ...appearance });
     
     addHistory(room, '🔔 سیستم', `${me.name} وارد اتاق شد.`);
     sendTo(me, { type: 'joined', playerId: me.id, roomCode: code });
@@ -288,21 +314,22 @@ function handleMessage(me, msg) {
   // ── rejoin (بعد از reconnect) ────────────────────────────────
   if (msg.type === 'rejoin') {
     const code = String(msg.roomCode ?? '').trim().toUpperCase();
-    const oldId = String(msg.oldPlayerId ?? '');
+    const oldId = String(msg.playerId ?? msg.oldPlayerId ?? '');
     const name = String(msg.name ?? '').trim().slice(0, 15) || 'بازیکن';
     
     const room = rooms.get(code);
     if (!room) {
-      return sendTo(me, { type: 'error', message: 'اتاق یافت نشد.' });
+      return sendTo(me, { type: 'error', code: 'player_not_found', message: 'اتاق یافت نشد.' });
     }
     
     // جستجوی بازیکن قدیمی
     const oldPlayer = room.players.find(p => p.id === oldId);
     if (!oldPlayer) {
-      return sendTo(me, { type: 'error', message: 'بازیکن در اتاق یافت نشد.' });
+      return sendTo(me, { type: 'error', code: 'player_not_found', message: 'بازیکن در اتاق یافت نشد.' });
     }
     
-    // جایگزینی socket
+    // جایگزینی socket و لغو مهلت ۶۰ ثانیه‌ای حضور آفلاین
+    if (oldPlayer.graceTimer) { clearTimeout(oldPlayer.graceTimer); oldPlayer.graceTimer = null; }
     oldPlayer.ws = me.ws;
     me.id = oldId;
     me.name = oldPlayer.name;
@@ -608,7 +635,19 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    leaveCurrentRoom(me);
+    const room = me.roomCode && rooms.get(me.roomCode);
+    const player = room?.players.find(p => p.id === me.id);
+    // فقط socket فعال همان بازیکن حق شروع grace timer را دارد؛ socket قدیمی
+    // پس از rejoin نباید بازیکن را دوباره آفلاین کند.
+    if (player && player.ws === ws) {
+      player.ws = null;
+      if (player.graceTimer) clearTimeout(player.graceTimer);
+      player.graceTimer = setTimeout(() => {
+        player.graceTimer = null;
+        if (player.ws === null && room.players.includes(player)) removePlayerFromRoom(room, player);
+      }, 60000);
+      broadcastRoom(room);
+    }
     clients.delete(ws);
   });
   
@@ -621,8 +660,6 @@ wss.on('connection', (ws) => {
 const interval = setInterval(() => {
   wss.clients.forEach((ws) => {
     if (ws.isAlive === false) {
-      const me = clients.get(ws);
-      if (me) leaveCurrentRoom(me);
       clients.delete(ws);
       return ws.terminate();
     }
@@ -636,3 +673,5 @@ wss.on('close', () => {
 });
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+    
