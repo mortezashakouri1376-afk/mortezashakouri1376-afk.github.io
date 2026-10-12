@@ -1,18 +1,19 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 const { WebSocketServer, WebSocket } = require('ws');
 
 const PORT = process.env.PORT || 3000;
 const AVATARS = ['😀','😎','🥳','🤠','🦊','🐼','🐸','🐯','🦉','🐙','🦄','🐝'];
 const COLORS = ['#6366f1','#ec4899','#22c55e','#f59e0b','#06b6d4','#a855f7','#ef4444','#84cc16'];
-const PUBLIC_DIR = path.join(__dirname, 'public');
+const PUBLIC_DIR = path.join(__dirname, 'public'); // همیشه public، بدون fallback ناامن
 
+// اطمینان از وجود پوشه public
 if (!fs.existsSync(PUBLIC_DIR)) {
   fs.mkdirSync(PUBLIC_DIR, { recursive: true });
 }
 
+// کپی index.html به public اگر وجود ندارد (برای dev)
 const indexPath = path.join(__dirname, 'index.html');
 const publicIndexPath = path.join(PUBLIC_DIR, 'index.html');
 if (fs.existsSync(indexPath) && !fs.existsSync(publicIndexPath)) {
@@ -50,6 +51,7 @@ const server = http.createServer((req, res) => {
   
   const safePath = path.resolve(PUBLIC_DIR, '.' + urlPath);
   
+  // امن‌سازی مسیر
   if (!safePath.startsWith(PUBLIC_DIR + path.sep) || 
       path.basename(safePath).startsWith('.') ||
       safePath.includes('..')) {
@@ -72,7 +74,7 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({ 
   server,
-  maxPayload: 16 * 1024
+  maxPayload: 16 * 1024 // محدودیت 16KB برای پیام‌ها
 });
 
 const rooms   = new Map(); // code -> room
@@ -92,12 +94,9 @@ function pickAvatar(msg, room = null) {
 
 function generateRoomCode() {
   const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  for (let attempt = 0; attempt < 100; attempt++) {
-    let code = '';
-    for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    if (!rooms.has(code)) return code;
-  }
-  return crypto.randomBytes(3).toString('hex').toUpperCase();
+  let code = '';
+  for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return rooms.has(code) ? generateRoomCode() : code;
 }
 
 function sendTo(player, data) {
@@ -111,14 +110,11 @@ function sendTo(player, data) {
 }
 
 function broadcastRoom(room) {
-  room.players.forEach(p => {
-    if (!p.disconnected) {
-      sendTo(p, { type: 'state', state: buildState(room, p.id) });
-    }
-  });
+  room.players.forEach(p => sendTo(p, { type: 'state', state: buildState(room, p.id) }));
 }
 
 function addHistory(room, author, text) {
+  // محدود کردن طول متن تاریخچه
   const safeText = String(text).slice(0, 200);
   const safeAuthor = String(author).slice(0, 30);
   room.history.push({ author: safeAuthor, text: safeText });
@@ -126,6 +122,7 @@ function addHistory(room, author, text) {
 }
 
 function buildState(room, viewerId) {
+  const isHost = room.hostId === viewerId;
   return {
     hostId:            room.hostId,
     phase:             room.phase,
@@ -139,17 +136,11 @@ function buildState(room, viewerId) {
     connectedPlayerId: room.currentClue?.connectorId || null,
     countdownEndsAt:   room.countdownEndsAt || null,
     winnerMessage:     room.winnerMessage || '',
-    players:           room.players.map(p => ({
-      id: p.id,
-      name: p.name,
-      avatar: p.avatar,
-      color: p.color,
-      disconnected: !!p.disconnected
-    })),
+    players:           room.players.map(p => ({ id: p.id, name: p.name, avatar: p.avatar, color: p.color })),
     history:           room.history,
     chatLog:           room.chatLog,
     voice:             Array.from(room.voice || []),
-    serverNow:         Date.now()
+    serverNow:         Date.now() // برای همگام‌سازی تایمر کلاینت
   };
 }
 
@@ -180,6 +171,7 @@ function startCountdown(room) {
     addHistory(room, '⏰ سیستم', 'مهلت تمام شد! بازیکنان کلمه خود را ارسال کنند.');
     broadcastRoom(room);
     
+    // تایمر اضطراری برای فاز submit (۳۰ ثانیه)
     room.submitTimer = setTimeout(() => {
       if (room.phase === 'submit' && room.currentClue) {
         addHistory(room, '⏰ سیستم', 'مهلت ثبت کلمه تمام شد! سرنخ لغو شد.');
@@ -193,75 +185,91 @@ function startCountdown(room) {
   }, 5000);
 }
 
-function removePlayerCompletely(room, playerId) {
-  const index = room.players.findIndex(p => p.id === playerId);
-  if (index === -1) return;
-  const player = room.players[index];
-  if (player.graceTimer) clearTimeout(player.graceTimer);
-
-  if (room.currentClue && (room.currentClue.authorId === playerId || room.currentClue.connectorId === playerId)) {
-    clearTimer(room);
-    room.currentClue = null;
-    room.phase = 'clue';
-    room.countdownEndsAt = null;
-    addHistory(room, '⚠️ سیستم', `طرف سرنخ (${player.name}) خارج شد؛ سرنخ لغو شد.`);
+// خارج کردن بازیکن از اتاق قبلی
+function leaveCurrentRoom(me, connectionLost = false) {
+  if (!me.roomCode || !rooms.has(me.roomCode)) return;
+  
+  const room = rooms.get(me.roomCode);
+  
+  // اگر در حال سرنخ‌دهی یا کانتکت بود، لغو کن
+  if (room.currentClue) {
+    const c = room.currentClue;
+    if (c.authorId === me.id || c.connectorId === me.id) {
+      clearTimer(room);
+      room.currentClue = null;
+      room.phase = 'clue';
+      room.countdownEndsAt = null;
+      addHistory(room, '⚠️ سیستم', 'طرف سرنخ اتاق را ترک کرد؛ سرنخ لغو شد.');
+    }
   }
-
-  room.players.splice(index, 1);
-  if (room.voice) room.voice.delete(playerId);
-
-  if (room.players.length === 0) {
-    clearTimer(room);
-    rooms.delete(room.code);
+  
+  if (room.voice) room.voice.delete(me.id);
+  const isHost = room.hostId === me.id;
+  if (connectionLost && isHost) {
+    const hostPlayer = room.players.find(p => p.id === me.id);
+    if (hostPlayer) { hostPlayer.disconnected = true; hostPlayer.ws = null; }
+    if (room.hostGraceTimer) clearTimeout(room.hostGraceTimer);
+    addHistory(room, '👑 سیستم', 'منتظر بازگشت میزبان...');
+    room.hostGraceTimer = setTimeout(() => {
+      if (room.hostId !== me.id) return;
+      const index = room.players.findIndex(p => p.id === me.id);
+      if (index >= 0) room.players.splice(index, 1);
+      room.hostId = room.players[0]?.id || null;
+      room.secretWord = '';
+      room.revealedLength = 0;
+      room.hostGraceTimer = null;
+      if (room.players.length === 0) {
+        clearTimer(room);
+        rooms.delete(room.code);
+      } else {
+        clearTimer(room);
+        room.currentClue = null;
+        room.countdownEndsAt = null;
+        room.phase = 'setup';
+        room.secretWord = '';
+        room.revealedLength = 0;
+        addHistory(room, '👑 سیستم', `${room.players[0].name} میزبان جدید شد. کلمه مخفی پاک شد.`);
+        broadcastRoom(room);
+      }
+    }, 45000);
+    addHistory(room, '👋 سیستم', `${me.name} اتاق را ترک کرد.`);
+    broadcastRoom(room);
+    me.roomCode = null;
     return;
   }
 
-  if (room.hostId === playerId) {
-    const activePlayer = room.players.find(p => !p.disconnected) || room.players[0];
-    room.hostId = activePlayer.id;
-    room.secretWord = '';
-    room.revealedLength = 0;
-    room.phase = 'setup';
+  room.players = room.players.filter(p => p.id !== me.id);
+  
+  if (room.players.length === 0) {
     clearTimer(room);
-    room.currentClue = null;
-    addHistory(room, '👑 سیستم', `${activePlayer.name} میزبان جدید شد. کلمه مخفی پاک شد.`);
-  }
-
-  addHistory(room, '👋 سیستم', `${player.name} اتاق را ترک کرد.`);
-  broadcastRoom(room);
-}
-
-function leaveCurrentRoom(me, connectionLost = false) {
-  if (!me.roomCode || !rooms.has(me.roomCode)) return;
-  const room = rooms.get(me.roomCode);
-  const player = room.players.find(p => p.id === me.id);
-  if (!player) return;
-
-  if (connectionLost) {
-    player.disconnected = true;
-    player.ws = null;
-    if (room.voice) room.voice.delete(me.id);
-
-    if (player.graceTimer) clearTimeout(player.graceTimer);
-    player.graceTimer = setTimeout(() => {
-      removePlayerCompletely(room, me.id);
-    }, 60000);
-
-    addHistory(room, '📡 سیستم', `ارتباط ${player.name} قطع شد (مهلت بازگشت: ۱ دقیقه).`);
-    broadcastRoom(room);
+    if (room.hostGraceTimer) clearTimeout(room.hostGraceTimer);
+    rooms.delete(me.roomCode);
   } else {
-    removePlayerCompletely(room, me.id);
+    // انتقال میزبانی
+    if (isHost) {
+      if (room.hostGraceTimer) { clearTimeout(room.hostGraceTimer); room.hostGraceTimer = null; }
+      room.hostId = room.players[0].id;
+      // کلمه مخفی را پاک کن چون میزبان جدید نمی‌داند
+      room.secretWord = '';
+      room.revealedLength = 0;
+      addHistory(room, '👑 سیستم', `${room.players[0].name} میزبان جدید شد. کلمه مخفی پاک شد.`);
+    }
+    addHistory(room, '👋 سیستم', `${me.name} اتاق را ترک کرد.`);
+    broadcastRoom(room);
   }
+  
   me.roomCode = null;
 }
 
 function handleMessage(me, msg) {
+  // اعتبارسنجی نوع پیام
   if (!msg || typeof msg !== 'object' || typeof msg.type !== 'string') {
     return sendTo(me, { type: 'error', message: 'پیام نامعتبر.' });
   }
 
   // ── ساخت اتاق ──────────────────────────────────────────────
   if (msg.type === 'create_room') {
+    // خارج شدن از اتاق قبلی
     leaveCurrentRoom(me);
     
     const name = String(msg.name ?? '').trim().slice(0, 15) || 'میزبان';
@@ -269,8 +277,6 @@ function handleMessage(me, msg) {
     
     const code = generateRoomCode();
     me.roomCode = code;
-    const sessionToken = crypto.randomBytes(16).toString('hex');
-    me.sessionToken = sessionToken;
     const appearance = pickAvatar(msg);
     
     const room = {
@@ -283,15 +289,17 @@ function handleMessage(me, msg) {
       countdownEndsAt: null,
       timer: null, 
       submitTimer: null,
+      hostGraceTimer: null,
       winnerMessage: '',
       history: [],
       chatLog: [],
+      chatSeq: 0,
       voice: new Set(),
-      players: [{ id: me.id, name: me.name, ws: me.ws, sessionToken, disconnected: false, ...appearance }]
+      players: [{ id: me.id, name: me.name, ws: me.ws, ...appearance }]
     };
     
     rooms.set(code, room);
-    sendTo(me, { type: 'room_created', playerId: me.id, sessionToken, roomCode: code });
+    sendTo(me, { type: 'room_created', playerId: me.id, roomCode: code });
     broadcastRoom(room);
     return;
   }
@@ -306,55 +314,46 @@ function handleMessage(me, msg) {
       return sendTo(me, { type: 'error', message: 'اتاقی با این کد یافت نشد.' });
     }
     
+    // خارج شدن از اتاق قبلی
     leaveCurrentRoom(me);
     
     me.name = name; 
     me.roomCode = code;
-    const sessionToken = crypto.randomBytes(16).toString('hex');
-    me.sessionToken = sessionToken;
     const appearance = pickAvatar(msg, room);
-    room.players.push({ id: me.id, name: me.name, ws: me.ws, sessionToken, disconnected: false, ...appearance });
+    room.players.push({ id: me.id, name: me.name, ws: me.ws, ...appearance });
     
     addHistory(room, '🔔 سیستم', `${me.name} وارد اتاق شد.`);
-    sendTo(me, { type: 'joined', playerId: me.id, sessionToken, roomCode: code });
+    sendTo(me, { type: 'joined', playerId: me.id, roomCode: code });
     broadcastRoom(room);
     return;
   }
 
-  // ── بازگشت به اتاق (Rejoin) ──────────────────────────────────
+  // ── rejoin (بعد از reconnect) ────────────────────────────────
   if (msg.type === 'rejoin') {
     const code = String(msg.roomCode ?? '').trim().toUpperCase();
     const oldId = String(msg.oldPlayerId ?? '');
-    const token = String(msg.sessionToken ?? '');
+    const name = String(msg.name ?? '').trim().slice(0, 15) || 'بازیکن';
     
     const room = rooms.get(code);
     if (!room) {
       return sendTo(me, { type: 'error', message: 'اتاق یافت نشد.' });
     }
     
+    // جستجوی بازیکن قدیمی
     const oldPlayer = room.players.find(p => p.id === oldId);
     if (!oldPlayer) {
       return sendTo(me, { type: 'error', message: 'بازیکن در اتاق یافت نشد.' });
     }
-
-    if (oldPlayer.sessionToken && oldPlayer.sessionToken !== token) {
-      return sendTo(me, { type: 'error', message: 'اعتبارسنجی نشست ناموفق بود.' });
-    }
     
-    if (oldPlayer.graceTimer) {
-      clearTimeout(oldPlayer.graceTimer);
-      oldPlayer.graceTimer = null;
-    }
-
+    // جایگزینی socket
     oldPlayer.ws = me.ws;
     oldPlayer.disconnected = false;
+    if (room.hostId === oldId && room.hostGraceTimer) { clearTimeout(room.hostGraceTimer); room.hostGraceTimer = null; }
     me.id = oldId;
     me.name = oldPlayer.name;
     me.roomCode = code;
-    me.sessionToken = oldPlayer.sessionToken;
     
-    sendTo(me, { type: 'rejoined', playerId: me.id, sessionToken: me.sessionToken, roomCode: code });
-    addHistory(room, '🔄 سیستم', `${me.name} مجدداً متصل شد.`);
+    sendTo(me, { type: 'rejoined', playerId: me.id, roomCode: code });
     broadcastRoom(room);
     return;
   }
@@ -379,7 +378,7 @@ function handleMessage(me, msg) {
     const room = rooms.get(me.roomCode);
     if (!room) return;
     const target = room.players.find(p => p.id === msg.to);
-    if (!target || target.disconnected) return;
+    if (!target) return;
     sendTo(target, { type: 'voice_signal', from: me.id, signal: msg.signal });
     return;
   }
@@ -397,30 +396,27 @@ function handleMessage(me, msg) {
     if (!text) return sendTo(me, { type: 'error', message: 'پیام نمی‌تواند خالی باشد.' });
     if (text.length > 200) return sendTo(me, { type: 'error', message: 'پیام خیلی طولانی است.' });
     const now = Date.now();
-    if (now - (me.lastChatAt || 0) < 600) return;
+    if (now - (me.lastChatAt || 0) < 800) return sendTo(me, { type: "error", message: "هر یک ثانیه یک پیام." });
     me.lastChatAt = now;
-    const player = room.players.find(p => p.id === me.id);
-    room.chatLog.push({
-      id: crypto.randomBytes(6).toString('hex'),
-      playerId: me.id,
-      name: me.name,
-      avatar: player?.avatar,
-      color: player?.color,
-      text,
-      at: now
-    });
-    if (room.chatLog.length > 60) room.chatLog.shift();
+    room.chatLog.push({ id: ++room.chatSeq, playerId: me.id, name: me.name, avatar: room.players.find(p => p.id === me.id)?.avatar, color: room.players.find(p => p.id === me.id)?.color, text, at: now });
+    if (room.chatLog.length > 200) room.chatLog.shift();
     broadcastRoom(room);
     return;
   }
 
   // ── ثبت کلمه مخفی ──────────────────────────────────────────
   if (msg.type === 'set_secret') {
-    if (!isHost) return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند کلمه تعیین کند.' });
-    if (room.phase !== 'setup') return sendTo(me, { type: 'error', message: 'فقط در فاز setup می‌توانید کلمه تعیین کنید.' });
+    if (!isHost) {
+      return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند کلمه تعیین کند.' });
+    }
+    if (room.phase !== 'setup') {
+      return sendTo(me, { type: 'error', message: 'فقط در فاز setup می‌توانید کلمه تعیین کنید.' });
+    }
     
-    const word = String(msg.secret ?? '').trim().slice(0, 50);
-    if (!word || word.length < 2) return sendTo(me, { type: 'error', message: 'کلمه باید حداقل ۲ حرف باشد.' });
+    const word = String(msg.secret ?? '').trim().slice(0, 50); // محدودیت ۵۰ کاراکتر
+    if (!word || word.length < 2) {
+      return sendTo(me, { type: 'error', message: 'کلمه باید حداقل ۲ حرف باشد.' });
+    }
     
     room.secretWord = word;
     room.revealedLength = 1;
@@ -430,8 +426,12 @@ function handleMessage(me, msg) {
 
   // ── شروع بازی ──────────────────────────────────────────────
   if (msg.type === 'start_game') {
-    if (!isHost) return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند بازی را شروع کند.' });
-    if (!room.secretWord) return sendTo(me, { type: 'error', message: 'ابتدا کلمه مخفی را ثبت کنید.' });
+    if (!isHost) {
+      return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند بازی را شروع کند.' });
+    }
+    if (!room.secretWord) {
+      return sendTo(me, { type: 'error', message: 'ابتدا کلمه مخفی را ثبت کنید.' });
+    }
     
     room.phase = 'clue';
     room.currentClue = null;
@@ -442,9 +442,15 @@ function handleMessage(me, msg) {
 
   // ── ارسال سرنخ ─────────────────────────────────────────────
   if (msg.type === 'post_clue') {
-    if (isHost) return sendTo(me, { type: 'error', message: 'میزبان نمی‌تواند سرنخ بفرستد.' });
-    if (room.phase !== 'clue') return sendTo(me, { type: 'error', message: 'اکنون زمان مناسبی برای ارسال سرنخ نیست.' });
-    if (room.currentClue) return sendTo(me, { type: 'error', message: 'یک سرنخ فعال وجود دارد.' });
+    if (isHost) {
+      return sendTo(me, { type: 'error', message: 'میزبان نمی‌تواند سرنخ بفرستد.' });
+    }
+    if (room.phase !== 'clue') {
+      return sendTo(me, { type: 'error', message: 'now is not the time for clues.' });
+    }
+    if (room.currentClue) {
+      return sendTo(me, { type: 'error', message: 'یک سرنخ فعال وجود دارد.' });
+    }
     
     const clueText = String(msg.clue ?? '').trim().slice(0, 200);
     const underlyingWord = String(msg.word ?? '').trim().slice(0, 50);
@@ -476,10 +482,18 @@ function handleMessage(me, msg) {
 
   // ── کانتکت ─────────────────────────────────────────────────
   if (msg.type === 'connect_clue') {
-    if (isHost) return sendTo(me, { type: 'error', message: 'میزبان نمی‌تواند کانتکت بزند.' });
-    if (room.phase !== 'clue') return sendTo(me, { type: 'error', message: 'اکنون زمان مناسبی برای کانتکت نیست.' });
-    if (!room.currentClue) return sendTo(me, { type: 'error', message: 'سرنخی برای کانتکت وجود ندارد.' });
-    if (room.currentClue.authorId === me.id) return sendTo(me, { type: 'error', message: 'طراح سرنخ نمی‌تواند خودش کانتکت بزند.' });
+    if (isHost) {
+      return sendTo(me, { type: 'error', message: 'میزبان نمی‌تواند کانتکت بزند.' });
+    }
+    if (room.phase !== 'clue') {
+      return sendTo(me, { type: 'error', message: 'now is not the time for contact.' });
+    }
+    if (!room.currentClue) {
+      return sendTo(me, { type: 'error', message: 'سرنخی برای کانتکت وجود ندارد.' });
+    }
+    if (room.currentClue.authorId === me.id) {
+      return sendTo(me, { type: 'error', message: 'نویسنده سرنخ نمی‌تواند کانتکت بزند.' });
+    }
     
     room.currentClue.connectorId = me.id;
     room.currentClue.connectorName = me.name;
@@ -489,9 +503,11 @@ function handleMessage(me, msg) {
 
   // ── دیس‌کانکت میزبان ────────────────────────────────────────
   if (msg.type === 'disconnect_guess') {
-    if (!isHost) return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند دیس‌کانکت کند.' });
+    if (!isHost) {
+      return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند دیس‌کانکت کند.' });
+    }
     if (!['clue', 'countdown'].includes(room.phase) || !room.currentClue) {
-      return sendTo(me, { type: 'error', message: 'اکنون زمان مناسبی برای حدس میزبان نیست.' });
+      return sendTo(me, { type: 'error', message: 'now is not the time for disconnect.' });
     }
     
     const guess = String(msg.guess ?? '').trim().slice(0, 50);
@@ -510,7 +526,7 @@ function handleMessage(me, msg) {
     } else if (normGuess === normTarget) {
       clearTimer(room);
       room.countdownEndsAt = null;
-      addHistory(room, '🚫 سیستم', `میزبان «${guess}» را درست حدس زد — سرنخ دیس‌کانکت شد!`);
+      addHistory(room, '🚫 سیستم', `میزبان «${guess}» را حدس زد — سرنخ دیس‌کانکت شد!`);
       room.currentClue = null;
       room.phase = 'clue';
       broadcastRoom(room);
@@ -524,24 +540,28 @@ function handleMessage(me, msg) {
   // ── ثبت کلمه نهایی ─────────────────────────────────────────
   if (msg.type === 'submit_word') {
     if (room.phase !== 'submit' || !room.currentClue) {
-      return sendTo(me, { type: 'error', message: 'اکنون زمان ارسال کلمه نهایی نیست.' });
+      return sendTo(me, { type: 'error', message: 'now is not the time for submission.' });
     }
     
     const clue = room.currentClue;
     if (me.id !== clue.authorId && me.id !== clue.connectorId) {
-      return sendTo(me, { type: 'error', message: 'شما مجاز به ثبت این کلمه نیستید.' });
+      return sendTo(me, { type: 'error', message: 'شما مجاز به ثبت نیستید.' });
     }
     
     const word = String(msg.secret ?? '').trim().slice(0, 50);
-    if (!word) return sendTo(me, { type: 'error', message: 'کلمه را وارد کنید.' });
+    if (!word) {
+      return sendTo(me, { type: 'error', message: 'کلمه را وارد کنید.' });
+    }
     
+    // اعتبارسنجی: کلمه باید با پیشوند فاش‌شده شروع شود
     const prefix = normalizeText(room.secretWord.slice(0, room.revealedLength));
     if (!normalizeText(word).startsWith(prefix)) {
       return sendTo(me, { type: 'error', message: `کلمه باید با «${room.secretWord.slice(0, room.revealedLength)}» شروع شود.` });
     }
     
+    // نویسنده سرنخ باید همان کلمه underlying را بفرستد
     if (me.id === clue.authorId && normalizeText(word) !== normalizeText(clue.underlyingWord)) {
-      return sendTo(me, { type: 'error', message: 'باید همان کلمه‌ای که در سرنخ مشخص کرده بودید را بفرستید.' });
+      return sendTo(me, { type: 'error', message: 'باید همان کلمه‌ای که در سرنخ اعلام کردید را بفرستید.' });
     }
     
     if (!clue.submittedBy) clue.submittedBy = new Map();
@@ -561,7 +581,7 @@ function handleMessage(me, msg) {
         room.countdownEndsAt = null;
         
         addHistory(room, '🎉 سیستم',
-          `ارتباط برقرار شد! هر دو گفتند «${authorWord}». حروف فاش‌شده: «${room.secretWord.slice(0, room.revealedLength)}»`);
+          `ارتباط برقرار شد! هر دو گفتند «${authorWord}». حروف فاش: «${room.secretWord.slice(0, room.revealedLength)}»`);
         
         if (won) {
           room.phase = 'ended';
@@ -572,21 +592,23 @@ function handleMessage(me, msg) {
         }
       } else {
         addHistory(room, '❌ سیستم',
-          `کلمات همخوانی نداشت! (${clue.authorName}: ${authorWord} | ${clue.connectorName}: ${connectorWord})`);
+          `کلمات متفاوت بود! (${clue.authorName}: ${authorWord} | ${clue.connectorName}: ${connectorWord})`);
         room.phase = 'clue';
       }
       
       room.currentClue = null;
       broadcastRoom(room);
     } else {
-      sendTo(me, { type: 'info', message: 'کلمه شما ثبت شد. در انتظار تایید بازیکن مقابل...' });
+      sendTo(me, { type: 'error', message: 'کلمه شما ثبت شد. در انتظار طرف مقابل...' });
     }
     return;
   }
 
   // ── دست جدید ───────────────────────────────────────────────
   if (msg.type === 'restart_round') {
-    if (!isHost) return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند دست جدید شروع کند.' });
+    if (!isHost) {
+      return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند دست جدید شروع کند.' });
+    }
     
     clearTimer(room);
     room.phase = 'setup';
@@ -595,14 +617,16 @@ function handleMessage(me, msg) {
     room.currentClue = null;
     room.countdownEndsAt = null;
     room.winnerMessage = '';
-    addHistory(room, '🔄 سیستم', 'دست جدید آغاز شد.');
+    addHistory(room, '🔄 سیستم', 'دست جدید شروع شد.');
     broadcastRoom(room);
     return;
   }
 
   // ── پایان بازی ─────────────────────────────────────────────
   if (msg.type === 'end_game') {
-    if (!isHost) return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند بازی را پایان دهد.' });
+    if (!isHost) {
+      return sendTo(me, { type: 'error', message: 'فقط میزبان می‌تواند بازی را پایان دهد.' });
+    }
     
     clearTimer(room);
     room.phase = 'ended';
@@ -614,14 +638,16 @@ function handleMessage(me, msg) {
     return;
   }
 
+  // پیام ناشناخته
   sendTo(me, { type: 'error', message: 'پیام نامشخص.' });
 }
 
 wss.on('connection', (ws) => {
-  const clientId = crypto.randomBytes(6).toString('hex');
+  const clientId = Math.random().toString(36).slice(2, 10);
   const me = { id: clientId, ws, roomCode: null, name: '' };
   clients.set(ws, me);
 
+  // heartbeat
   ws.isAlive = true;
   ws.on('pong', () => { ws.isAlive = true; });
 
@@ -631,16 +657,25 @@ wss.on('connection', (ws) => {
       try { 
         msg = JSON.parse(raw); 
       } catch { 
-        return sendTo(me, { type: 'error', message: 'قالب JSON نامعتبر است.' });
+        return sendTo(me, { type: 'error', message: 'JSON نامعتبر.' });
       }
+      
       handleMessage(me, msg);
     } catch (err) {
       console.error('Message handler error:', err);
-      sendTo(me, { type: 'error', message: 'خطای داخلی سرور.' });
+      sendTo(me, { type: 'error', message: 'خطای سرور.' });
     }
   });
 
   ws.on('close', () => {
+    if (me.roomCode) {
+      const room = rooms.get(me.roomCode);
+      const player = room?.players.find(p => p.id === me.id);
+      if (player?.ws && player.ws !== ws) {
+        clients.delete(ws);
+        return;
+      }
+    }
     leaveCurrentRoom(me, true);
     clients.delete(ws);
   });
@@ -650,6 +685,7 @@ wss.on('connection', (ws) => {
   });
 });
 
+// interval برای پاک کردن connection‌های مرده
 const interval = setInterval(() => {
   wss.clients.forEach((ws) => {
     if (ws.isAlive === false) {
