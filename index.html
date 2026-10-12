@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>کانتکت | بازی دورهمی آنلاین</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -608,7 +608,24 @@
 #ambientLayer{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;opacity:.6}.blob{position:absolute;width:40vw;height:40vw;min-width:260px;min-height:260px;border-radius:50%;filter:blur(75px);opacity:.22;animation:blobFloat 22s ease-in-out infinite alternate}.blob.b1{left:-12%;top:5%;background:radial-gradient(circle,#22d3ee,transparent 68%)}.blob.b2{right:-12%;top:22%;background:radial-gradient(circle,#d946ef,transparent 68%);animation-duration:29s}.blob.b3{left:32%;bottom:-25%;background:radial-gradient(circle,#6366f1,transparent 68%);animation-duration:34s}@keyframes blobFloat{to{transform:translate(6vw,-5vh) scale(1.12)}}
 .table-holo{position:absolute;inset:0;pointer-events:none}.table-core.phase-setup{--core1:#64748b;--core2:#94a3b8}.table-core.phase-clue{--core1:#f59e0b;--core2:#fcd34d}.table-core.phase-countdown{--core1:#22c55e;--core2:#86efac;animation:corepulse .9s ease-in-out infinite alternate}.table-core.phase-submit{--core1:#22d3ee;--core2:#a5f3fc}.table-core.phase-ended{--core1:#f43f5e;--core2:#c084fc}.rim.rim1{opacity:.7;animation-duration:11s}.rim.rim3{width:93%;height:80%;opacity:.32;animation-duration:28s;animation-direction:reverse;background:conic-gradient(#22d3ee,transparent 80deg,#d946ef 180deg,transparent 270deg,#22d3ee)}
 #bubbleLayer{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:visible}.phase-bubble{position:absolute;transform:translate(-50%,-100%);max-width:190px;padding:8px 12px;border:1px solid rgba(255,255,255,.24);border-radius:14px;background:rgba(15,23,42,.83);color:#fff;backdrop-filter:blur(12px);box-shadow:0 8px 28px #0008;font-size:.82rem;line-height:1.4;animation:bubbleIn .22s ease-out;transition:opacity .4s,transform .4s;word-break:break-word}.phase-bubble.fade{opacity:0;transform:translate(-50%,-115%)}@keyframes bubbleIn{from{opacity:0;transform:translate(-50%,-85%) scale(.9)}to{opacity:1;transform:translate(-50%,-100%) scale(1)}}.seat.speaking .avatar{box-shadow:0 0 0 4px #22c55e,0 0 28px #4ade80!important;animation:speakingGlow .8s ease-in-out infinite alternate}@keyframes speakingGlow{to{box-shadow:0 0 0 7px #22c55e88,0 0 34px #4ade80!important}}.btn-secondary#soundBtn,.btn-secondary#voiceBtn{min-width:42px;padding:7px 10px}.btn-secondary#voiceBtn.voice-on{background:rgba(34,197,94,.18);border-color:#22c55e;color:#86efac;box-shadow:0 0 12px #22c55e66}.sound-toggle{position:static;width:auto;height:auto;border-radius:8px;padding:5px 8px;background:transparent}.net{display:flex;align-items:center;gap:9px}
-@media(prefers-reduced-motion:reduce){.blob,.rim,.table-core.phase-countdown,.phase-bubble,.seat.speaking .avatar{animation:none!important;transition:none!important}}
+/* شتاب‌دهی سخت‌افزاری لایه‌های متحرک */
+.blob, .rim, .table-core.phase-countdown,
+.phase-bubble, .seat.speaking .avatar,
+#ambientLayer, .electric-line {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .blob        { animation-duration: 22s !important; }
+  .rim         { animation-duration: 30s !important; }
+  .phase-bubble,
+  .seat.speaking .avatar { animation-duration: .5s !important; }
+  #chatPanel, .table-ellipse, .seat-name, .phase-bubble, .card {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+}
 
 </style>
 </head>
@@ -843,6 +860,7 @@
   let roomCode = null;
   let toastTimer = null;
   let clockTimer = null;
+  let activeCountdownEndsAt = null;
   let reconnectAttempts = 0;
   const MAX_RECONNECT = 10;
   const AVATARS = ['😀','😎','🥳','🤠','🦊','🐼','🐸','🐯','🦉','🐙','🦄','🐝'];
@@ -1117,10 +1135,15 @@
       // تایمر شمارش معکوس
       if (state.phase === 'countdown' && state.countdownEndsAt) {
         $('#countdownWrap').classList.remove('hide');
-        startCountdown(state.countdownEndsAt, state.serverNow);
+        if (activeCountdownEndsAt !== state.countdownEndsAt) {
+          activeCountdownEndsAt = state.countdownEndsAt;
+          startCountdown(state.countdownEndsAt, state.serverNow);
+        }
       } else {
         $('#countdownWrap').classList.add('hide');
         clearInterval(clockTimer);
+        clockTimer = null;
+        activeCountdownEndsAt = null;
       }
 
       // فرم سرنخ
@@ -1165,7 +1188,6 @@
     
     // ذخیره session
     saveSession();
-    renderTable();
     renderChatPanel();
     if (lastPhase && lastPhase !== 'submit' && state.phase === 'submit') spawnConfetti();
     lastPhase = state.phase;
@@ -1199,7 +1221,7 @@
 
   function processChatSnapshot(snapshot) {
     const entries = Array.isArray(snapshot.chatLog) ? snapshot.chatLog : [];
-    const keys = entries.map(e => `${e.at}|${e.playerId}`);
+    const keys = entries.map((e, i) => `${e.at}|${e.playerId}|${i}|${e.text || ''}`);
     if (!chatInitialized) {
       keys.forEach(k => seenChatKeys.add(k));
       lastChatKey = keys[keys.length - 1] || null;
