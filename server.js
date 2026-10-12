@@ -16,24 +16,26 @@ if (!fs.existsSync(PUBLIC_DIR)) {
 // کپی index.html به public اگر وجود ندارد (برای dev)
 const indexPath = path.join(__dirname, 'index.html');
 const publicIndexPath = path.join(PUBLIC_DIR, 'index.html');
-if (fs.existsSync(indexPath)) {
-  try { fs.copyFileSync(indexPath, publicIndexPath); }
-  catch (err) { console.error('Could not copy sibling index.html:', err.message); }
+if (fs.existsSync(indexPath) && !fs.existsSync(publicIndexPath)) {
+  fs.copyFileSync(indexPath, publicIndexPath);
 }
 
 function normalizeText(text) {
   if (!text) return '';
-  return text
-    .toString()
+  return String(text)
     .trim()
-    .replace(/[\u200C\u200B\u200D\uFEFF]/g, '')
+    .replace(/[\u200B-\u200F\u202A-\u202E\u2060\uFEFF]/g, '')
+    .replace(/\u200C/g, '')
+    .replace(/[\u00A0\u2000-\u200A\u202F\u205F\u3000]/g, ' ')
+    .replace(/\s+/g, ' ')
     .replace(/\u064A/g, '\u06CC')
     .replace(/\u0643/g, '\u06A9')
     .replace(/[\u0623\u0625\u0622]/g, '\u0627')
     .replace(/\u0629/g, '\u0647')
-    .replace(/[\u064B-\u065F]/g, '')
+    .replace(/[\u064B-\u065F\u0670]/g, '')
     .replace(/\u0640/g, '')
-    .toLowerCase();
+    .toLowerCase()
+    .trim();
 }
 
 const MIME_TYPES = {
@@ -175,43 +177,20 @@ function startCountdown(room) {
         addHistory(room, '⏰ سیستم', 'مهلت ثبت کلمه تمام شد! سرنخ لغو شد.');
         room.currentClue = null;
         room.phase = 'clue';
+        room.countdownEndsAt = null;
+        room.submitTimer = null;
         broadcastRoom(room);
       }
     }, 30000);
   }, 5000);
 }
 
-// حذف بازیکن پس از پایان مهلت اتصال مجدد
-function removePlayerFromRoom(room, player) {
-  if (!room || !player || !room.players.includes(player)) return;
-  if (player.graceTimer) { clearTimeout(player.graceTimer); player.graceTimer = null; }
-  if (room.currentClue) {
-    const c = room.currentClue;
-    if (c.authorId === player.id || c.connectorId === player.id) {
-      clearTimer(room); room.currentClue = null; room.phase = 'clue'; room.countdownEndsAt = null;
-      addHistory(room, '⚠️ سیستم', 'طرف سرنخ اتاق را ترک کرد؛ سرنخ لغو شد.');
-    }
-  }
-  if (room.voice) room.voice.delete(player.id);
-  room.players = room.players.filter(p => p !== player);
-  if (room.players.length === 0) { clearTimer(room); rooms.delete(room.code); return; }
-  if (room.hostId === player.id) {
-    room.hostId = room.players[0].id; room.secretWord = ''; room.revealedLength = 0; room.phase = 'setup';
-    room.currentClue = null; room.countdownEndsAt = null;
-    addHistory(room, '👑 سیستم', `${room.players[0].name} میزبان جدید شد. کلمه مخفی پاک شد.`);
-  }
-  addHistory(room, '👋 سیستم', `${player.name} از اتاق خارج شد.`);
-  broadcastRoom(room);
-}
-
 // خارج کردن بازیکن از اتاق قبلی
-function leaveCurrentRoom(me) {
+function leaveCurrentRoom(me, connectionLost = false) {
   if (!me.roomCode || !rooms.has(me.roomCode)) return;
   
   const room = rooms.get(me.roomCode);
   
-  const oldPlayer = room.players.find(p => p.id === me.id);
-  if (oldPlayer?.graceTimer) { clearTimeout(oldPlayer.graceTimer); oldPlayer.graceTimer = null; }
   // اگر در حال سرنخ‌دهی یا کانتکت بود، لغو کن
   if (room.currentClue) {
     const c = room.currentClue;
@@ -225,14 +204,44 @@ function leaveCurrentRoom(me) {
   }
   
   if (room.voice) room.voice.delete(me.id);
+  const isHost = room.hostId === me.id;
+  if (connectionLost && isHost) {
+    const hostPlayer = room.players.find(p => p.id === me.id);
+    if (hostPlayer) { hostPlayer.disconnected = true; hostPlayer.ws = null; }
+    if (room.hostGraceTimer) clearTimeout(room.hostGraceTimer);
+    addHistory(room, '👑 سیستم', 'منتظر بازگشت میزبان...');
+    room.hostGraceTimer = setTimeout(() => {
+      if (room.hostId !== me.id) return;
+      const index = room.players.findIndex(p => p.id === me.id);
+      if (index >= 0) room.players.splice(index, 1);
+      room.hostId = room.players[0]?.id || null;
+      room.secretWord = '';
+      room.revealedLength = 0;
+      room.hostGraceTimer = null;
+      if (room.players.length === 0) {
+        clearTimer(room);
+        rooms.delete(room.code);
+      } else {
+        addHistory(room, '👑 سیستم', `${room.players[0].name} میزبان جدید شد. کلمه مخفی پاک شد.`);
+        broadcastRoom(room);
+      }
+    }, 45000);
+    addHistory(room, '👋 سیستم', `${me.name} اتاق را ترک کرد.`);
+    broadcastRoom(room);
+    me.roomCode = null;
+    return;
+  }
+
   room.players = room.players.filter(p => p.id !== me.id);
   
   if (room.players.length === 0) {
     clearTimer(room);
+    if (room.hostGraceTimer) clearTimeout(room.hostGraceTimer);
     rooms.delete(me.roomCode);
   } else {
     // انتقال میزبانی
-    if (room.hostId === me.id) {
+    if (isHost) {
+      if (room.hostGraceTimer) { clearTimeout(room.hostGraceTimer); room.hostGraceTimer = null; }
       room.hostId = room.players[0].id;
       // کلمه مخفی را پاک کن چون میزبان جدید نمی‌داند
       room.secretWord = '';
@@ -274,11 +283,12 @@ function handleMessage(me, msg) {
       countdownEndsAt: null,
       timer: null, 
       submitTimer: null,
+      hostGraceTimer: null,
       winnerMessage: '',
       history: [],
       chatLog: [],
       voice: new Set(),
-      players: [{ id: me.id, name: me.name, ws: me.ws, graceTimer: null, ...appearance }]
+      players: [{ id: me.id, name: me.name, ws: me.ws, ...appearance }]
     };
     
     rooms.set(code, room);
@@ -303,7 +313,7 @@ function handleMessage(me, msg) {
     me.name = name; 
     me.roomCode = code;
     const appearance = pickAvatar(msg, room);
-    room.players.push({ id: me.id, name: me.name, ws: me.ws, graceTimer: null, ...appearance });
+    room.players.push({ id: me.id, name: me.name, ws: me.ws, ...appearance });
     
     addHistory(room, '🔔 سیستم', `${me.name} وارد اتاق شد.`);
     sendTo(me, { type: 'joined', playerId: me.id, roomCode: code });
@@ -314,23 +324,24 @@ function handleMessage(me, msg) {
   // ── rejoin (بعد از reconnect) ────────────────────────────────
   if (msg.type === 'rejoin') {
     const code = String(msg.roomCode ?? '').trim().toUpperCase();
-    const oldId = String(msg.playerId ?? msg.oldPlayerId ?? '');
+    const oldId = String(msg.oldPlayerId ?? '');
     const name = String(msg.name ?? '').trim().slice(0, 15) || 'بازیکن';
     
     const room = rooms.get(code);
     if (!room) {
-      return sendTo(me, { type: 'error', code: 'player_not_found', message: 'اتاق یافت نشد.' });
+      return sendTo(me, { type: 'error', message: 'اتاق یافت نشد.' });
     }
     
     // جستجوی بازیکن قدیمی
     const oldPlayer = room.players.find(p => p.id === oldId);
     if (!oldPlayer) {
-      return sendTo(me, { type: 'error', code: 'player_not_found', message: 'بازیکن در اتاق یافت نشد.' });
+      return sendTo(me, { type: 'error', message: 'بازیکن در اتاق یافت نشد.' });
     }
     
-    // جایگزینی socket و لغو مهلت ۶۰ ثانیه‌ای حضور آفلاین
-    if (oldPlayer.graceTimer) { clearTimeout(oldPlayer.graceTimer); oldPlayer.graceTimer = null; }
+    // جایگزینی socket
     oldPlayer.ws = me.ws;
+    oldPlayer.disconnected = false;
+    if (room.hostId === oldId && room.hostGraceTimer) { clearTimeout(room.hostGraceTimer); room.hostGraceTimer = null; }
     me.id = oldId;
     me.name = oldPlayer.name;
     me.roomCode = code;
@@ -496,8 +507,18 @@ function handleMessage(me, msg) {
     const normGuess = normalizeText(guess);
     const normTarget = normalizeText(room.currentClue.underlyingWord);
     
-    if (normGuess === normTarget) {
+    if (normGuess === normalizeText(room.secretWord)) {
       clearTimer(room);
+      room.countdownEndsAt = null;
+      room.revealedLength = room.secretWord.length;
+      room.currentClue = null;
+      room.phase = 'ended';
+      room.winnerMessage = `🏆 کلمه «${room.secretWord}» کشف شد! میزبان برنده شد.`;
+      addHistory(room, '🏆 سیستم', room.winnerMessage);
+      broadcastRoom(room);
+    } else if (normGuess === normTarget) {
+      clearTimer(room);
+      room.countdownEndsAt = null;
       addHistory(room, '🚫 سیستم', `میزبان «${guess}» را حدس زد — سرنخ دیس‌کانکت شد!`);
       room.currentClue = null;
       room.phase = 'clue';
@@ -546,8 +567,11 @@ function handleMessage(me, msg) {
       clearTimer(room);
       
       if (normalizeText(authorWord) === normalizeText(connectorWord)) {
-        room.revealedLength += 1;
-        const won = room.revealedLength >= room.secretWord.length;
+        const exactWord = normalizeText(authorWord) === normalizeText(room.secretWord);
+        if (exactWord) room.revealedLength = room.secretWord.length;
+        else room.revealedLength = Math.min(room.revealedLength + 1, room.secretWord.length);
+        const won = exactWord;
+        room.countdownEndsAt = null;
         
         addHistory(room, '🎉 سیستم',
           `ارتباط برقرار شد! هر دو گفتند «${authorWord}». حروف فاش: «${room.secretWord.slice(0, room.revealedLength)}»`);
@@ -599,6 +623,8 @@ function handleMessage(me, msg) {
     
     clearTimer(room);
     room.phase = 'ended';
+    room.countdownEndsAt = null;
+    room.currentClue = null;
     room.winnerMessage = 'بازی توسط میزبان پایان یافت.';
     addHistory(room, '🛑 سیستم', room.winnerMessage);
     broadcastRoom(room);
@@ -635,19 +661,7 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    const room = me.roomCode && rooms.get(me.roomCode);
-    const player = room?.players.find(p => p.id === me.id);
-    // فقط socket فعال همان بازیکن حق شروع grace timer را دارد؛ socket قدیمی
-    // پس از rejoin نباید بازیکن را دوباره آفلاین کند.
-    if (player && player.ws === ws) {
-      player.ws = null;
-      if (player.graceTimer) clearTimeout(player.graceTimer);
-      player.graceTimer = setTimeout(() => {
-        player.graceTimer = null;
-        if (player.ws === null && room.players.includes(player)) removePlayerFromRoom(room, player);
-      }, 60000);
-      broadcastRoom(room);
-    }
+    leaveCurrentRoom(me, true);
     clients.delete(ws);
   });
   
@@ -660,6 +674,8 @@ wss.on('connection', (ws) => {
 const interval = setInterval(() => {
   wss.clients.forEach((ws) => {
     if (ws.isAlive === false) {
+      const me = clients.get(ws);
+      if (me) leaveCurrentRoom(me, true);
       clients.delete(ws);
       return ws.terminate();
     }
@@ -673,5 +689,3 @@ wss.on('close', () => {
 });
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-    
