@@ -572,8 +572,8 @@
    .avatar-options,.color-options{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.avatar-opt,.color-opt{cursor:pointer;border:2px solid transparent;background:rgba(255,255,255,.06);border-radius:10px;padding:5px 8px;font-size:1.2rem}.color-opt{width:28px;height:28px;padding:0;border-radius:50%;background:var(--swatch)}.avatar-opt.selected,.color-opt.selected{border-color:#fff;box-shadow:0 0 12px var(--primary)}
     #tableArea{position:relative;width:100%;aspect-ratio:2/1;max-height:380px;margin:0 0 20px;overflow:visible}#roundTable{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:66%;height:62%;border-radius:50%;background:radial-gradient(ellipse,rgba(34,48,78,.85),rgba(13,20,38,.88));border:2px solid rgba(99,102,241,.75);box-shadow:inset 0 0 32px rgba(99,102,241,.2),0 0 25px rgba(99,102,241,.16);display:grid;place-items:center}#tableCenter{text-align:center;max-width:75%;color:#cbd5e1}#tableClue{font-weight:700;color:#f9a8d4;font-size:.9rem}#tableTimer{font-size:1.8rem;font-weight:900;color:#fca5a5}#avatarLayer,#confettiLayer,#lineLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}#lineLayer{z-index:1;overflow:visible}.seat{position:absolute;z-index:2;transform:translate(-50%,-50%);text-align:center;pointer-events:auto}.avatar-wrap{position:relative;width:58px;height:58px;margin:auto}.avatar{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;border:3px solid rgba(255,255,255,.45);box-shadow:0 0 12px color-mix(in srgb,var(--pcolor),transparent 30%);background:var(--pcolor)}.seat.is-me .avatar{border-color:white;box-shadow:0 0 18px var(--pcolor)}.seat.is-clue-author .avatar{animation:seatGlow 1s infinite alternate}.seat.is-connected .avatar{box-shadow:0 0 18px var(--success);border-color:var(--success)}.seat.is-host .avatar{border-color:#fbbf24}.seat-name{display:block;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(10,15,25,.88);border:1px solid var(--border);border-radius:99px;padding:2px 7px;font-size:.72rem;margin-top:3px}.seat-crown{position:absolute;top:-11px;right:-4px;filter:drop-shadow(0 0 5px #fbbf24)}.seat-ring{position:absolute;inset:-3px;width:64px;height:64px;transform:rotate(-90deg);display:none}.seat.ring-active .seat-ring{display:block}.seat-ring circle{fill:none;stroke:#fbbf24;stroke-width:3;stroke-dasharray:176;stroke-dashoffset:calc(176 * (1 - var(--ring,1)));transition:stroke-dashoffset .1s linear}.chat-bubble{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translate(-50%,0);z-index:5;max-width:180px;min-width:54px;padding:7px 10px;background:#f8fafc;color:#111827;border-radius:12px;font-size:.75rem;line-height:1.35;box-shadow:0 5px 20px #0008;opacity:1;transition:opacity .35s,transform .35s;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word;cursor:pointer}.chat-bubble:after{content:'';position:absolute;left:calc(50% - 5px);bottom:-5px;border-width:6px 5px 0;border-style:solid;border-color:#f8fafc transparent transparent}.chat-bubble.pinned{display:block;overflow:visible;-webkit-line-clamp:unset;max-width:240px;z-index:10}.chat-bubble.fading{opacity:0;transform:translate(-50%,-8px)}@keyframes seatGlow{to{box-shadow:0 0 20px var(--accent);border-color:var(--accent)}}.electric-line{stroke:#34d399;stroke-width:3;fill:none;stroke-dasharray:8 8;filter:drop-shadow(0 0 6px #34d399);animation:flow  .45s linear infinite}@keyframes flow{to{stroke-dashoffset:-32}}.confetti{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:2px;animation:burst 1.2s ease-out forwards}@keyframes burst{to{transform:translate(var(--dx),var(--dy)) rotate(600deg);opacity:0}}
     .electric-path{stroke-dasharray:8 8;animation:flow .45s linear infinite;filter:drop-shadow(0 0 6px #34d399)}
-    #chatFab{position:fixed;left:20px;bottom:82px;z-index:1001;border:0;border-radius:50%;width:56px;height:56px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-size:1.4rem;box-shadow:0 6px 22px #0008;cursor:pointer}#chatBadge{position:absolute;top:-4px;right:-4px;background:var(--danger);border-radius:99px;min-width:20px;height:20px;padding:1px 5px;font-size:.75rem}#chatBadge:empty,#chatBadge[data-count="0"]{display:none}#chatPanel{position:fixed;left:0;top:0;bottom:0;width:320px;max-width:90vw;z-index:1002;display:flex;flex-direction:column;background:rgba(18,25,43,.97);border:1px solid var(--border);box-shadow:10px 0 35px #0007;backdrop-filter:blur(16px);transform:translateX(-105%);transition:transform .3s}#chatPanel.open{transform:translateX(0)}#chatPanel header,#chatPanel footer{padding:14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}#chatPanel header{justify-content:space-between}#chatPanel header button{background:none;color:white;border:0;font-size:1.2rem;cursor:pointer}#chatMessages{padding:12px;flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}#chatPanel footer{border-top:1px solid var(--border);border-bottom:0}#chatInput{min-width:0;padding:9px!important}#chatSendBtn{border:0;border-radius:8px;padding:10px;background:var(--primary);color:white;cursor:pointer}.chat-message,.chat-system{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07);font-size:.84rem;line-height:1.4;overflow-wrap:anywhere}.chat-message strong{margin-inline-start:5px}.chat-system{background:rgba(99,102,241,.1);color:var(--text-dim);font-size:.78rem}
-    @media(max-width:640px){#tableArea{aspect-ratio:1.6/1;max-height:340px}.avatar-wrap{width:44px;height:44px}.avatar{width:42px;height:42px;font-size:1.35rem}.seat-ring{width:50px;height:50px}.seat-ring circle{stroke-dasharray:138;stroke-dashoffset:calc(138 * (1 - var(--ring,1)))}.seat-name{font-size:.65rem;max-width:72px}.chat-bubble{max-width:125px;font-size:.68rem}#chatPanel{top:auto;bottom:0;left:0;width:100%;max-width:none;height:55vh;transform:translateY(105%);border-radius:18px 18px 0 0}#chatPanel.open{transform:translateY(0)}}
+    #chatFab{position:fixed;left:20px;bottom:82px;z-index:1001;border:0;border-radius:50%;width:56px;height:56px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;font-size:1.4rem;box-shadow:0 6px 22px #0008;cursor:pointer}#chatBadge{position:absolute;top:-4px;right:-4px;background:var(--danger);border-radius:99px;min-width:20px;height:20px;padding:1px 5px;font-size:.75rem}#chatBadge:empty,#chatBadge[data-count="0"]{display:none}#chatPanel{position:fixed;left:0;top:0;bottom:0;width:320px;max-width:90vw;z-index:1002;display:flex;flex-direction:column;background:rgba(18,25,43,.97);border:1px solid var(--border);box-shadow:10px 0 35px #0007;backdrop-filter:blur(16px);transform:translateX(-105%);transition:transform .3s}#chatPanel.open{transform:translateX(0)}#chatPanel header,#chatPanel footer{padding:14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}#chatPanel header{justify-content:space-between}#chatPanel header button{background:none;color:white;border:0;font-size:1.2rem;cursor:pointer}#chatMessages{min-height:0;padding:12px;flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}#chatPanel footer{border-top:1px solid var(--border);border-bottom:0}#chatInput{min-width:0;padding:9px!important}#chatSendBtn{border:0;border-radius:8px;padding:10px;background:var(--primary);color:white;cursor:pointer}.chat-message,.chat-system{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.07);font-size:.84rem;line-height:1.4;overflow-wrap:anywhere}.chat-message strong{margin-inline-start:5px}.chat-system{background:rgba(99,102,241,.1);color:var(--text-dim);font-size:.78rem}
+    @media(max-width:640px){#tableArea{aspect-ratio:1.6/1;max-height:340px}.avatar-wrap{width:44px;height:44px}.avatar{width:42px;height:42px;font-size:1.35rem}.seat-ring{width:50px;height:50px}.seat-ring circle{stroke-dasharray:138;stroke-dashoffset:calc(138 * (1 - var(--ring,1)))}.seat-name{font-size:.65rem;max-width:72px}.chat-bubble{max-width:125px;font-size:.68rem}#chatPanel{top:auto;bottom:0;left:0;width:100%;max-width:none;height:55vh;height:55dvh;transform:translateY(105%);border-radius:18px 18px 0 0}#chatPanel.open{transform:translateY(0)}}
 
   
     .seat-ring circle{stroke-dasharray:176;stroke-dashoffset:calc(176 * (1 - var(--ring,1)))}
@@ -871,6 +871,8 @@
   let lastPhase = null;
   const bubbleTimers = new Map();
   const seenChatKeys = new Set();
+  let localChatLog = [];
+  let chatRenderedIds = new Set();
   const seatEls = new Map();
   const seatCoordinates = new Map();
   const activeBubbles = new Map();
@@ -1059,6 +1061,7 @@
       if (left <= 0) {
         updateCountdownRings(0);
         clearInterval(clockTimer);
+        clockTimer = null;
       }
     };
     
@@ -1220,23 +1223,21 @@
   }
 
   function processChatSnapshot(snapshot) {
-    const entries = Array.isArray(snapshot.chatLog) ? snapshot.chatLog : [];
-    const keys = entries.map((e, i) => `${e.at}|${e.playerId}|${i}|${e.text || ''}`);
-    if (!chatInitialized) {
-      keys.forEach(k => seenChatKeys.add(k));
-      lastChatKey = keys[keys.length - 1] || null;
-      chatInitialized = true;
-      return;
-    }
-    entries.forEach((entry, i) => {
-      const key = keys[i];
-      if (seenChatKeys.has(key)) return;
-      seenChatKeys.add(key); lastChatKey = key;
+    const entries = Array.isArray(snapshot?.chatLog) ? snapshot.chatLog : [];
+    entries.forEach(entry => {
+      const id = entry.id != null ? entry.id : `${entry.at}|${entry.playerId}|${entry.text}`;
+      if (chatRenderedIds.has(id)) return;
+      if (!localChatLog.some(item => item._id === id)) {
+        localChatLog.push({ ...entry, _id: id });
+      }
+      chatRenderedIds.add(id);
       showChatBubble(entry.playerId, entry.text);
-      appendChatMessage(entry);
-      if (!$('#chatPanel').classList.contains('open')) { unreadCount++; updateChatBadge(); }
+      appendChatMessageDOM(entry);
+      if (!$('#chatPanel').classList.contains('open')) {
+        unreadCount++;
+        updateChatBadge();
+      }
     });
-    if (seenChatKeys.size > 500) { seenChatKeys.clear(); keys.forEach(k => seenChatKeys.add(k)); }
   }
 
   function showChatBubble(id, text) {
@@ -1275,19 +1276,25 @@
     startFade();
   }
 
-  function appendChatMessage(entry) {
-    renderChatPanel();
+  function appendChatMessageDOM(entry) {
+    const box = $('#chatMessages');
+    if (!box) return;
+    const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+    const div = document.createElement('div');
+    div.className = 'chat-message';
+    div.innerHTML = `<strong>${esc(entry.name)}:</strong> ${esc(entry.text)}`;
+    box.appendChild(div);
+    if (nearBottom) box.scrollTop = box.scrollHeight;
   }
 
   function renderChatPanel() {
     const box = $('#chatMessages');
     if (!box || !state) return;
-    const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 50;
     const rows = [];
     (state.history || []).forEach(h => rows.push(`<div class="chat-system">⚙ ${esc(h.author)}: ${esc(h.text)}</div>`));
-    (state.chatLog || []).forEach(e => rows.push(`<div class="chat-message"><strong>${esc(e.name)}:</strong> ${esc(e.text)}</div>`));
+    localChatLog.forEach(e => rows.push(`<div class="chat-message"><strong>${esc(e.name)}:</strong> ${esc(e.text)}</div>`));
     box.innerHTML = rows.join('');
-    if (nearBottom) box.scrollTop = box.scrollHeight;
+    box.scrollTop = box.scrollHeight;
   }
 
   function updateChatBadge() {
@@ -1295,7 +1302,7 @@
   }
   function toggleChat(open) {
     $('#chatPanel').classList.toggle('open', open);
-    if (open) { unreadCount = 0; updateChatBadge(); requestAnimationFrame(() => { $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight; $('#chatInput').focus(); }); }
+    if (open) { renderChatPanel(); unreadCount = 0; updateChatBadge(); requestAnimationFrame(() => { $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight; $('#chatInput').focus(); }); }
   }
 
   function makeSeat(player) {
@@ -1426,7 +1433,7 @@
     clearSession();
     state=null; playerId=null; roomCode=null;
     lastChatKey=null;chatInitialized=false;unreadCount=0;lastPhase=null;
-    seenChatKeys.clear();updateChatBadge();
+    seenChatKeys.clear();localChatLog=[];chatRenderedIds.clear();updateChatBadge();
     for (const item of activeBubbles.values()) { clearTimeout(item.timer); item.element.remove(); }
     activeBubbles.clear();bubbleTimers.forEach(t=>clearTimeout(t));bubbleTimers.clear();
     $('#chatMessages').innerHTML='';$('#chatInput').value='';toggleChat(false);
