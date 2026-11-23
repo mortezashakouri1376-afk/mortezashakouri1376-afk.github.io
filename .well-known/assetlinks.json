@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.mortezashakouri1376_afk.twa",
+        "sha256_cert_fingerprints": ["B8:27:33:69:77:5D:B8:BB:B7:82:22:51:B3:30:A8:60:3D:AA:77:1C:CB:F8:9B:E8:D7:41:3B:E0:F8:B6:CE:54"]
+      }
+    }]
